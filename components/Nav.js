@@ -9,6 +9,7 @@ const LINKS = [
   { href: "/", label: "Home", ic: "🏠" },
   { href: "/plan", label: "Plan", ic: "💞" },
   { href: "/saved", label: "Saved", ic: "🔖" },
+  { href: "/rewards", label: "Rewards", ic: "🎟️" },
   { href: "/me", label: "Me", ic: "👤" },
 ];
 
@@ -16,8 +17,8 @@ export default function Nav() {
   const path = usePathname();
   const user = useUser();
   const links = [...LINKS];
-  if (user && (user.role === "owner" || user.role === "admin")) links.splice(3, 0, { href: "/dashboard", label: "Business", ic: "📊" });
-  if (user && user.role === "admin") links.splice(4, 0, { href: "/admin", label: "Admin", ic: "🛠️" });
+  if (user && (user.role === "owner" || user.role === "admin")) links.splice(4, 0, { href: "/dashboard", label: "Business", ic: "📊" });
+  if (user && user.role === "admin") links.splice(5, 0, { href: "/admin", label: "Admin", ic: "🛠️" });
   const on = (h) => (h === "/" ? path === "/" : path.startsWith(h));
   return (
     <>

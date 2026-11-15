@@ -90,6 +90,7 @@ export default function Me() {
           <button className="btn sm ghost" onClick={() => setEdit(true)}>Edit profile</button>
           {(user.role === "owner" || user.role === "admin") && <Link href="/dashboard" className="btn sm dark">Business dashboard</Link>}
           {user.role === "admin" && <Link href="/admin" className="btn sm dark">Admin</Link>}
+          <Link href="/rewards" className="btn sm dark">🎟️ My rewards</Link>
           <button className="btn sm danger" onClick={async () => { await db.signOut(); window.location.href = "/"; }}>Log out</button>
         </div>
       )}

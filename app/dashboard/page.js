@@ -4,7 +4,8 @@ import Link from "next/link";
 import { db } from "@/lib/data";
 import { useUser, goLogin } from "@/lib/hooks";
 import { MOODS } from "@/lib/seed";
-import { niceTime, nextDays, todayIso, bookingSlots, STATUS_LABEL } from "@/lib/utils";
+import { RewardsTab, ReviewsTab, FeaturePicker } from "@/components/OwnerExtras";
+import { niceTime, nextDays, todayIso, bookingSlots, STATUS_LABEL, parseMenu } from "@/lib/utils";
 
 const STATUS_BADGE = { confirmed: "", requested: "warn", declined: "red", cancelled: "grey", arrived: "book", no_show: "red" };
 
@@ -44,11 +45,13 @@ export default function Dashboard() {
       </div>
       <Stats spotId={spot.id} />
       <div className="tabs-in">
-        {[["bookings", "Bookings"], ["settings", "Booking settings"], ["page", "Edit page & menu"]].map(([k, l]) => (
+        {[["bookings", "Bookings"], ["rewards", "Rewards & QR"], ["reviews", "Reviews & tips"], ["settings", "Booking settings"], ["page", "Edit page & menu"]].map(([k, l]) => (
           <button key={k} className={tab === k ? "on" : ""} onClick={() => setTab(k)}>{l}</button>
         ))}
       </div>
       {tab === "bookings" && <Bookings spot={spot} />}
+      {tab === "rewards" && <RewardsTab spot={spot} onSaved={refresh} />}
+      {tab === "reviews" && <ReviewsTab spot={spot} />}
       {tab === "settings" && <Settings spot={spot} onSaved={refresh} />}
       {tab === "page" && <EditPage spot={spot} onSaved={refresh} />}
     </>
@@ -200,7 +203,7 @@ function EditPage({ spot, onSaved }) {
   const toggleMood = (m) => setF({ ...f, moods: f.moods.includes(m) ? f.moods.filter((x) => x !== m) : [...f.moods, m] });
   const save = async () => {
     const patch = { about: f.about, open_time: f.open_time, close_time: f.close_time, video_url: f.video_url, phone: f.phone,
-      whatsapp: f.whatsapp, price_min: f.price_min, price_max: f.price_max, moods: f.moods,
+      whatsapp: f.whatsapp, price_min: f.price_min, price_max: f.price_max, moods: f.moods, features: f.features || [],
       menu: menu.filter((m) => m.item), menu_updated_at: todayIso() };
     try { await db.updateSpot(spot.id, patch); onSaved(patch); setMsg("Saved ✓"); } catch (e) { setMsg(e.message); }
   };
@@ -220,11 +223,13 @@ function EditPage({ spot, onSaved }) {
       <div className="field"><span>Good for</span>
         <div className="row" style={{ gap: 6 }}>{MOODS.map((m) => <button key={m} className={"chip" + (f.moods.includes(m) ? " on" : "")} onClick={() => toggleMood(m)}>{m}</button>)}</div>
       </div>
+      <FeaturePicker value={f.features || []} onChange={(features) => setF({ ...f, features })} />
       <div className="field"><span>Menu & prices</span>
         {menu.map((m, i) => (
           <div key={i} className="row" style={{ marginBottom: 6, flexWrap: "nowrap" }}>
             <input className="input" value={m.item} onChange={(e) => setMenu(i, "item", e.target.value)} placeholder="Item" />
-            <input className="input" style={{ width: 110 }} type="number" value={m.price} onChange={(e) => setMenu(i, "price", e.target.value)} placeholder="LKR" />
+            <input className="input" style={{ width: 100 }} type="number" value={m.price} onChange={(e) => setMenu(i, "price", e.target.value)} placeholder="LKR" />
+            <input className="input" style={{ width: 150 }} value={(m.tags || []).join(", ")} onChange={(e) => setMenu(i, "tags", parseMenu("x|0|" + e.target.value)[0].tags || [])} placeholder="veg, spicy2, star" title="Labels: veg, vegan, halal, nuts, spicy1-3, star (signature)" />
             <button className="linkbtn" onClick={() => setF({ ...f, menu: menu.filter((_, j) => j !== i) })}>✕</button>
           </div>
         ))}

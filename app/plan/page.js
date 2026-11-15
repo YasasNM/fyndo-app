@@ -4,9 +4,10 @@ import Link from "next/link";
 import { db } from "@/lib/data";
 import { useSpots, useUser, goLogin } from "@/lib/hooks";
 import { VIBES, buildPlan } from "@/lib/planner";
+import { downloadIcs, atDateTime } from "@/lib/ics";
 import { AREAS } from "@/lib/seed";
 import { Thumb } from "@/components/SpotCard";
-import { lkr, niceTime, nextDays, shareNow, avgPrice } from "@/lib/utils";
+import { lkr, niceTime, nextDays, shareNow, avgPrice, whyThis } from "@/lib/utils";
 
 const TIMES = ["16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00"];
 
@@ -53,6 +54,15 @@ export default function PlanPage() {
     try { await navigator.clipboard.writeText(planLink()); setMsg("Plan link copied. Send it to your date!"); }
     catch { setMsg("Could not copy the link."); }
   };
+
+  const addToCalendar = () => {
+    const events = plan.stops.filter((x) => x.spot).map((x) => ({
+      title: `${x.label}: ${x.spot.name}`, start: atDateTime(f.date, x.time), minutes: 75,
+      location: `${x.spot.name}, ${x.spot.area}`, notes: "Planned with Fyndo",
+    }));
+    if (events.length) downloadIcs("fyndo-date-plan.ics", events);
+  };
+  const vibeMoods = (VIBES.find((v) => v.id === f.vibe) || { moods: [] }).moods;
 
   const save = async () => {
     if (!user) return goLogin();
@@ -154,6 +164,7 @@ export default function PlanPage() {
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <Link href={`/spot?id=${s.spot.id}`}><h3>{s.spot.name}</h3></Link>
                       <div className="small muted">{s.spot.area} · about {avgPrice(s.spot) ? lkr(avgPrice(s.spot) * 2) : "free"} for two</div>
+                      <div className="small why">{whyThis(s.spot, { moods: vibeMoods, budget: f.budget, area: f.area })}</div>
                       <div className="row" style={{ marginTop: 6, gap: 14 }}>
                         {s.alternatives > 0 && <button className="linkbtn" onClick={() => swap(i)}>↻ Swap</button>}
                         {s.spot.booking_enabled && (
@@ -176,6 +187,8 @@ export default function PlanPage() {
           <div className="row" style={{ marginTop: 14 }}>
             <button className="btn" onClick={share}>Share plan</button>
             <button className="btn ghost" onClick={copy}>🔗 Copy link</button>
+            <button className="btn ghost" onClick={addToCalendar}>📅 Add to calendar</button>
+            <Link className="btn ghost" href="/split">🧾 Split bill</Link>
             <button className="btn ghost" onClick={save}>Save plan</button>
             <button className="btn ghost" onClick={() => { setStep(0); setSkip({}); setMsg(""); }}>Start over</button>
           </div>

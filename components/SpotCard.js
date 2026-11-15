@@ -18,8 +18,9 @@ function nowHHMM() {
   return `${String(n.getHours()).padStart(2, "0")}:${String(n.getMinutes()).padStart(2, "0")}`;
 }
 
-// rating: { avg, count } (optional), distanceKm: number (optional)
-export default function SpotCard({ spot, rating, distanceKm }) {
+// rating: { avg, count } (optional), distanceKm: number (optional), why: string (optional)
+// pick: { on, toggle(id) } shows a small tick to select the card for Compare / Vote.
+export default function SpotCard({ spot, rating, distanceKm, why, pick }) {
   const open = isOpenAt(spot, nowHHMM());
   return (
     <Link href={`/spot?id=${spot.id}`} className="card spot-card">
@@ -29,6 +30,11 @@ export default function SpotCard({ spot, rating, distanceKm }) {
           {spot.hidden_gem && <span className="badge gem">Hidden gem</span>}
         </div>
         {spot.video_url && <div className="play">▶</div>}
+        {pick && (
+          <button type="button" className={"pickbtn" + (pick.on ? " on" : "")} aria-pressed={pick.on}
+            aria-label={pick.on ? `Remove ${spot.name} from selection` : `Select ${spot.name} to compare or vote`}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); pick.toggle(spot.id); }}>{pick.on ? "✓" : "+"}</button>
+        )}
       </Thumb>
       <div className="body">
         <h3>{spot.name}</h3>
@@ -41,6 +47,7 @@ export default function SpotCard({ spot, rating, distanceKm }) {
           <span className={open ? "open-now" : "closed-now"}>{open ? "● Open now" : "● Closed"}</span>
           {spot.booking_enabled && <span style={{ color: "var(--head)", fontWeight: 600 }}>📅 Bookable</span>}
         </div>
+        {why && <div className="small why">{why}</div>}
       </div>
     </Link>
   );

@@ -4,18 +4,90 @@ import Link from "next/link";
 import { db } from "@/lib/data";
 import { useUser, goLogin } from "@/lib/hooks";
 import { AREAS, CATEGORIES, MOODS } from "@/lib/seed";
-import { slug, todayIso } from "@/lib/utils";
+import { slug, todayIso, parseMenu, menuToText } from "@/lib/utils";
+import { FeaturePicker } from "@/components/OwnerExtras";
 import { googleSearch } from "@/lib/api";
 import OsmFinder from "@/components/OsmFinder";
 
 const BLANK = {
   id: "", name: "", area: AREAS[0], category: CATEGORIES[0], price_min: 1000, price_max: 2000, moods: [], about: "",
   google_place_id: "", video_url: "", menu: [], open_time: "10:00", close_time: "22:00", lat: "", lng: "", phone: "", whatsapp: "",
-  verified: false, hidden_gem: false, booking_enabled: false, booking_mode: "instant", tables_for_booking: 4,
+  features: [], stamp_goal: 6, stamp_reward: "", verified: false, hidden_gem: false, booking_enabled: false, booking_mode: "instant", tables_for_booking: 4,
   max_party: 6, slot_minutes: 30, booking_start: "18:00", booking_end: "21:30", cancel_hours: 2, color: "#FF8A1E",
 };
 
 const fromOsm = (r) => { const { address, ...rest } = r; return { ...BLANK, ...rest, area: r.area || BLANK.area, category: r.category || BLANK.category, phone: r.phone || "", about: r.about || "" }; };
+
+function Collections({ spots }) {
+  const [list, setList] = useState(null);
+  const [edit, setEdit] = useState(null);
+  const [err, setErr] = useState("");
+  const load = () => db.getCollections().then(setList);
+  useEffect(() => { load(); }, []);
+  const blank = { id: "", title: "", blurb: "", emoji: "✨", spot_ids: [], published: true, sort: 0 };
+  const save = async () => {
+    if (!edit.title.trim()) return setErr("Add a title.");
+    try { await db.saveCollection({ ...edit, id: edit.id || slug(edit.title) }); setEdit(null); setErr(""); load(); } catch (e) { setErr(e.message); }
+  };
+  const toggle = (id) => setEdit({ ...edit, spot_ids: edit.spot_ids.includes(id) ? edit.spot_ids.filter((x) => x !== id) : [...edit.spot_ids, id] });
+  if (!list) return <div className="loading">Loading...</div>;
+  if (edit) return (
+    <div className="card pad narrow" style={{ margin: 0 }}>
+      <div className="grid2">
+        <label className="field"><span>Title</span><input className="input" value={edit.title} onChange={(e) => setEdit({ ...edit, title: e.target.value })} placeholder="Best kottu in Colombo" /></label>
+        <label className="field"><span>Emoji</span><input className="input" value={edit.emoji} maxLength={4} onChange={(e) => setEdit({ ...edit, emoji: e.target.value })} /></label>
+      </div>
+      <label className="field"><span>Short note</span><input className="input" value={edit.blurb} onChange={(e) => setEdit({ ...edit, blurb: e.target.value })} /></label>
+      <div className="field"><span>Places in this list</span>
+        <div className="row" style={{ gap: 6 }}>{spots.map((s) => <button key={s.id} type="button" className={"chip" + (edit.spot_ids.includes(s.id) ? " on" : "")} onClick={() => toggle(s.id)}>{s.name}</button>)}</div></div>
+      <label className="row small"><input type="checkbox" checked={edit.published} onChange={(e) => setEdit({ ...edit, published: e.target.checked })} /> Show on the home page</label>
+      {err && <div className="alert">{err}</div>}
+      <div className="row" style={{ marginTop: 10 }}><button className="btn" onClick={save}>Save list</button><button className="btn ghost" onClick={() => { setEdit(null); setErr(""); }}>Cancel</button></div>
+    </div>
+  );
+  return (
+    <>
+      <div className="row between"><p className="small muted" style={{ margin: 0 }}>Curated lists show as rows on the home page. Run schema_v3.sql first.</p>
+        <button className="btn sm" onClick={() => setEdit({ ...blank })}>+ New list</button></div>
+      {err && <div className="alert">{err}</div>}
+      <div className="stack" style={{ marginTop: 10 }}>
+        {list.map((c) => (
+          <div key={c.id} className="card pad row between">
+            <span>{c.emoji} <b>{c.title}</b> <span className="small muted">· {c.spot_ids.length} places {c.published ? "" : "· hidden"}</span></span>
+            <span><button className="linkbtn" onClick={() => setEdit(c)}>Edit</button>{"  ·  "}
+              <button className="linkbtn" style={{ color: "var(--chili)" }} onClick={async () => { if (window.confirm("Delete this list?")) { await db.deleteCollection(c.id); load(); } }}>Delete</button></span>
+          </div>
+        ))}
+        {list.length === 0 && <div className="empty">No lists yet.</div>}
+      </div>
+    </>
+  );
+}
+
+function Reports({ spots }) {
+  const [list, setList] = useState(null);
+  const load = () => db.getReports().then(setList);
+  useEffect(() => { load(); }, []);
+  if (!list) return <div className="loading">Loading...</div>;
+  const name = (id) => (spots.find((s) => s.id === id) || {}).name || id;
+  const open = list.filter((r) => !r.resolved);
+  return (
+    <>
+      <p className="small muted" style={{ marginTop: 0 }}>{open.length} open report{open.length === 1 ? "" : "s"}. To remove a bad review, open the spot page as admin and tap Delete on it.</p>
+      <div className="stack">
+        {list.map((r) => (
+          <div key={r.id} className="card pad" style={{ opacity: r.resolved ? 0.55 : 1 }}>
+            <div className="row between"><b>{r.kind === "review" ? "Review" : "Spot"} report</b><span className="small muted">{new Date(r.created_at).toLocaleDateString()}</span></div>
+            <div className="small">“{r.reason}”</div>
+            <div className="small muted">Target: {r.kind === "spot" ? name(r.target) : r.target}</div>
+            {!r.resolved && <button className="btn sm ghost" style={{ marginTop: 6 }} onClick={async () => { await db.resolveReport(r.id); load(); }}>Mark resolved</button>}
+          </div>
+        ))}
+        {list.length === 0 && <div className="empty">No reports. 🎉</div>}
+      </div>
+    </>
+  );
+}
 
 export default function Admin() {
   const user = useUser();
@@ -24,6 +96,7 @@ export default function Admin() {
   const [q, setQ] = useState("");
   const [msg, setMsg] = useState("");
   const [finder, setFinder] = useState(false);
+  const [tab, setTab] = useState("spots");
   const load = () => db.getSpots().then(setSpots);
   useEffect(() => { if (user === null) goLogin(); if (user && user.role === "admin") load(); }, [user]);
 
@@ -44,8 +117,19 @@ export default function Admin() {
     try { await db.assignOwner(s.id, email); setMsg(`Owner set for ${s.name}.`); load(); } catch (e) { setMsg(e.message); }
   };
 
+  if (tab !== "spots") return (
+    <>
+      <h1>Admin</h1>
+      <div className="tabs-in">{[["spots", "Spots"], ["collections", "Lists"], ["reports", "Reports"]].map(([k, l]) => (
+        <button key={k} className={tab === k ? "on" : ""} onClick={() => setTab(k)}>{l}</button>))}</div>
+      {tab === "collections" ? <Collections spots={spots} /> : <Reports spots={spots} />}
+    </>
+  );
+
   return (
     <>
+      <div className="tabs-in" style={{ marginTop: 4 }}>{[["spots", "Spots"], ["collections", "Lists"], ["reports", "Reports"]].map(([k, l]) => (
+        <button key={k} className={tab === k ? "on" : ""} onClick={() => setTab(k)}>{l}</button>))}</div>
       <div className="row between"><h1>Admin · Spots ({spots.length})</h1>
         <div className="row"><button className="btn ghost" onClick={() => setFinder(!finder)}>🗺️ Find places (free)</button>
           <button className="btn" onClick={() => setEditing({ ...BLANK })}>+ Add spot</button></div></div>
@@ -93,9 +177,8 @@ function SpotForm({ initial, isNew, onDone }) {
   const set = (k, num) => (e) => setF({ ...f, [k]: num ? Number(e.target.value) : e.target.value });
   const chk = (k) => (e) => setF({ ...f, [k]: e.target.checked });
   const toggleMood = (m) => setF({ ...f, moods: f.moods.includes(m) ? f.moods.filter((x) => x !== m) : [...f.moods, m] });
-  const menuText = (f.menu || []).map((m) => `${m.item} | ${m.price}`).join("\n");
-  const setMenuText = (t) => setF({ ...f, menu: t.split("\n").map((l) => l.split("|")).filter((p) => p[0].trim())
-    .map((p) => ({ item: p[0].trim(), price: Number((p[1] || "0").replace(/[^0-9]/g, "")) })) });
+  const menuText = menuToText(f.menu);
+  const setMenuText = (t) => setF({ ...f, menu: parseMenu(t) });
 
   const save = async () => {
     setErr("");
@@ -151,12 +234,13 @@ function SpotForm({ initial, isNew, onDone }) {
           <label className="field"><span>WhatsApp (94771234567)</span><input className="input" value={f.whatsapp || ""} onChange={set("whatsapp")} /></label>
         </div>
         <p className="small muted" style={{ marginTop: -4 }}>Tip: "Find places (free)" fills the map position for you.</p>
+        <FeaturePicker value={f.features || []} onChange={(features) => setF({ ...f, features })} />
         <label className="field"><span>About</span><textarea className="input" rows={3} value={f.about} onChange={set("about")} /></label>
         <label className="field"><span>Video link (TikTok / Instagram / YouTube)</span><input className="input" value={f.video_url || ""} onChange={set("video_url")} /></label>
         <div className="field"><span>Moods</span>
           <div className="row" style={{ gap: 6 }}>{MOODS.map((m) => <button key={m} className={"chip" + (f.moods.includes(m) ? " on" : "")} onClick={() => toggleMood(m)}>{m}</button>)}</div></div>
-        <label className="field"><span>Menu (one per line: Item | Price)</span>
-          <textarea className="input" rows={4} defaultValue={menuText} onBlur={(e) => setMenuText(e.target.value)} placeholder={"Chicken kottu | 850\nIced Milo | 400"} /></label>
+        <label className="field"><span>Menu (one per line: Item | Price | labels). Labels: veg, vegan, halal, nuts, spicy1, spicy2, spicy3, star</span>
+          <textarea className="input" rows={4} defaultValue={menuText} onBlur={(e) => setMenuText(e.target.value)} placeholder={"Chicken kottu | 850 | spicy2, star\nVegetable kottu | 700 | veg\nIced Milo | 400"} /></label>
         <div className="row" style={{ gap: 18, marginBottom: 12 }}>
           <label className="row small"><input type="checkbox" checked={!!f.verified} onChange={chk("verified")} /> Verified</label>
           <label className="row small"><input type="checkbox" checked={!!f.hidden_gem} onChange={chk("hidden_gem")} /> Hidden gem</label>

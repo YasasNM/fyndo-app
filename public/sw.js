@@ -1,5 +1,5 @@
 // Fyndo service worker: makes the app installable and keeps working on weak connections.
-const CACHE = "fyndo-v2";
+const CACHE = "fyndo-v3";
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(["/", "/manifest.webmanifest", "/icons/icon-192.png"])));
   self.skipWaiting();

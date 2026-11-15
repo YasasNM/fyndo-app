@@ -8,9 +8,12 @@ import { useUser, goLogin } from "@/lib/hooks";
 import { Thumb } from "@/components/SpotCard";
 import { CONFIG } from "@/lib/config";
 import GooglePanel from "@/components/GooglePanel";
-import ReviewsPanel from "@/components/ReviewsPanel";
+import ReviewsPanel, { FeedbackBox } from "@/components/ReviewsPanel";
+import MenuPanel from "@/components/MenuPanel";
+import RewardsBox from "@/components/RewardsBox";
+import FeatureChips from "@/components/FeatureChips";
 import { RatingPill } from "@/components/Stars";
-import { embedUrl, lkr, mapsUrl, niceTime, priceLabel, waUrl, shareNow } from "@/lib/utils";
+import { embedUrl, mapsUrl, niceTime, priceLabel, waUrl, shareNow } from "@/lib/utils";
 
 const SpotMap = dynamic(() => import("@/components/SpotMap"), { ssr: false, loading: () => <div className="skel" style={{ height: 240, borderRadius: 16 }} /> });
 
@@ -98,18 +101,12 @@ function SpotPage() {
         </div>
         {msg && <div className={"alert" + (msg === "Link copied." ? " ok" : "")}>{msg}</div>}
 
-        {spot.menu && spot.menu.length > 0 && (
-          <>
-            <h2>Menu & prices</h2>
-            <div className="card pad">
-              {spot.menu.map((m, i) => (
-                <div key={i} className="menu-row"><span>{m.item}</span><b>{lkr(m.price)}</b></div>
-              ))}
-              {spot.menu_updated_at && <div className="small muted" style={{ marginTop: 8 }}>Prices checked on {spot.menu_updated_at}</div>}
-            </div>
-          </>
-        )}
-        <ReviewsPanel spotId={spot.id} user={user} />
+        <FeatureChips ids={spot.features} />
+        <MenuPanel spot={spot} />
+        <RewardsBox spot={spot} user={user} />
+        <ReviewsPanel spotId={spot.id} user={user} onChange={(l) => l.length && setRating({ avg: l.reduce((a, r) => a + r.rating, 0) / l.length, count: l.length })} />
+        <FeedbackBox spotId={spot.id} user={user} />
+        <p className="small muted" style={{ marginTop: 10 }}><Link className="linkbtn" href="/split">Split the bill with friends →</Link></p>
         <p className="small muted" style={{ marginTop: 16 }}>
           Wrong info? <a className="linkbtn" href={waUrl(CONFIG.whatsapp, `Hi Fyndo, the info for ${spot.name} needs an update: `)} target="_blank" rel="noreferrer">Tell us</a>
         </p>

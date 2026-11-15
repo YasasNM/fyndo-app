@@ -55,6 +55,7 @@ You'll do 6 parts. Take them in order. Each takes 5 to 15 minutes.
 1. **supabase.com** > New project. Name `fyndo`, region **Singapore**, strong password (save it).
 2. **SQL Editor** > New query > paste all of `supabase/schema.sql` > **Run**.
    (Already ran it before? Run it again. It safely adds the new Google column.)
+   **Then run `supabase/schema_v3.sql` the same way.** It adds QR check-ins and rewards, verified reviews, owner replies, private feedback, reports, collections and group votes. Safe to run again. Paste the file's contents, not its name.
 3. **Skip `seed.sql`** for real launch. You'll add real places from Google in Part 6.
 4. **Authentication > Sign In / Providers > Email**: turn off "Confirm email" for now.
 5. **Project Settings > API**: keep the **Project URL** and **anon public key** open in a tab.

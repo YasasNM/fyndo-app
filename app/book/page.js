@@ -5,6 +5,7 @@ import Link from "next/link";
 import { db } from "@/lib/data";
 import { useUser, goLogin } from "@/lib/hooks";
 import { Thumb } from "@/components/SpotCard";
+import { downloadIcs, atDateTime } from "@/lib/ics";
 import { bookingSlots, nextDays, niceTime, toMin, todayIso, shareWa, STATUS_LABEL } from "@/lib/utils";
 
 export default function BookPageWrapper() {
@@ -81,6 +82,8 @@ function BookPage() {
         <div className="row" style={{ justifyContent: "center" }}>
           <a className="btn" target="_blank" rel="noreferrer"
              href={shareWa(`Booked ${spot.name} on Fyndo for ${dl}, ${niceTime(done.time)} 💞 (Ref ${done.ref_code})`)}>Share with partner</a>
+          <button className="btn ghost" onClick={() => downloadIcs("fyndo-booking.ics", [{ title: `Table at ${spot.name}`, start: atDateTime(done.date, done.time),
+            minutes: 90, location: `${spot.name}, ${spot.area}`, notes: `Fyndo booking ref ${done.ref_code} for ${done.guests} guests` }])}>📅 Add to calendar</button>
           <Link href="/me" className="btn ghost">My bookings</Link>
         </div>
       </div>
