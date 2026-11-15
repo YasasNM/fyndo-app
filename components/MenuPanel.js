@@ -36,7 +36,7 @@ export default function MenuPanel({ spot }) {
               <span style={{ flex: 1, minWidth: 0 }}>
                 {m.item}
                 {(m.tags || []).filter((t) => t !== "star" && DISH_TAGS[t]).length > 0 && (
-                  <span className="small muted" style={{ display: "block" }}>{m.tags.filter((t) => t !== "star" && DISH_TAGS[t]).map((t) => DISH_TAGS[t]).join("  ")}</span>
+                  <span className="row" style={{ gap: 4, margin: "3px 0" }}>{m.tags.filter((t) => t !== "star" && DISH_TAGS[t]).map((t) => <span key={t} className="tag">{DISH_TAGS[t]}</span>)}</span>
                 )}
                 {note && <span className="small" style={{ display: "block", color: "var(--teal-2)" }}>{note}</span>}
               </span>

@@ -63,11 +63,12 @@ async function details(id, withReviews) {
     website: p.websiteUri || "",
     photo: null,
   };
-  const ph = (p.photos || [])[0];
-  if (ph) {
+  // Up to 6 photos. Only the names are sent; the browser asks for each image when it is shown.
+  out.photos = (p.photos || []).slice(0, 6).map((ph) => {
     const a = (ph.authorAttributions || [])[0] || {};
-    out.photo = { name: ph.name, author: a.displayName || "", authorUrl: a.uri || "", mapsUrl: ph.googleMapsUri || out.mapsUrl };
-  }
+    return { name: ph.name, author: a.displayName || "", authorUrl: a.uri || "", mapsUrl: ph.googleMapsUri || out.mapsUrl };
+  });
+  out.photo = out.photos[0] || null;
   if (withReviews) {
     out.reviews = (p.reviews || []).slice(0, 5).map((r) => ({
       rating: r.rating,

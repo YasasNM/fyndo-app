@@ -3,7 +3,7 @@ import { Ico } from "./Icon";
 import { useEffect, useMemo, useState } from "react";
 import { db } from "@/lib/data";
 import { goLogin } from "@/lib/hooks";
-import { REVIEW_TAGS } from "@/lib/features";
+import { REVIEW_TAGS, VISIT_TYPES, visitLabel } from "@/lib/features";
 import Stars from "@/components/Stars";
 
 function ago(iso) {
@@ -21,6 +21,7 @@ export default function ReviewsPanel({ spotId, user, onChange }) {
   const [body, setBody] = useState("");
   const [tags, setTags] = useState([]);
   const [again, setAgain] = useState(null);
+  const [visit, setVisit] = useState("");
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
   const [open, setOpen] = useState(false);
@@ -30,7 +31,7 @@ export default function ReviewsPanel({ spotId, user, onChange }) {
 
   const mine = user && list ? list.find((r) => r.user_id === user.id) : null;
   useEffect(() => {
-    if (mine) { setRating(mine.rating); setBody(mine.body || ""); setTags(mine.tags || []); setAgain(mine.would_return ?? null); }
+    if (mine) { setRating(mine.rating); setBody(mine.body || ""); setTags(mine.tags || []); setAgain(mine.would_return ?? null); setVisit(mine.visit_type || ""); }
   }, [mine && mine.id]); // eslint-disable-line
 
   const avg = list && list.length ? list.reduce((a, r) => a + r.rating, 0) / list.length : 0;
@@ -42,9 +43,12 @@ export default function ReviewsPanel({ spotId, user, onChange }) {
     const n = {};
     list.forEach((r) => (r.tags || []).forEach((t) => (n[t] = (n[t] || 0) + 1)));
     const top = Object.entries(n).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([t, c]) => `${tagLabel(t).toLowerCase()} (${c})`);
+    const vt = {};
+    list.forEach((r) => r.visit_type && (vt[r.visit_type] = (vt[r.visit_type] || 0) + 1));
+    const bestFor = Object.entries(vt).sort((a, b) => b[1] - a[1])[0];
     const asked = list.filter((r) => typeof r.would_return === "boolean");
     const yes = asked.filter((r) => r.would_return).length;
-    return [top.length && `People mention: ${top.join(", ")}.`, asked.length >= 2 && `${Math.round((yes / asked.length) * 100)}% would go again.`]
+    return [bestFor && bestFor[1] >= 2 && `Most often visited for: ${visitLabel(bestFor[0]).toLowerCase()} (${bestFor[1]}).`, top.length && `People mention: ${top.join(", ")}.`, asked.length >= 2 && `${Math.round((yes / asked.length) * 100)}% would go again.`]
       .filter(Boolean).join(" ");
   }, [list]);
 
@@ -56,7 +60,7 @@ export default function ReviewsPanel({ spotId, user, onChange }) {
     if (!rating) return setMsg("Tap the stars to rate first.");
     setBusy(true); setMsg("");
     try {
-      await db.saveReview(spotId, rating, body, { tags, would_return: again === null ? undefined : again });
+      await db.saveReview(spotId, rating, body, { tags, would_return: again === null ? undefined : again, visit_type: visit || undefined });
       await load(); setOpen(false); setMsg("Thanks! Your review is saved.");
     } catch (err) { setMsg(err.message); }
     setBusy(false);
@@ -101,6 +105,13 @@ export default function ReviewsPanel({ spotId, user, onChange }) {
               ))}
             </div>
           </div>
+          <div className="field"><span>Who did you go with?</span>
+            <div className="row" style={{ gap: 6 }}>
+              {VISIT_TYPES.map((v) => (
+                <button type="button" key={v.id} className={"chip" + (visit === v.id ? " on" : "")} aria-pressed={visit === v.id} onClick={() => setVisit(visit === v.id ? "" : v.id)}>{v.label}</button>
+              ))}
+            </div>
+          </div>
           <div className="field"><span>Would you go again?</span>
             <div className="seg">
               <button type="button" className={again === true ? "on" : ""} onClick={() => setAgain(again === true ? null : true)}><Ico n="thumbup" size={16} />Yes</button>
@@ -128,6 +139,7 @@ export default function ReviewsPanel({ spotId, user, onChange }) {
             <span className="row" style={{ gap: 8 }}>
               <b>{r.author}</b><Stars value={r.rating} size={14} />
               {r.visited && <span className="badge" title="This person checked in at this place">Visited</span>}
+              {r.visit_type && <span className="tag">{visitLabel(r.visit_type)}</span>}
             </span>
             <span className="small muted">{ago(r.created_at)}</span>
           </div>

@@ -155,6 +155,7 @@ end $$;
 -- ---------- REVIEWS: tags, "would go again", owner reply, visited badge ----------
 alter table public.reviews add column if not exists tags text[] not null default '{}' check (cardinality(tags) <= 6);
 alter table public.reviews add column if not exists would_return boolean;
+alter table public.reviews add column if not exists visit_type text check (visit_type is null or visit_type in ('date', 'friends', 'family', 'solo', 'quick'));
 alter table public.reviews add column if not exists owner_reply text check (owner_reply is null or char_length(owner_reply) <= 500);
 alter table public.reviews add column if not exists owner_reply_at timestamptz;
 
@@ -191,7 +192,8 @@ end $$;
 create or replace view public.reviews_public as
   select r.id, r.spot_id, r.user_id, r.author, r.rating, r.body, r.tags, r.would_return,
          r.owner_reply, r.owner_reply_at, r.created_at,
-         exists (select 1 from public.checkins c where c.user_id = r.user_id and c.spot_id = r.spot_id) as visited
+         exists (select 1 from public.checkins c where c.user_id = r.user_id and c.spot_id = r.spot_id) as visited,
+         r.visit_type
   from public.reviews r;
 grant select on public.reviews_public to anon, authenticated;
 

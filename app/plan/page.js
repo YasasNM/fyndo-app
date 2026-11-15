@@ -2,6 +2,7 @@
 import { Ico } from "@/components/Icon";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { db } from "@/lib/data";
 import { useSpots, useUser, goLogin } from "@/lib/hooks";
 import { VIBES, buildPlan } from "@/lib/planner";
@@ -10,6 +11,7 @@ import { AREAS } from "@/lib/seed";
 import { Thumb } from "@/components/SpotCard";
 import { lkr, niceTime, nextDays, shareNow, avgPrice, whyThis } from "@/lib/utils";
 
+const RouteMap = dynamic(() => import("@/components/RouteMap"), { ssr: false, loading: () => <div className="skel" style={{ height: 260, borderRadius: 16, marginTop: 14 }} /> });
 const VIBE_ICON = { romantic: "heart", fun: "group", outdoor: "sun", chill: "cup" };
 const TIMES = ["16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00"];
 
@@ -183,7 +185,11 @@ export default function PlanPage() {
               </div>
             ))}
           </div>
-          <div className="total"><span>Estimated total for two</span><span>{lkr(plan.total)}</span></div>
+          {(() => {
+            const mapStops = plan.stops.filter((x) => x.spot && x.spot.lat != null && x.spot.lng != null).map((x) => x.spot);
+            return mapStops.length >= 2 ? <RouteMap stops={mapStops} /> : null;
+          })()}
+          <div className="total" style={{ marginTop: 14 }}><span>Estimated total for two</span><span>{lkr(plan.total)}</span></div>
           {plan.total > f.budget && <p className="small muted">A bit over your budget. Swap a stop to bring it down.</p>}
           {msg && <div className={"alert" + (/^(Plan saved|Plan link)/.test(msg) ? " ok" : "")}>{msg}</div>}
           <div className="row" style={{ marginTop: 14 }}>

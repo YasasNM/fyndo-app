@@ -98,7 +98,14 @@ Azure portal > your Static Web App > **Settings > Environment variables** > add 
 | `AZURE_OPENAI_API_KEY` | Part 5b below |
 | `AZURE_OPENAI_DEPLOYMENT` | Part 5b below (the deployment name, e.g. `gpt-4o-mini`) |
 
+| `GEMINI_API_KEY` | **Free AI option.** Get a key at aistudio.google.com (no card). Use it instead of Azure OpenAI. Optional `GEMINI_MODEL` if you want a different model (default `gemini-2.5-flash`). |
+
+You only need **one** AI option (Gemini or Azure OpenAI). If both are set, Gemini is used first and Azure is the backup.
+The free Gemini tier may use what people type to improve Google's products. Fyndo only sends the search sentence, never names or emails.
+
 These keys stay on the server. They are never sent to people's browsers.
+
+**Key safety:** never paste a key into code, GitHub or a chat. If one is exposed, open Google Cloud > Credentials, delete it and make a new one. For the Google key Fyndo uses, set **API restrictions** to *Places API (New)* only and cap the daily quota. Don't use an "HTTP referrer" restriction on it, because the key is used by the server, not the browser.
 
 ### 5a. Google Maps key
 1. **console.cloud.google.com** > create a project `fyndo`.

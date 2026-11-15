@@ -2,6 +2,7 @@
 import { Ico } from "./Icon";
 import { useEffect, useState } from "react";
 import { googlePlace, photoSrc } from "@/lib/api";
+import PhotoGallery from "./PhotoGallery";
 
 // Live info from Google for a spot that has a google_place_id.
 // Follows Google's display rules: "Google Maps" attribution, photo and review authors credited,
@@ -30,7 +31,9 @@ export default function GooglePanel({ placeId, onInfo }) {
 
   return (
     <div className="card gpanel">
-      {g.photo && (
+      {g.photos && g.photos.length > 0 ? (
+        <PhotoGallery photos={g.photos} placeName={g.name || "this place"} />
+      ) : g.photo && (
         <a href={g.photo.mapsUrl} target="_blank" rel="noreferrer" className="gphoto">
           <img src={photoSrc(g.photo.name, 900)} alt={`Photo of ${g.name}`} loading="lazy" />
           {g.photo.author && <span className="gcredit">Photo: {g.photo.author}</span>}

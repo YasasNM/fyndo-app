@@ -1,5 +1,5 @@
 // POST /api/ask  { "q": "anniversary dinner under 6000 near colombo 7, veg" }
-// Azure OpenAI turns the sentence into search filters. It never picks or invents places:
+// An AI model (Gemini or Azure OpenAI) turns the sentence into search filters. It never picks or invents places:
 // the app then matches the filters against real Fyndo spots.
 const { json, rateLimited, clean } = require("../shared/util");
 const { MOODS, CATEGORIES, AREAS, VIBES } = require("../shared/constants");
@@ -46,31 +46,58 @@ function sanitize(o) {
   };
 }
 
-module.exports = async function (context, req) {
+// Two AI options, use whichever you have a key for:
+//  - Google Gemini (free tier from Google AI Studio, no card): set GEMINI_API_KEY (optional GEMINI_MODEL)
+//  - Azure OpenAI: set AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY, AZURE_OPENAI_DEPLOYMENT
+// Only the user's sentence is sent. No names, emails or other personal data.
+async function askGemini(q, log) {
+  const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY },
+    body: JSON.stringify({
+      systemInstruction: { parts: [{ text: SYSTEM }] },
+      contents: [{ role: "user", parts: [{ text: q }] }],
+      generationConfig: { responseMimeType: "application/json", temperature: 0.2 },
+    }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) { log && log.error && log.error("Gemini error", res.status, data && data.error && data.error.message); return null; }
+  const parts = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts;
+  return (parts && parts.map((p) => p.text || "").join("")) || "";
+}
+
+async function askAzure(q, log) {
   const endpoint = (process.env.AZURE_OPENAI_ENDPOINT || "").replace(/\/+$/, "");
-  const apiKey = process.env.AZURE_OPENAI_API_KEY;
-  const deployment = process.env.AZURE_OPENAI_DEPLOYMENT;
   const apiVersion = process.env.AZURE_OPENAI_API_VERSION || "2024-10-21";
+  const res = await fetch(`${endpoint}/openai/deployments/${encodeURIComponent(process.env.AZURE_OPENAI_DEPLOYMENT)}/chat/completions?api-version=${apiVersion}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "api-key": process.env.AZURE_OPENAI_API_KEY },
+    body: JSON.stringify({
+      messages: [{ role: "system", content: SYSTEM }, { role: "user", content: q }],
+      response_format: { type: "json_object" },
+    }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) { log && log.error && log.error("Azure OpenAI error", res.status, data && data.error); return null; }
+  return (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || "";
+}
+
+module.exports = async function (context, req) {
+  const hasGemini = Boolean(process.env.GEMINI_API_KEY);
+  const hasAzure = Boolean(process.env.AZURE_OPENAI_ENDPOINT && process.env.AZURE_OPENAI_API_KEY && process.env.AZURE_OPENAI_DEPLOYMENT);
   try {
     const q = clean(req.body && req.body.q, 300);
     if (q.length < 3) return (context.res = json(400, { error: "Tell me a bit more." }));
-    if (!endpoint || !apiKey || !deployment) return (context.res = json(503, { error: "AI is not set up yet." }));
+    if (!hasGemini && !hasAzure) return (context.res = json(503, { error: "AI is not set up yet." }));
     if (rateLimited(req, "ask", 30)) return (context.res = json(429, { error: "You've asked a lot! Try again in a bit." }));
 
-    const res = await fetch(`${endpoint}/openai/deployments/${encodeURIComponent(deployment)}/chat/completions?api-version=${apiVersion}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "api-key": apiKey },
-      body: JSON.stringify({
-        messages: [{ role: "system", content: SYSTEM }, { role: "user", content: q }],
-        response_format: { type: "json_object" },
-      }),
-    });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      context.log && context.log.error && context.log.error("Azure OpenAI error", res.status, data && data.error);
-      return (context.res = json(502, { error: "AI is busy right now." }));
-    }
-    const text = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+    const log = context.log;
+    let text = hasGemini ? await askGemini(q, log) : await askAzure(q, log);
+    // If Gemini is busy and Azure is also set up, try Azure before giving up.
+    if (text === null && hasGemini && hasAzure) text = await askAzure(q, log);
+    if (text === null) return (context.res = json(502, { error: "AI is busy right now." }));
+
     let parsed = {};
     try { parsed = JSON.parse(text || "{}"); } catch { parsed = {}; }
     context.res = json(200, sanitize(parsed));
