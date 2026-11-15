@@ -22,15 +22,25 @@ function rateLimited(req, key, maxPerHour) {
 }
 
 // Checks the logged-in user is an admin, using their Supabase login token.
+// The token comes in X-Fyndo-Token (Azure can replace the standard Authorization header) or Authorization.
 async function requireAdmin(req) {
-  const url = process.env.SUPABASE_URL;
-  const anon = process.env.SUPABASE_ANON_KEY;
+  const url = String(process.env.SUPABASE_URL || "").trim().replace(/\/+$/, "");
+  const anon = String(process.env.SUPABASE_ANON_KEY || "").trim();
   if (!url || !anon) return { ok: false, status: 503, error: "Connect Supabase first (SUPABASE_URL and SUPABASE_ANON_KEY settings)." };
-  const auth = (req.headers && req.headers["authorization"]) || "";
-  if (!auth.startsWith("Bearer ")) return { ok: false, status: 401, error: "Please log in as admin." };
+  const h = req.headers || {};
+  const custom = String(h["x-fyndo-token"] || "").trim();
+  const auth = custom ? "Bearer " + custom : String(h["authorization"] || "");
+  if (!auth.startsWith("Bearer ") || auth.length < 20) return { ok: false, status: 401, error: "Please log in as admin." };
   const headers = { apikey: anon, Authorization: auth };
-  const u = await fetch(`${url}/auth/v1/user`, { headers });
-  if (!u.ok) return { ok: false, status: 401, error: "Login expired. Please log in again." };
+  let u;
+  try { u = await fetch(`${url}/auth/v1/user`, { headers }); }
+  catch { return { ok: false, status: 502, error: "Could not reach Supabase. Check the SUPABASE_URL setting for typos." }; }
+  if (!u.ok) {
+    const body = await u.json().catch(() => ({}));
+    const why = String(body.msg || body.message || body.error_description || body.error || "").slice(0, 120);
+    const hint = u.status === 401 && /api key/i.test(why) ? " The SUPABASE_ANON_KEY setting looks wrong." : u.status === 404 ? " The SUPABASE_URL setting looks wrong." : " Log out and log in again.";
+    return { ok: false, status: 401, error: `Supabase did not accept the login (${u.status}${why ? ": " + why : ""}).${hint}` };
+  }
   const user = await u.json();
   const p = await fetch(`${url}/rest/v1/profiles?id=eq.${encodeURIComponent(user.id)}&select=role`, { headers });
   const rows = p.ok ? await p.json() : [];
