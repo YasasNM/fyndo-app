@@ -1,5 +1,6 @@
 "use client";
 import { Suspense, useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { db } from "@/lib/data";
@@ -10,6 +11,8 @@ import GooglePanel from "@/components/GooglePanel";
 import ReviewsPanel from "@/components/ReviewsPanel";
 import { RatingPill } from "@/components/Stars";
 import { embedUrl, lkr, mapsUrl, niceTime, priceLabel, waUrl, shareNow } from "@/lib/utils";
+
+const SpotMap = dynamic(() => import("@/components/SpotMap"), { ssr: false, loading: () => <div className="skel" style={{ height: 240, borderRadius: 16 }} /> });
 
 export default function SpotPageWrapper() {
   return <Suspense fallback={<div className="loading">Loading...</div>}><SpotPage /></Suspense>;
@@ -51,6 +54,15 @@ function SpotPage() {
           <div className="video"><iframe src={embed} allow="autoplay; encrypted-media; fullscreen" allowFullScreen title="Video review" /></div>
         ) : (
           <Thumb spot={spot} className="video empty"><div className="small" style={{ marginTop: 6, opacity: 0.85 }}>Video coming soon</div></Thumb>
+        )}
+        {spot.lat != null && spot.lng != null && (
+          <div style={{ marginTop: 14 }}>
+            <SpotMap spots={[spot]} single height={240} />
+            <div className="row small" style={{ marginTop: 6 }}>
+              <a className="linkbtn" href={`https://www.google.com/maps/dir/?api=1&destination=${spot.lat},${spot.lng}`} target="_blank" rel="noreferrer">Directions (Google Maps)</a>
+              <a className="linkbtn" href={`https://www.openstreetmap.org/?mlat=${spot.lat}&mlon=${spot.lng}#map=17/${spot.lat}/${spot.lng}`} target="_blank" rel="noreferrer">OpenStreetMap</a>
+            </div>
+          </div>
         )}
         {spot.google_place_id && <GooglePanel placeId={spot.google_place_id} onInfo={setGInfo} />}
       </div>

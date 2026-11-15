@@ -1,11 +1,14 @@
 "use client";
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import SpotCard, { SkeletonGrid } from "@/components/SpotCard";
 import AskFyndo from "@/components/AskFyndo";
 import { useSpots, useRatings, usePopular, useLocation } from "@/lib/hooks";
 import { MOODS, CATEGORIES, AREAS } from "@/lib/seed";
 import { avgPrice, isOpenAt, km } from "@/lib/utils";
+
+const SpotMap = dynamic(() => import("@/components/SpotMap"), { ssr: false, loading: () => <div className="skel" style={{ height: 420, borderRadius: 16 }} /> });
 
 const BUDGETS = [
   { id: "", label: "Any budget" },
@@ -35,6 +38,7 @@ export default function Home() {
   const [openNow, setOpenNow] = useState(false);
   const [bookable, setBookable] = useState(false);
   const [sort, setSort] = useState("best");
+  const [view, setView] = useState("list");
 
   const chooseSort = (v) => { setSort(v); if (v === "near" && !loc.pos) loc.ask(); };
   const dist = (s) => (loc.pos && s.lat != null && s.lng != null ? km(loc.pos, { lat: s.lat, lng: s.lng }) : null);
@@ -113,6 +117,10 @@ export default function Home() {
         <button className={"chip" + (openNow ? " on" : "")} onClick={() => setOpenNow(!openNow)}>Open now</button>
         <button className={"chip" + (bookable ? " on" : "")} onClick={() => setBookable(!bookable)}>Can book</button>
         {filtering && <button className="linkbtn" onClick={clear}>Clear all</button>}
+        <span className="seg" style={{ marginLeft: "auto" }}>
+          <button className={view === "list" ? "on" : ""} onClick={() => setView("list")}>☰ List</button>
+          <button className={view === "map" ? "on" : ""} onClick={() => { setView("map"); if (!loc.pos && loc.status === "") loc.ask(); }}>🗺️ Map</button>
+        </span>
       </div>
       {sort === "near" && loc.status === "asking" && <p className="small muted">Finding your location...</p>}
       {sort === "near" && loc.status === "denied" && (
@@ -122,7 +130,14 @@ export default function Home() {
         <p className="small muted">Spots without a map position are listed last.</p>
       )}
 
-      {!filtering && (
+      {view === "map" && spots && (
+        <div style={{ marginTop: 12 }}>
+          <SpotMap spots={filtered} me={loc.pos} height={460} />
+          <p className="small muted">{filtered.filter((s) => s.lat != null).length} of {filtered.length} spots have a map position. Tap a pin to open it.</p>
+        </div>
+      )}
+
+      {view === "list" && !filtering && (
         <div className="hero-plan">
           <div>
             <h2>💞 Plan a date in 60 seconds</h2>
@@ -135,7 +150,7 @@ export default function Home() {
       {error && <div className="alert">Could not load places: {error}</div>}
       {!spots && !error && <SkeletonGrid />}
 
-      {spots && !filtering && (
+      {spots && !filtering && view === "list" && (
         <>
           {popular.length > 0 && (<><h2>🔥 Popular right now</h2><div className="hscroll">{popular.map(card)}</div></>)}
           {topRated.length > 0 && (<><h2>⭐ Top rated by Fyndo users</h2><div className="hscroll">{topRated.map(card)}</div></>)}
@@ -143,8 +158,8 @@ export default function Home() {
           <h2>All spots</h2>
         </>
       )}
-      {spots && filtering && <h2>{filtered.length} {filtered.length === 1 ? "spot" : "spots"} found</h2>}
-      {spots && (
+      {spots && view === "list" && filtering && <h2>{filtered.length} {filtered.length === 1 ? "spot" : "spots"} found</h2>}
+      {spots && view === "list" && (
         filtered.length ? <div className="grid">{filtered.map(card)}</div>
           : (
             <div className="empty">

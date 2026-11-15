@@ -238,3 +238,11 @@ textarea.input { resize: vertical; }
   .stars, .stars button { color: #3b4a49; }
   .stars .on, .stars button.on { color: #f5a623; }
 }
+
+/* map + list toggle */
+.spotmap { width: 100%; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); z-index: 0; }
+.fy-pin div { width: 34px; height: 34px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center;
+  justify-content: center; border: 2.5px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,.35); }
+.seg { display: inline-flex; border: 1.5px solid var(--line); border-radius: 999px; overflow: hidden; background: var(--card); }
+.seg button { border: 0; background: none; padding: 7px 13px; cursor: pointer; font-weight: 600; font-size: 13.5px; color: var(--muted); }
+.seg button.on { background: var(--teal); color: #fff; }
