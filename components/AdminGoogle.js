@@ -76,7 +76,7 @@ export function GoogleLinker({ spots, onDone }) {
   const cancel = useRef(false);
 
   const start = async () => {
-    const batch = todo.slice(0, 25);
+    const batch = todo.slice(0, 10);
     if (!batch.length) return;
     if (!window.confirm(`This will make ${batch.length} Google searches (one per place). Google gives a free monthly allowance, so a small batch is normally free. Continue?`)) return;
     cancel.current = false; setErr(""); setRows([]); setDone(0); setState("working");
@@ -92,7 +92,7 @@ export function GoogleLinker({ spots, onDone }) {
       } catch (e) {
         setErr(e.message);
         out.push({ spot: s, hit: null, score: 0, pick: false });
-        if (/not set up|key|403|permission|API|denied|log in|expired|Admins/i.test(e.message)) break; // same error would repeat
+        if (/not set up|key|403|permission|API|denied|log in|expired|Admins|limit|quota|not turned on|restricted/i.test(e.message)) break; // same error would repeat
       }
       setRows([...out]); setDone(out.length);
       await new Promise((r) => setTimeout(r, 350));
@@ -120,8 +120,8 @@ export function GoogleLinker({ spots, onDone }) {
         Finds the matching Google listing for each place that has none, so spot pages can show Google photos, ratings and opening hours.
         You check every match before it is saved. Made-up sample places will not match, which is fine.
       </p>
-      {state === "idle" && <button className="btn sm" onClick={start}>Find matches for {Math.min(todo.length, 25)} place{Math.min(todo.length, 25) === 1 ? "" : "s"}</button>}
-      {state === "working" && <div className="row"><span className="small">Searching Google ({done} of {Math.min(todo.length, 25)})...</span><button className="linkbtn" onClick={() => (cancel.current = true)}>Stop</button></div>}
+      {state === "idle" && <button className="btn sm" onClick={start}>Find matches for {Math.min(todo.length, 10)} place{Math.min(todo.length, 10) === 1 ? "" : "s"}</button>}
+      {state === "working" && <div className="row"><span className="small">Searching Google ({done} of {Math.min(todo.length, 10)})...</span><button className="linkbtn" onClick={() => (cancel.current = true)}>Stop</button></div>}
       {err && <div className="alert" style={{ marginTop: 8 }}>{err}</div>}
       {rows && rows.length > 0 && (
         <div className="stack" style={{ marginTop: 10 }}>

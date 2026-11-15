@@ -10,6 +10,19 @@ function key() {
   return k;
 }
 
+// Turns Google's long error text into something an admin can act on.
+function friendly(raw, status) {
+  if (status === 429 || /quota/i.test(raw)) {
+    if (/per day/i.test(raw)) return "Google's daily search limit for this project is used up. Raise the daily Text Search limit in Google Cloud (APIs & Services, Places API (New), Quotas), or try again tomorrow.";
+    if (/per minute|per second/i.test(raw)) return "Too many Google searches at once. Wait a minute and try again.";
+    return "Google's search limit for this project has been reached. Check Quotas for Places API (New) in Google Cloud.";
+  }
+  if (/api key not valid|API_KEY_INVALID/i.test(raw)) return "Google rejected the key. Check the GOOGLE_MAPS_API_KEY setting in Azure.";
+  if (/has not been used|is disabled|SERVICE_DISABLED/i.test(raw)) return "Places API (New) is not turned on for this Google project. Enable it in Google Cloud, then try again.";
+  if (/referer|referrer|IP address/i.test(raw)) return "This Google key is restricted to websites or IP addresses, so the server cannot use it. Create a key with only an API restriction.";
+  return raw;
+}
+
 async function call(path, { method = "GET", fieldMask, body } = {}) {
   const res = await fetch(BASE + path, {
     method,
@@ -18,8 +31,10 @@ async function call(path, { method = "GET", fieldMask, body } = {}) {
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    const e = new Error((data.error && data.error.message) || "Google request failed");
-    e.status = res.status === 429 ? 429 : 502;
+    const raw = (data.error && data.error.message) || "Google request failed";
+    const e = new Error(friendly(raw, res.status));
+    e.status = res.status === 429 || /quota/i.test(raw) ? 429 : 502;
+    e.quota = e.status === 429;
     throw e;
   }
   return data;
