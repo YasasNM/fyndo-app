@@ -266,3 +266,56 @@ create policy "bookings update" on public.bookings for update using (
 grant execute on function public.slot_counts(text, date) to anon, authenticated;
 grant execute on function public.spot_stats(text) to authenticated;
 grant execute on function public.assign_owner(text, text) to authenticated;
+
+-- =====================================================================
+-- V2: REVIEWS, RATINGS, POPULAR (safe to run again)
+-- =====================================================================
+create table if not exists public.reviews (
+  id uuid primary key default gen_random_uuid(),
+  spot_id text not null references public.spots(id) on delete cascade,
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  author text not null default 'Fyndo user',
+  rating int not null check (rating between 1 and 5),
+  body text not null default '' check (char_length(body) <= 600),
+  created_at timestamptz default now(),
+  unique (spot_id, user_id)
+);
+
+-- The reviewer's display name always comes from their profile (first name only), never from the app.
+create or replace function public.set_review_author() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  new.author := coalesce(
+    nullif(split_part((select name from public.profiles where id = new.user_id), ' ', 1), ''), 'Fyndo user');
+  return new;
+end $$;
+drop trigger if exists set_review_author on public.reviews;
+create trigger set_review_author before insert or update on public.reviews
+  for each row execute function public.set_review_author();
+
+alter table public.reviews enable row level security;
+drop policy if exists "reviews read" on public.reviews;
+create policy "reviews read" on public.reviews for select using (true);
+drop policy if exists "reviews insert" on public.reviews;
+create policy "reviews insert" on public.reviews for insert with check (user_id = auth.uid());
+drop policy if exists "reviews update" on public.reviews;
+create policy "reviews update" on public.reviews for update using (user_id = auth.uid()) with check (user_id = auth.uid());
+drop policy if exists "reviews delete" on public.reviews;
+create policy "reviews delete" on public.reviews for delete using (user_id = auth.uid() or public.is_admin());
+
+grant select on public.reviews to anon, authenticated;
+grant insert, update, delete on public.reviews to authenticated;
+
+-- Average rating per spot (public).
+create or replace view public.spot_ratings with (security_invoker = true) as
+  select spot_id, round(avg(rating)::numeric, 1)::float as avg, count(*)::int as count
+  from public.reviews group by spot_id;
+grant select on public.spot_ratings to anon, authenticated;
+
+-- Most saved spots (counts only, no personal info).
+create or replace function public.popular_spots(p_limit int default 8)
+returns table (spot_id text, saves int)
+language sql stable security definer set search_path = public as $$
+  select spot_id, count(*)::int from public.saves group by spot_id order by 2 desc limit p_limit;
+$$;
+grant execute on function public.popular_spots(int) to anon, authenticated;

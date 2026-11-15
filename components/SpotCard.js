@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { priceLabel } from "@/lib/utils";
+import { priceLabel, isOpenAt } from "@/lib/utils";
+import { RatingPill } from "@/components/Stars";
 
 export const CAT_EMOJI = { Restaurant: "🍛", "Café": "☕", "Street Food": "🔥", Dessert: "🍨", Activity: "🌅" };
 
@@ -12,7 +13,14 @@ export function Thumb({ spot, className = "thumb", children }) {
   );
 }
 
-export default function SpotCard({ spot }) {
+function nowHHMM() {
+  const n = new Date();
+  return `${String(n.getHours()).padStart(2, "0")}:${String(n.getMinutes()).padStart(2, "0")}`;
+}
+
+// rating: { avg, count } (optional), distanceKm: number (optional)
+export default function SpotCard({ spot, rating, distanceKm }) {
+  const open = isOpenAt(spot, nowHHMM());
   return (
     <Link href={`/spot?id=${spot.id}`} className="card spot-card">
       <Thumb spot={spot}>
@@ -24,10 +32,26 @@ export default function SpotCard({ spot }) {
       </Thumb>
       <div className="body">
         <h3>{spot.name}</h3>
-        <div className="small muted">{spot.area} · {spot.category}</div>
-        <div className="small" style={{ marginTop: 4 }}>{priceLabel(spot)}</div>
-        {spot.booking_enabled && <div className="small" style={{ color: "var(--teal)", fontWeight: 600, marginTop: 2 }}>📅 Book a table</div>}
+        <div className="small muted">{spot.area} · {spot.category}{distanceKm != null && <> · {distanceKm < 10 ? distanceKm.toFixed(1) : Math.round(distanceKm)} km</>}</div>
+        <div className="row small" style={{ marginTop: 4, gap: 8 }}>
+          <span>{priceLabel(spot)}</span>
+          <RatingPill rating={rating} />
+        </div>
+        <div className="row small" style={{ marginTop: 2, gap: 10 }}>
+          <span className={open ? "open-now" : "closed-now"}>{open ? "● Open now" : "● Closed"}</span>
+          {spot.booking_enabled && <span style={{ color: "var(--head)", fontWeight: 600 }}>📅 Bookable</span>}
+        </div>
       </div>
     </Link>
+  );
+}
+
+export function SkeletonGrid({ n = 6 }) {
+  return (
+    <div className="grid">
+      {Array.from({ length: n }).map((_, i) => (
+        <div key={i} className="card skel-card"><div className="skel thumb-skel" /><div className="body"><div className="skel line" style={{ width: "70%" }} /><div className="skel line" style={{ width: "45%" }} /></div></div>
+      ))}
+    </div>
   );
 }

@@ -6,7 +6,7 @@ import { useSpots, useUser, goLogin } from "@/lib/hooks";
 import { VIBES, buildPlan } from "@/lib/planner";
 import { AREAS } from "@/lib/seed";
 import { Thumb } from "@/components/SpotCard";
-import { lkr, niceTime, nextDays, shareWa, avgPrice } from "@/lib/utils";
+import { lkr, niceTime, nextDays, shareNow, avgPrice } from "@/lib/utils";
 
 const TIMES = ["16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00"];
 
@@ -40,6 +40,19 @@ export default function PlanPage() {
     `Our Fyndo date plan for ${dateLabel} 💞\n` +
     plan.stops.filter((s) => s.spot).map((s) => `${niceTime(s.time)}  ${s.label}: ${s.spot.name} (${s.spot.area})`).join("\n") +
     `\nAbout ${lkr(plan.total)} for two.`;
+
+  // A link that rebuilds this same plan for whoever opens it.
+  const planLink = () => {
+    const p = new URLSearchParams({ vibe: f.vibe, budget: String(f.budget), start: f.start, date: f.date });
+    if (f.area) p.set("area", f.area);
+    if (f.veg) p.set("veg", "1");
+    return `${window.location.origin}/plan/?${p}`;
+  };
+  const share = async () => { await shareNow({ title: "Our Fyndo date plan", text: shareText(), url: planLink() }); };
+  const copy = async () => {
+    try { await navigator.clipboard.writeText(planLink()); setMsg("Plan link copied. Send it to your date!"); }
+    catch { setMsg("Could not copy the link."); }
+  };
 
   const save = async () => {
     if (!user) return goLogin();
@@ -159,9 +172,10 @@ export default function PlanPage() {
           </div>
           <div className="total"><span>Estimated total for two</span><span>{lkr(plan.total)}</span></div>
           {plan.total > f.budget && <p className="small muted">A bit over your budget. Swap a stop to bring it down.</p>}
-          {msg && <div className={"alert" + (msg.startsWith("Plan saved") ? " ok" : "")}>{msg}</div>}
+          {msg && <div className={"alert" + (/^(Plan saved|Plan link)/.test(msg) ? " ok" : "")}>{msg}</div>}
           <div className="row" style={{ marginTop: 14 }}>
-            <a className="btn" href={shareWa(shareText())} target="_blank" rel="noreferrer">Share on WhatsApp</a>
+            <button className="btn" onClick={share}>Share plan</button>
+            <button className="btn ghost" onClick={copy}>🔗 Copy link</button>
             <button className="btn ghost" onClick={save}>Save plan</button>
             <button className="btn ghost" onClick={() => { setStep(0); setSkip({}); setMsg(""); }}>Start over</button>
           </div>

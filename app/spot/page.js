@@ -7,7 +7,9 @@ import { useUser, goLogin } from "@/lib/hooks";
 import { Thumb } from "@/components/SpotCard";
 import { CONFIG } from "@/lib/config";
 import GooglePanel from "@/components/GooglePanel";
-import { embedUrl, lkr, mapsUrl, niceTime, priceLabel, waUrl, shareWa } from "@/lib/utils";
+import ReviewsPanel from "@/components/ReviewsPanel";
+import { RatingPill } from "@/components/Stars";
+import { embedUrl, lkr, mapsUrl, niceTime, priceLabel, waUrl, shareNow } from "@/lib/utils";
 
 export default function SpotPageWrapper() {
   return <Suspense fallback={<div className="loading">Loading...</div>}><SpotPage /></Suspense>;
@@ -20,8 +22,10 @@ function SpotPage() {
   const [saved, setSaved] = useState(false);
   const [msg, setMsg] = useState("");
   const [gInfo, setGInfo] = useState(null);
+  const [rating, setRating] = useState(null);
 
   useEffect(() => { db.getSpot(id).then(setSpot).catch(() => setSpot(null)); }, [id]);
+  useEffect(() => { db.getRatings().then((r) => setRating(r[id] || null)).catch(() => {}); }, [id]);
   useEffect(() => { if (user) db.getSaves().then((l) => setSaved(l.includes(id))); }, [user, id]);
 
   if (spot === undefined) return <div className="loading">Loading...</div>;
@@ -32,7 +36,13 @@ function SpotPage() {
     if (!user) return goLogin();
     try { setSaved(await db.toggleSave(spot.id)); } catch (e) { setMsg(e.message); }
   };
-  const shareText = `Check out ${spot.name} (${spot.area}) on Fyndo: ${typeof window !== "undefined" ? window.location.href : ""}`;
+  const share = async () => {
+    const r = await shareNow({ title: `${spot.name} on Fyndo`, text: `Check out ${spot.name} (${spot.area}) on Fyndo:`, url: window.location.href });
+    if (r === "shared") setMsg("");
+  };
+  const copyLink = async () => {
+    try { await navigator.clipboard.writeText(window.location.href); setMsg("Link copied."); } catch { setMsg("Could not copy. Copy the address bar instead."); }
+  };
 
   return (
     <div className="two" style={{ marginTop: 16 }}>
@@ -51,6 +61,7 @@ function SpotPage() {
           {spot.verified && <span className="badge">Verified</span>}
           {spot.hidden_gem && <span className="badge gem">Hidden gem</span>}
           {spot.booking_enabled && <span className="badge book">Booking on</span>}
+          <RatingPill rating={rating} />
         </div>
         <p className="muted" style={{ margin: "8px 0" }}>
           {spot.area} · {spot.category} · {priceLabel(spot)}<br />
@@ -70,9 +81,10 @@ function SpotPage() {
           )}
           <a className="btn ghost" href={(gInfo && gInfo.mapsUrl) || mapsUrl(spot)} target="_blank" rel="noreferrer">Map</a>
           <button className="btn ghost" onClick={toggle}>{saved ? "★ Saved" : "☆ Save"}</button>
-          <a className="btn ghost" href={shareWa(shareText)} target="_blank" rel="noreferrer">Share</a>
+          <button className="btn ghost" onClick={share}>Share</button>
+          <button className="btn ghost" onClick={copyLink} aria-label="Copy link">🔗</button>
         </div>
-        {msg && <div className="alert">{msg}</div>}
+        {msg && <div className={"alert" + (msg === "Link copied." ? " ok" : "")}>{msg}</div>}
 
         {spot.menu && spot.menu.length > 0 && (
           <>
@@ -85,6 +97,7 @@ function SpotPage() {
             </div>
           </>
         )}
+        <ReviewsPanel spotId={spot.id} user={user} />
         <p className="small muted" style={{ marginTop: 16 }}>
           Wrong info? <a className="linkbtn" href={waUrl(CONFIG.whatsapp, `Hi Fyndo, the info for ${spot.name} needs an update: `)} target="_blank" rel="noreferrer">Tell us</a>
         </p>
