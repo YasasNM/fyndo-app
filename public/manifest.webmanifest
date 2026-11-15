@@ -1,0 +1,14 @@
+{
+  "name": "Fyndo · Find the real spots",
+  "short_name": "Fyndo",
+  "description": "Find great places and plan dates in Sri Lanka.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFAF4",
+  "theme_color": "#0E3B3B",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
