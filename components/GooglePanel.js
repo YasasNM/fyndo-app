@@ -7,21 +7,25 @@ import PhotoGallery from "./PhotoGallery";
 // Live info from Google for a spot that has a google_place_id.
 // Follows Google's display rules: "Google Maps" attribution, photo and review authors credited,
 // links back to Google Maps, review order notice.
-export default function GooglePanel({ placeId, onInfo }) {
+export default function GooglePanel({ placeId, onInfo, admin }) {
   const [g, setG] = useState(undefined);
   const [reviews, setReviews] = useState(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [showHours, setShowHours] = useState(false);
+  const [loadErr, setLoadErr] = useState("");
 
   useEffect(() => {
     let on = true;
-    googlePlace(placeId).then((d) => { if (on) { setG(d); onInfo && onInfo(d); } }).catch(() => on && setG(null));
+    googlePlace(placeId).then((d) => { if (on) { setG(d); onInfo && onInfo(d); } }).catch((e) => { if (on) { setG(null); setLoadErr(e.message); } });
     return () => { on = false; };
   }, [placeId]); // eslint-disable-line
 
   if (g === undefined) return <div className="card pad small muted gpanel">Loading info from Google Maps...</div>;
-  if (g === null) return null; // Google not set up or not reachable: just hide the panel
+  if (g === null) {
+    // Visitors just don't see the panel. Admins see why, so setup problems are easy to find.
+    return admin ? <div className="alert gpanel">Google info is hidden: {loadErr || "no reply from the server"}. Open Admin and look at the Setup check.</div> : null;
+  }
 
   const loadReviews = async () => {
     setBusy(true); setErr("");

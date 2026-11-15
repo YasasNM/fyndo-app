@@ -7,6 +7,7 @@ import { useUser, goLogin } from "@/lib/hooks";
 import { AREAS, CATEGORIES, MOODS } from "@/lib/seed";
 import { slug, todayIso, parseMenu, menuToText } from "@/lib/utils";
 import { FeaturePicker } from "@/components/OwnerExtras";
+import { SetupCheck, GoogleLinker } from "@/components/AdminGoogle";
 import { googleSearch } from "@/lib/api";
 import OsmFinder from "@/components/OsmFinder";
 
@@ -97,6 +98,7 @@ export default function Admin() {
   const [q, setQ] = useState("");
   const [msg, setMsg] = useState("");
   const [finder, setFinder] = useState(false);
+  const [linker, setLinker] = useState(false);
   const [tab, setTab] = useState("spots");
   const load = () => db.getSpots().then(setSpots);
   useEffect(() => { if (user === null) goLogin(); if (user && user.role === "admin") load(); }, [user]);
@@ -132,8 +134,11 @@ export default function Admin() {
       <div className="tabs-in" style={{ marginTop: 4 }}>{[["spots", "Spots"], ["collections", "Lists"], ["reports", "Reports"]].map(([k, l]) => (
         <button key={k} className={tab === k ? "on" : ""} onClick={() => setTab(k)}>{l}</button>))}</div>
       <div className="row between"><h1>Spots ({spots.length})</h1>
-        <div className="row"><button className="btn ghost" onClick={() => setFinder(!finder)}><Ico n="map" size={16} />Find places (free)</button>
+        <div className="row"><button className="btn ghost" onClick={() => setLinker(!linker)}><Ico n="link" size={16} />Link to Google</button>
+          <button className="btn ghost" onClick={() => setFinder(!finder)}><Ico n="map" size={16} />Find places (free)</button>
           <button className="btn" onClick={() => setEditing({ ...BLANK })}>+ Add spot</button></div></div>
+      <SetupCheck spots={spots} />
+      {linker && <GoogleLinker spots={spots} onDone={(m) => { setMsg(m); setLinker(false); load(); }} />}
       {finder && <OsmFinder existing={spots.map((x) => x.name)} onPick={(r) => setEditing(fromOsm(r))} />}
       <p className="muted small" style={{ marginTop: 0 }}>Add places you have visited and checked. Mark them Verified once the menu and prices are confirmed.</p>
       {msg && <div className="alert ok">{msg}</div>}
@@ -147,7 +152,8 @@ export default function Admin() {
                 <td><Link className="linkbtn" href={`/spot?id=${s.id}`}>{s.name}</Link></td>
                 <td>{s.area}</td><td>{s.category}</td>
                 <td>{s.verified ? <span className="badge">Verified</span> : <span className="badge grey">Unverified</span>}{" "}
-                    {s.booking_enabled && <span className="badge book">Booking</span>}</td>
+                    {s.booking_enabled && <span className="badge book">Booking</span>}{" "}
+                    {s.google_place_id ? <span className="badge book">Google</span> : <span className="badge grey">No Google</span>}</td>
                 <td className="small">{s.owner_id ? "Claimed" : <button className="linkbtn" onClick={() => owner(s)}>Set owner</button>}</td>
                 <td style={{ whiteSpace: "nowrap" }}>
                   <button className="linkbtn" onClick={() => setEditing(s)}>Edit</button>{"  ·  "}

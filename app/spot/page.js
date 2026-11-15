@@ -59,7 +59,13 @@ function SpotPage() {
         ) : (
           <Thumb spot={spot} className="video empty"><div className="small" style={{ marginTop: 10, position: "relative", zIndex: 1, color: "#fff", fontWeight: 600 }}>Video coming soon</div></Thumb>
         )}
-        {spot.google_place_id && <GooglePanel placeId={spot.google_place_id} onInfo={setGInfo} />}
+        {spot.google_place_id && <GooglePanel placeId={spot.google_place_id} onInfo={setGInfo} admin={Boolean(user && user.role === "admin")} />}
+        {!spot.google_place_id && user && user.role === "admin" && (
+          <div className="card pad small" style={{ marginTop: 14 }}>
+            <b>Admin note:</b> this place is not linked to Google, so there are no Google photos, ratings or hours here.{" "}
+            <Link className="linkbtn" href="/admin">Link it in Admin</Link>
+          </div>
+        )}
       </div>
       <div>
         <Link href="/" className="small muted">All spots</Link>
