@@ -1,4 +1,5 @@
 "use client";
+import { Ico } from "@/components/Icon";
 import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { CONFIG } from "@/lib/config";
@@ -45,7 +46,7 @@ function Split() {
   const toggleWho = (i, w) => { const it = items[i]; setItem(i, { who: it.who.includes(w) ? it.who.filter((x) => x !== w) : [...it.who, w] }); };
 
   const message = () =>
-    `Bill split${note ? " for " + note : ""} 🍽️\n` + people.map((p, i) => `${p}: ${lkr(rounded[i])}`).join("\n") +
+    `Bill split${note ? " for " + note : ""}\n` + people.map((p, i) => `${p}: ${lkr(rounded[i])}`).join("\n") +
     `\nTotal: ${lkr(Math.round(mode === "equal" ? Number(total) || 0 : sum))} (shares rounded up to the next LKR 10)`;
 
   return (
@@ -63,7 +64,7 @@ function Split() {
         {people.map((p, i) => (
           <div key={i} className="row" style={{ flexWrap: "nowrap", marginBottom: 6 }}>
             <input className="input" value={p} maxLength={20} onChange={(e) => setName(i, e.target.value)} aria-label={`Person ${i + 1}`} />
-            {n > 2 && <button className="linkbtn" onClick={() => removePerson(i)} aria-label="Remove person">✕</button>}
+            {n > 2 && <button className="linkbtn" onClick={() => removePerson(i)} aria-label="Remove person"><Ico n="close" size={16} /></button>}
           </div>
         ))}
         {n < 12 && <button className="btn sm ghost" onClick={addPerson}>+ Add person</button>}
@@ -79,7 +80,7 @@ function Split() {
               <div className="row" style={{ flexWrap: "nowrap" }}>
                 <input className="input" value={it.name} onChange={(e) => setItem(i, { name: e.target.value })} placeholder="Dish" />
                 <input className="input" style={{ width: 110 }} type="number" min="0" value={it.price} onChange={(e) => setItem(i, { price: e.target.value })} placeholder="LKR" />
-                {items.length > 1 && <button className="linkbtn" onClick={() => setItems(items.filter((_, k) => k !== i))} aria-label="Remove dish">✕</button>}
+                {items.length > 1 && <button className="linkbtn" onClick={() => setItems(items.filter((_, k) => k !== i))} aria-label="Remove dish"><Ico n="close" size={16} /></button>}
               </div>
               <div className="row small" style={{ gap: 6, marginTop: 6 }}>
                 <span className="muted">Shared by:</span>

@@ -1,4 +1,5 @@
 "use client";
+import { Ico } from "@/components/Icon";
 import { useState } from "react";
 import Link from "next/link";
 import { db } from "@/lib/data";
@@ -25,7 +26,7 @@ export default function Watch() {
       <p className="muted" style={{ marginTop: 0 }}>See how places really look. Tap to play.</p>
       {error && <div className="alert">{error}</div>}
       {!spots && !error && <div className="loading">Loading...</div>}
-      {spots && withVideo.length === 0 && <div className="empty"><div className="big">🎬</div>No videos yet. Admins can add a TikTok, Reel or YouTube link to any place.</div>}
+      {spots && withVideo.length === 0 && <div className="empty"><div className="big"><Ico n="film" size={30} /></div>No videos yet. Admins can add a TikTok, Reel or YouTube link to any place.</div>}
       <div className="reel-feed">
         {withVideo.map((s) => (
           <section key={s.id} className="reel">
@@ -33,13 +34,13 @@ export default function Watch() {
               <div className="video"><iframe src={embedUrl(s.video_url)} allow="autoplay; encrypted-media; fullscreen" allowFullScreen title={`Video of ${s.name}`} /></div>
             ) : (
               <button className="reel-thumb" onClick={() => setPlaying(s.id)} aria-label={`Play video of ${s.name}`}>
-                <Thumb spot={s} className="video empty"><div className="playbig">▶</div></Thumb>
+                <Thumb spot={s} className="video empty"><div className="playbig"><Ico n="play" size={26} /></div></Thumb>
               </button>
             )}
             <div className="row between" style={{ marginTop: 8 }}>
-              <div><b>{s.name}</b><div className="small muted">{s.area} · {s.category} · {priceLabel(s)}</div></div>
+              <div><h3>{s.name}</h3><div className="card-meta"><span className="meta"><Ico n="pin" size={14} />{s.area}</span><span className="tag">{s.category}</span><span className="small">{priceLabel(s)}</span></div></div>
               <div className="row">
-                <button className="btn sm ghost" onClick={() => save(s)}>{saved[s.id] ? "★ Saved" : "☆ Save"}</button>
+                <button className="btn sm ghost" onClick={() => save(s)}><Ico n="bookmark" size={16} style={saved[s.id] ? { fill: "currentColor" } : undefined} />{saved[s.id] ? "Saved" : "Save"}</button>
                 <Link className="btn sm" href={`/spot?id=${s.id}`}>Open</Link>
               </div>
             </div>

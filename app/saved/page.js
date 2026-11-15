@@ -1,4 +1,5 @@
 "use client";
+import { Ico } from "@/components/Icon";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { db } from "@/lib/data";
@@ -17,7 +18,7 @@ export default function Saved() {
 
   if (user === undefined) return <div className="loading">Loading...</div>;
   if (!user) return (
-    <div className="empty"><div className="big">🔖</div>Log in to save spots and date plans.<br /><br />
+    <div className="empty"><div className="big"><Ico n="bookmark" size={30} /></div>Log in to save spots and date plans.<br /><br />
       <Link href="/login?next=/saved" className="btn">Log in</Link></div>
   );
 
@@ -32,7 +33,7 @@ export default function Saved() {
         <button className={tab === "plans" ? "on" : ""} onClick={() => setTab("plans")}>Date plans ({plans.length})</button>
       </div>
       {tab === "spots" && (mine.length ? <div className="grid">{mine.map((s) => <SpotCard key={s.id} spot={s} />)}</div>
-        : <div className="empty"><div className="big">☆</div>No saved spots yet. Tap Save on any spot.</div>)}
+        : <div className="empty"><div className="big"><Ico n="bookmark" size={30} /></div>No saved spots yet. Tap Save on any spot.</div>)}
       {tab === "plans" && (plans.length ? (
         <div className="stack">
           {plans.map((p) => (
@@ -40,7 +41,7 @@ export default function Saved() {
               <div className="row between"><h3>{p.title}</h3><span className="small muted">{lkr(p.data.total)} for two</span></div>
               {p.data.stops.filter((s) => s.spot).map((s, i) => (
                 <div key={i} className="small" style={{ marginTop: 4 }}>
-                  {niceTime(s.time)} · {s.label}: <Link className="linkbtn" href={`/spot?id=${s.spot.id}`}>{s.spot.name}</Link>
+                  {niceTime(s.time)} {s.label}: <Link className="linkbtn" href={`/spot?id=${s.spot.id}`}>{s.spot.name}</Link>
                 </div>
               ))}
               <div className="row" style={{ marginTop: 10 }}>
@@ -51,7 +52,7 @@ export default function Saved() {
             </div>
           ))}
         </div>
-      ) : <div className="empty"><div className="big">💞</div>No saved plans. <Link className="linkbtn" href="/plan">Plan a date</Link></div>)}
+      ) : <div className="empty"><div className="big"><Ico n="heart" size={30} /></div>No saved plans. <Link className="linkbtn" href="/plan">Plan a date</Link></div>)}
     </>
   );
 }

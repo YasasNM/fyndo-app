@@ -1,4 +1,5 @@
 "use client";
+import { Ico } from "./Icon";
 import { useEffect, useMemo, useState } from "react";
 import QRCode from "qrcode";
 import { db } from "@/lib/data";
@@ -31,7 +32,7 @@ export function RewardsTab({ spot, onSaved }) {
   };
   const save = async () => {
     const patch = { stamp_goal: Math.max(2, Math.min(20, Number(goal) || 6)), stamp_reward: reward.trim().slice(0, 80) };
-    try { await db.updateSpot(spot.id, patch); onSaved(patch); setMsg("Saved ✓"); } catch (e) { setErr(e.message); }
+    try { await db.updateSpot(spot.id, patch); onSaved(patch); setMsg("Saved"); } catch (e) { setErr(e.message); }
   };
 
   return (
@@ -48,7 +49,7 @@ export function RewardsTab({ spot, onSaved }) {
           <div className="small muted">fyndo · Find the real spots</div>
         </div>
         <div className="row noprint" style={{ marginTop: 10 }}>
-          <button className="btn sm" onClick={() => window.print()} disabled={!qr}>🖨️ Print poster</button>
+          <button className="btn sm" onClick={() => window.print()} disabled={!qr}><Ico n="print" size={16} />Print poster</button>
           <button className="btn sm ghost" onClick={() => navigator.clipboard && navigator.clipboard.writeText(url).then(() => setMsg("Link copied."))}>Copy link</button>
           <button className="btn sm danger" onClick={rotate}>New code</button>
         </div>
@@ -132,7 +133,7 @@ export function ReviewsTab({ spot }) {
   return (
     <>
       {err && <div className="alert">{err}</div>}
-      <h2 style={{ marginTop: 0 }}>💡 Your weekly tips</h2>
+      <h2 style={{ marginTop: 0 }}>Your weekly tips</h2>
       <div className="card pad">
         {tips.length ? <ul style={{ margin: 0, paddingLeft: 18 }}>{tips.map((x, i) => <li key={i} style={{ margin: "6px 0" }}>{x}</li>)}</ul>
           : <span className="muted">Nothing to fix right now. Keep collecting reviews and check-ins and tips will appear here.</span>}

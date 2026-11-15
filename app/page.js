@@ -10,6 +10,7 @@ import { useWeather } from "@/lib/weather";
 import { MOODS, CATEGORIES, AREAS } from "@/lib/seed";
 import { FEATURES, OCCASIONS } from "@/lib/features";
 import { avgPrice, isOpenAt, km, whyThis } from "@/lib/utils";
+import { Ico } from "@/components/Icon";
 
 const SpotMap = dynamic(() => import("@/components/SpotMap"), { ssr: false, loading: () => <div className="skel" style={{ height: 420, borderRadius: 16 }} /> });
 
@@ -93,6 +94,7 @@ export default function Home() {
     return by ? [...list].sort(by) : list;
   }, [spots, ratings, q, mood, occ, needs, indoor, cat, area, budget, openNow, bookable, sort, loc.pos]); // eslint-disable-line
 
+  const activeFilters = [q, area, budget, cat].filter(Boolean).length + (sort !== "best" ? 1 : 0) + needs.length;
   const filtering = q || mood || occasion || needs.length || indoor || cat || area || budget || openNow || bookable || sort !== "best";
   const clear = () => { setQ(""); setMood(""); setOccasion(""); setNeeds([]); setIndoor(false); setCat(""); setArea(""); setBudget(""); setOpenNow(false); setBookable(false); setSort("best"); };
 
@@ -114,7 +116,7 @@ export default function Home() {
     setBusy(true);
     try {
       const options = picked.map((id) => spots.find((s) => s.id === id)).filter(Boolean)
-        .map((s) => ({ id: s.id, name: s.name, area: s.area, price: ratings[s.id] ? `★ ${ratings[s.id].avg.toFixed(1)}` : "" }));
+        .map((s) => ({ id: s.id, name: s.name, area: s.area, price: ratings[s.id] ? `Rated ${ratings[s.id].avg.toFixed(1)}` : "" }));
       const pid = await db.createPoll(title, options);
       window.location.href = `/vote/?id=${pid}`;
     } catch (e) { window.alert(e.message); }
@@ -124,67 +126,71 @@ export default function Home() {
   return (
     <>
       <h1>Find the real spots.</h1>
-      <p className="muted" style={{ marginTop: 0 }}>Real videos, real prices, and a full date plan in one minute.</p>
+      <p className="lede">See how a place really looks, what it really costs, and plan the whole night in a minute.</p>
 
       <AskFyndo spots={spots} />
 
       {rainy && (
         <div className="card pad rainbar">
-          <span>🌧️ {weather.raining ? "It is raining in Colombo." : `Rain likely soon (${weather.chance}%).`} Want cozy indoor picks?</span>
-          <button className={"chip" + (indoor ? " on" : "")} onClick={() => setIndoor(!indoor)}>{indoor ? "Indoor only ✓" : "Show indoor"}</button>
+          <span className="row" style={{ gap: 8 }}><Ico n="rain" size={20} />{weather.raining ? "It is raining in Colombo." : `Rain likely soon (${weather.chance}%).`} Want cozy indoor picks?</span>
+          <button className={"chip" + (indoor ? " on" : "")} onClick={() => setIndoor(!indoor)} aria-pressed={indoor}>{indoor ? "Indoor only" : "Show indoor"}</button>
         </div>
       )}
 
-      <div className="search" style={{ marginTop: 12 }}>
-        <span className="ic">🔍</span>
-        <input className="input" type="search" placeholder="Or search by name: kottu, rooftop, tea..." value={q} onChange={(e) => setQ(e.target.value)} />
-      </div>
-
-      <h2 style={{ marginTop: 16 }}>What's the occasion?</h2>
+      <h2 className="rowlabel">What are you celebrating?</h2>
       <div className="chips">
         {OCCASIONS.map((o) => (
-          <button key={o.id} className={"chip" + (occasion === o.id ? " on" : "")} onClick={() => setOccasion(occasion === o.id ? "" : o.id)}>{o.emoji} {o.label}</button>
+          <button key={o.id} className={"chip" + (occasion === o.id ? " on" : "")} aria-pressed={occasion === o.id} onClick={() => setOccasion(occasion === o.id ? "" : o.id)}>{o.label}</button>
         ))}
       </div>
 
-      <h2 style={{ marginTop: 10 }}>What's the mood?</h2>
+      <h2 className="rowlabel">Pick a mood</h2>
       <div className="chips">
         {MOODS.map((m) => (
-          <button key={m} className={"chip" + (mood === m ? " on" : "")} onClick={() => setMood(mood === m ? "" : m)}>{m}</button>
+          <button key={m} className={"chip" + (mood === m ? " on" : "")} aria-pressed={mood === m} onClick={() => setMood(mood === m ? "" : m)}>{m}</button>
         ))}
       </div>
 
-      <div className="row" style={{ marginTop: 6 }}>
-        <select className="input" style={{ width: "auto" }} value={area} onChange={(e) => setArea(e.target.value)} aria-label="Area">
-          <option value="">All areas</option>
-          {AREAS.map((a) => <option key={a}>{a}</option>)}
-        </select>
-        <select className="input" style={{ width: "auto" }} value={budget} onChange={(e) => setBudget(e.target.value)} aria-label="Budget">
-          {BUDGETS.map((b) => <option key={b.id} value={b.id}>{b.label}</option>)}
-        </select>
-        <select className="input" style={{ width: "auto" }} value={cat} onChange={(e) => setCat(e.target.value)} aria-label="Type">
-          <option value="">All types</option>
-          {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
-        </select>
-        <select className="input" style={{ width: "auto" }} value={sort} onChange={(e) => chooseSort(e.target.value)} aria-label="Sort by">
-          {SORTS.map((s) => <option key={s.id} value={s.id}>{s.id === "best" ? "Sort: Best match" : s.label}</option>)}
-        </select>
-        <button className={"chip" + (openNow ? " on" : "")} onClick={() => setOpenNow(!openNow)}>Open now</button>
-        <button className={"chip" + (bookable ? " on" : "")} onClick={() => setBookable(!bookable)}>Can book</button>
-        <button className={"chip" + (needs.length || showNeeds ? " on" : "")} onClick={() => setShowNeeds(!showNeeds)}>
-          Facilities{needs.length ? ` (${needs.length})` : ""}
+      <div className="filters">
+        <button className={"chip" + (showNeeds || activeFilters ? " on" : "")} aria-expanded={showNeeds} onClick={() => setShowNeeds(!showNeeds)}>
+          <Ico n="sliders" size={16} />Filters{activeFilters ? ` (${activeFilters})` : ""}
         </button>
+        <button className={"chip" + (openNow ? " on" : "")} aria-pressed={openNow} onClick={() => setOpenNow(!openNow)}>Open now</button>
+        <button className={"chip" + (bookable ? " on" : "")} aria-pressed={bookable} onClick={() => setBookable(!bookable)}>Can book</button>
         {filtering && <button className="linkbtn" onClick={clear}>Clear all</button>}
         <span className="seg" style={{ marginLeft: "auto" }}>
-          <button className={view === "list" ? "on" : ""} onClick={() => setView("list")}>☰ List</button>
-          <button className={view === "map" ? "on" : ""} onClick={() => { setView("map"); if (!loc.pos && loc.status === "") loc.ask(); }}>🗺️ Map</button>
+          <button className={view === "list" ? "on" : ""} aria-pressed={view === "list"} onClick={() => setView("list")}><Ico n="list" size={16} />List</button>
+          <button className={view === "map" ? "on" : ""} aria-pressed={view === "map"} onClick={() => { setView("map"); if (!loc.pos && loc.status === "") loc.ask(); }}><Ico n="map" size={16} />Map</button>
         </span>
       </div>
       {showNeeds && (
-        <div className="chips" style={{ flexWrap: "wrap", overflow: "visible", marginTop: 8 }}>
-          {FEATURES.map((f) => (
-            <button key={f.id} className={"chip" + (needs.includes(f.id) ? " on" : "")} onClick={() => toggleNeed(f.id)}>{f.emoji} {f.label}</button>
-          ))}
+        <div className="card pad fpanel">
+          <div className="search">
+            <span className="ic"><Ico n="search" size={18} /></span>
+            <input className="input" type="search" aria-label="Search by name or dish" placeholder="Search by name or dish: kottu, rooftop, tea" value={q} onChange={(e) => setQ(e.target.value)} />
+          </div>
+          <div className="grid2" style={{ marginTop: 10 }}>
+            <select className="input" value={area} onChange={(e) => setArea(e.target.value)} aria-label="Area">
+              <option value="">All areas</option>
+              {AREAS.map((a) => <option key={a}>{a}</option>)}
+            </select>
+            <select className="input" value={budget} onChange={(e) => setBudget(e.target.value)} aria-label="Budget">
+              {BUDGETS.map((b) => <option key={b.id} value={b.id}>{b.label}</option>)}
+            </select>
+            <select className="input" value={cat} onChange={(e) => setCat(e.target.value)} aria-label="Type">
+              <option value="">All types</option>
+              {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
+            </select>
+            <select className="input" value={sort} onChange={(e) => chooseSort(e.target.value)} aria-label="Sort by">
+              {SORTS.map((s) => <option key={s.id} value={s.id}>{s.id === "best" ? "Sort: best match" : s.label}</option>)}
+            </select>
+          </div>
+          <div className="small" style={{ fontWeight: 650, margin: "12px 0 6px" }}>Facilities</div>
+          <div className="chips" style={{ flexWrap: "wrap", overflow: "visible" }}>
+            {FEATURES.map((f) => (
+              <button key={f.id} className={"chip" + (needs.includes(f.id) ? " on" : "")} aria-pressed={needs.includes(f.id)} onClick={() => toggleNeed(f.id)}>{f.label}</button>
+            ))}
+          </div>
         </div>
       )}
       {sort === "near" && loc.status === "asking" && <p className="small muted">Finding your location...</p>}
@@ -203,15 +209,15 @@ export default function Home() {
       )}
 
       {view === "list" && !filtering && (
-        <div className="hero-plan">
-          <div>
-            <h2>💞 Plan a date in 60 seconds</h2>
-            <p>Pick a vibe and a budget. We build the whole night: food, fun and dessert.</p>
-          </div>
-          <div className="row">
-            <Link href="/plan" className="btn">Start planning</Link>
-            <Link href="/watch" className="btn ghost">🎬 Watch</Link>
-          </div>
+        <div className="quick">
+          <Link href="/plan" className="qtile dark">
+            <span className="ico-wrap"><Ico n="route" size={22} /></span>
+            <span><b>Plan a date in 60 seconds</b><span className="s">Pick a vibe and budget. We build the whole night.</span></span>
+          </Link>
+          <Link href="/watch" className="qtile">
+            <span className="ico-wrap"><Ico n="film" size={22} /></span>
+            <span><b>Watch</b><span className="s">Short videos of real places</span></span>
+          </Link>
         </div>
       )}
 
@@ -220,16 +226,16 @@ export default function Home() {
 
       {spots && !filtering && view === "list" && (
         <>
-          {popular.length > 0 && (<><h2>🔥 Trending this week</h2><div className="hscroll">{popular.map(card)}</div></>)}
+          {popular.length > 0 && (<><h2>Trending this week</h2><div className="hscroll">{popular.map(card)}</div></>)}
           {colRows.map(({ c, list }) => (
             <div key={c.id}>
-              <h2>{c.emoji} {c.title}</h2>
+              <h2>{c.title}</h2>
               {c.blurb && <p className="small muted" style={{ margin: "-6px 0 8px" }}>{c.blurb}</p>}
               <div className="hscroll">{list.map(card)}</div>
             </div>
           ))}
-          {topRated.length > 0 && (<><h2>⭐ Top rated by Fyndo users</h2><div className="hscroll">{topRated.map(card)}</div></>)}
-          {spots.some((s) => s.hidden_gem) && (<><h2>💎 Hidden gems</h2><div className="grid">{spots.filter((s) => s.hidden_gem).map(card)}</div></>)}
+          {topRated.length > 0 && (<><h2>Top rated by Fyndo users</h2><div className="hscroll">{topRated.map(card)}</div></>)}
+          {spots.some((s) => s.hidden_gem) && (<><h2>Hidden gems</h2><div className="grid">{spots.filter((s) => s.hidden_gem).map(card)}</div></>)}
           <h2>All spots</h2>
         </>
       )}
@@ -238,7 +244,7 @@ export default function Home() {
         filtered.length ? <div className="grid">{filtered.map(card)}</div>
           : (
             <div className="empty">
-              <div className="big">🤷</div>
+              <div className="big"><Ico n="search" size={30} /></div>
               {spots.length === 0 ? "No places added yet." : "No spots match. Try fewer filters."}
               {filtering && spots.length > 0 && <><br /><br /><button className="btn sm" onClick={clear}>Clear filters</button></>}
             </div>
@@ -247,12 +253,12 @@ export default function Home() {
 
       {picked.length > 0 && (
         <div className="tray" role="region" aria-label="Selected places">
-          <span><b>{picked.length}</b> picked</span>
+          <span><b>{picked.length}</b> selected</span>
           <div className="row" style={{ gap: 8 }}>
             <button className="btn sm ghost" disabled={picked.length < 2 || picked.length > 3}
               title={picked.length > 3 ? "Compare up to 3" : "Compare side by side"}
-              onClick={() => (window.location.href = `/compare/?ids=${picked.slice(0, 3).join(",")}`)}>⚖️ Compare</button>
-            <button className="btn sm" disabled={picked.length < 2 || busy} onClick={startVote}>🗳️ Ask friends to vote</button>
+              onClick={() => (window.location.href = `/compare/?ids=${picked.slice(0, 3).join(",")}`)}><Ico n="scale" size={16} />Compare</button>
+            <button className="btn sm" disabled={picked.length < 2 || busy} onClick={startVote}><Ico n="group" size={16} />Ask friends to vote</button>
             <button className="linkbtn" onClick={() => setPicked([])}>Clear</button>
           </div>
         </div>

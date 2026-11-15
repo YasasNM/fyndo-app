@@ -1,4 +1,5 @@
 "use client";
+import { Ico } from "@/components/Icon";
 import { Suspense, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -17,15 +18,15 @@ function Compare() {
   const ratings = useRatings();
   const picked = useMemo(() => (spots ? ids.map((i) => spots.find((s) => s.id === i)).filter(Boolean) : []), [spots, ids.join(",")]); // eslint-disable-line
   if (!spots) return <div className="loading">Loading...</div>;
-  if (picked.length < 2) return <div className="empty"><div className="big">⚖️</div>Pick 2 or 3 places on the home page to compare.<br /><Link href="/" className="linkbtn">Go home</Link></div>;
+  if (picked.length < 2) return <div className="empty"><div className="big"><Ico n="scale" size={30} /></div>Pick 2 or 3 places on the home page to compare.<br /><Link href="/" className="linkbtn">Go home</Link></div>;
 
   const now = new Date();
   const t = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
   const cheapest = Math.min(...picked.map(avgPrice));
   const best = Math.max(...picked.map((s) => (ratings[s.id] ? ratings[s.id].avg : 0)));
   const rows = [
-    ["Price", (s) => <span style={avgPrice(s) === cheapest ? { color: "var(--green)", fontWeight: 700 } : {}}>{priceLabel(s)}{avgPrice(s) === cheapest ? " ✓" : ""}</span>],
-    ["Fyndo rating", (s) => { const r = ratings[s.id]; return r ? <span style={r.avg === best ? { color: "var(--green)", fontWeight: 700 } : {}}>★ {r.avg.toFixed(1)} ({r.count}){r.visited ? ` · ${r.visited} visited` : ""}</span> : <span className="muted">No reviews yet</span>; }],
+    ["Price", (s) => <span style={avgPrice(s) === cheapest ? { color: "var(--green)", fontWeight: 700 } : {}}>{priceLabel(s)}{avgPrice(s) === cheapest ? " (lowest)" : ""}</span>],
+    ["Fyndo rating", (s) => { const r = ratings[s.id]; return r ? <span style={r.avg === best ? { color: "var(--green)", fontWeight: 700 } : {}}>{r.avg.toFixed(1)} of 5 ({r.count} review{r.count > 1 ? "s" : ""}){r.visited ? `, ${r.visited} visited` : ""}</span> : <span className="muted">No reviews yet</span>; }],
     ["Open now", (s) => (isOpenAt(s, t) ? <span className="open-now">Yes</span> : <span className="closed-now">Closed</span>)],
     ["Hours", (s) => `${niceTime(s.open_time)} to ${niceTime(s.close_time)}`],
     ["Area", (s) => s.area],
@@ -54,7 +55,7 @@ function Compare() {
         </table>
       </div>
       <div className="row" style={{ marginTop: 12 }}>
-        <Link className="btn ghost" href="/">← Back</Link>
+        <Link className="btn ghost" href="/">Back to places</Link>
       </div>
     </>
   );

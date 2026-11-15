@@ -1,4 +1,5 @@
 "use client";
+import { Ico } from "./Icon";
 import { useEffect, useMemo, useState } from "react";
 import { db } from "@/lib/data";
 import { goLogin } from "@/lib/hooks";
@@ -80,7 +81,7 @@ export default function ReviewsPanel({ spotId, user, onChange }) {
         )}
       </div>
       {list && list.length > 0 && visitedN > 0 && (
-        <p className="small muted" style={{ margin: "0 0 6px" }}>✓ {visitedN} of {list.length} reviews are from people who checked in here.</p>
+        <p className="small muted" style={{ margin: "0 0 6px" }}>{visitedN} of {list.length} reviews are from people who checked in here.</p>
       )}
       {summary && <div className="card pad small" style={{ background: "var(--cream)", marginBottom: 8 }}>{summary}</div>}
 
@@ -88,7 +89,7 @@ export default function ReviewsPanel({ spotId, user, onChange }) {
 
       {!open ? (
         <button className="btn ghost sm" onClick={() => (user ? setOpen(true) : goLogin())}>
-          {mine ? "Edit your review" : "★ Write a review"}
+          {mine ? "Edit your review" : "Write a review"}
         </button>
       ) : (
         <form className="card pad" onSubmit={submit}>
@@ -102,8 +103,8 @@ export default function ReviewsPanel({ spotId, user, onChange }) {
           </div>
           <div className="field"><span>Would you go again?</span>
             <div className="seg">
-              <button type="button" className={again === true ? "on" : ""} onClick={() => setAgain(again === true ? null : true)}>👍 Yes</button>
-              <button type="button" className={again === false ? "on" : ""} onClick={() => setAgain(again === false ? null : false)}>👎 No</button>
+              <button type="button" className={again === true ? "on" : ""} onClick={() => setAgain(again === true ? null : true)}><Ico n="thumbup" size={16} />Yes</button>
+              <button type="button" className={again === false ? "on" : ""} onClick={() => setAgain(again === false ? null : false)}><Ico n="thumbdown" size={16} />No</button>
             </div>
           </div>
           <label className="field"><span>Your review (optional)</span>
@@ -130,10 +131,10 @@ export default function ReviewsPanel({ spotId, user, onChange }) {
             </span>
             <span className="small muted">{ago(r.created_at)}</span>
           </div>
-          {(r.tags || []).length > 0 && <div className="row small muted" style={{ gap: 6, marginTop: 2 }}>{r.tags.map((t) => <span key={t}>· {tagLabel(t)}</span>)}</div>}
+          {(r.tags || []).length > 0 && <div className="row small muted" style={{ gap: 6, marginTop: 2 }}>{r.tags.map((t) => <span key={t} className="tag">{tagLabel(t)}</span>)}</div>}
           {r.body && <p style={{ margin: "4px 0 0" }}>{r.body}</p>}
-          {r.would_return === true && <div className="small muted">👍 Would go again</div>}
-          {r.would_return === false && <div className="small muted">👎 Would not go again</div>}
+          {r.would_return === true && <div className="small muted"><Ico n="thumbup" size={14} /> Would go again</div>}
+          {r.would_return === false && <div className="small muted"><Ico n="thumbdown" size={14} /> Would not go again</div>}
           {r.owner_reply && (
             <div className="reply"><b className="small">Reply from the owner</b><div className="small">{r.owner_reply}</div></div>
           )}
@@ -164,7 +165,7 @@ export function FeedbackBox({ spotId, user }) {
     <div style={{ marginTop: 14 }}>
       {msg && <div className={"alert" + (msg.startsWith("Sent") ? " ok" : "")}>{msg}</div>}
       {!open ? (
-        <button className="linkbtn" onClick={() => (user ? setOpen(true) : goLogin())}>🔒 Had a problem? Tell the owner privately</button>
+        <button className="linkbtn" onClick={() => (user ? setOpen(true) : goLogin())}><Ico n="lock" size={14} /> Had a problem? Tell the owner privately</button>
       ) : (
         <form className="card pad" onSubmit={send}>
           <p className="small muted" style={{ marginTop: 0 }}>Only the owner and the Fyndo team can read this. It is not posted publicly.</p>

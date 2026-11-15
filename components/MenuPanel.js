@@ -1,4 +1,5 @@
 "use client";
+import { Ico } from "./Icon";
 import { useEffect, useState } from "react";
 import { CONFIG } from "@/lib/config";
 import { DISH_TAGS } from "@/lib/features";
@@ -24,9 +25,9 @@ export default function MenuPanel({ spot }) {
     <>
       <div className="row between">
         <h2>Menu & prices</h2>
-        <button className={"chip" + (tourist ? " on" : "")} onClick={flip} title="Shows USD and explains local dishes">🧳 Tourist mode</button>
+        <button className={"chip" + (tourist ? " on" : "")} onClick={flip} title="Shows USD and explains local dishes" aria-pressed={tourist}><Ico n="globe" size={16} />Tourist mode</button>
       </div>
-      {stars.length > 0 && <p className="small" style={{ margin: "0 0 8px" }}>⭐ Signature: {stars.map((m) => m.item).join(", ")}</p>}
+      {stars.length > 0 && <p className="small" style={{ margin: "0 0 8px" }}>Signature dishes: {stars.map((m) => m.item).join(", ")}</p>}
       <div className="card pad">
         {menu.map((m, i) => {
           const note = tourist ? dishNote(m.item) : "";
@@ -37,7 +38,7 @@ export default function MenuPanel({ spot }) {
                 {(m.tags || []).filter((t) => t !== "star" && DISH_TAGS[t]).length > 0 && (
                   <span className="small muted" style={{ display: "block" }}>{m.tags.filter((t) => t !== "star" && DISH_TAGS[t]).map((t) => DISH_TAGS[t]).join("  ")}</span>
                 )}
-                {note && <span className="small" style={{ display: "block", color: "var(--teal-2)" }}>ℹ️ {note}</span>}
+                {note && <span className="small" style={{ display: "block", color: "var(--teal-2)" }}>{note}</span>}
               </span>
               <b style={{ whiteSpace: "nowrap" }}>{price(m.price)}</b>
               <span className="stepper" style={{ transform: "scale(.86)", transformOrigin: "right top" }}>
@@ -59,7 +60,7 @@ export default function MenuPanel({ spot }) {
           <div className="kv"><span>VAT ({Math.round(CONFIG.vat * 100)}%)</span><span>{lkr(est.vat)}</span></div>
           <div className="kv"><b>Estimated bill</b><b>{price(est.total)}</b></div>
           <p className="small muted" style={{ margin: "6px 0 0" }}>An estimate. Some places add different charges, so check the real bill.</p>
-          <a className="linkbtn" href={`/split/?total=${est.total}`}>Split this bill →</a>
+          <a className="linkbtn" href={`/split/?total=${est.total}`}>Split this bill</a>
         </div>
       )}
     </>

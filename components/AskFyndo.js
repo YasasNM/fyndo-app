@@ -1,4 +1,5 @@
 "use client";
+import { Ico } from "./Icon";
 import { useState } from "react";
 import Link from "next/link";
 import { ask } from "@/lib/api";
@@ -30,10 +31,10 @@ export default function AskFyndo({ spots }) {
   return (
     <div className="ask">
       <form onSubmit={(e) => { e.preventDefault(); go(); }} className="ask-in">
-        <span className="ask-ic">✨</span>
+        <span className="ask-ic"><Ico n="search" size={20} /></span>
         <input className="input" value={q} onChange={(e) => setQ(e.target.value)} maxLength={300}
-               placeholder="Ask Fyndo: e.g. romantic dinner under 6000 in Colombo 7" aria-label="Ask Fyndo" />
-        <button className="btn" disabled={busy || q.trim().length < 3}>{busy ? "Thinking..." : "Ask"}</button>
+               placeholder="Describe your night, e.g. quiet dinner under 6000" aria-label="Ask Fyndo" />
+        <button className="btn" disabled={busy || q.trim().length < 3}>{busy ? "Finding..." : "Find"}</button>
       </form>
       {!res && (
         <div className="chips" style={{ marginTop: 8 }}>
@@ -50,11 +51,11 @@ export default function AskFyndo({ spots }) {
           {res.plan && (
             <>
               <div className="small muted" style={{ margin: "4px 0 8px" }}>
-                {res.plan.vibeLabel} · {res.opts.area || "Anywhere"} · budget {lkr(res.opts.budget)} for two
+                {res.plan.vibeLabel}, {res.opts.area || "anywhere in Colombo"}, budget {lkr(res.opts.budget)} for two
               </div>
               {res.plan.stops.map((s, i) => (
                 <div key={i} className="small" style={{ padding: "5px 0", borderBottom: "1px dashed var(--line)" }}>
-                  <b>{niceTime(s.time)}</b> · {s.label}:{" "}
+                  <b>{niceTime(s.time)}</b> {s.label}:{" "}
                   {s.spot ? <Link className="linkbtn" href={`/spot/?id=${s.spot.id}`}>{s.spot.name}</Link> : <span className="muted">no match</span>}
                 </div>
               ))}

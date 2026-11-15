@@ -1,4 +1,5 @@
 "use client";
+import { Ico } from "@/components/Icon";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { db, isLive } from "@/lib/data";
@@ -20,7 +21,7 @@ function InstallCard() {
   const install = async () => { const p = window.__installPrompt; if (p) { p.prompt(); await p.userChoice; setCan(false); } };
   return (
     <div className="card pad" style={{ background: "var(--cream)" }}>
-      <b>📲 Get the Fyndo app</b>
+      <b>Get the Fyndo app</b>
       <p className="small" style={{ margin: "4px 0 8px" }}>
         {ios ? "On iPhone: tap the Share button in Safari, then \"Add to Home Screen\"."
              : "Add Fyndo to your home screen. It opens like a normal app."}
@@ -42,7 +43,7 @@ export default function Me() {
   if (user === undefined) return <div className="loading">Loading...</div>;
   if (!user) return (
     <div className="narrow">
-      <div className="empty"><div className="big">👤</div>Log in to see your bookings and profile.<br /><br />
+      <div className="empty"><div className="big"><Ico n="user" size={30} /></div>Log in to see your bookings and profile.<br /><br />
         <Link href="/login?next=/me" className="btn">Log in or sign up</Link></div>
       <InstallCard />
     </div>
@@ -63,7 +64,7 @@ export default function Me() {
     <div className="card bk">
       <div>
         <b>{b.spot ? b.spot.name : "Spot"}</b>
-        <div className="small muted">{b.date} · {niceTime(b.time)} · {b.guests} guests · Ref {b.ref_code}</div>
+        <div className="small muted">{b.date} at {niceTime(b.time)}, {b.guests} guests, ref {b.ref_code}</div>
       </div>
       <div className="row">
         <span className={"badge " + (STATUS_BADGE[b.status] || "")}>{STATUS_LABEL[b.status]}</span>
@@ -76,8 +77,8 @@ export default function Me() {
 
   return (
     <div className="narrow">
-      <h1>Hi, {user.name || user.email} 👋</h1>
-      <p className="muted" style={{ marginTop: 0 }}>{user.email} · {user.role === "user" ? "Member" : user.role === "owner" ? "Business owner" : "Admin"}</p>
+      <h1>Hi, {user.name || user.email}</h1>
+      <p className="muted" style={{ marginTop: 0 }}>{user.email}, {user.role === "user" ? "Member" : user.role === "owner" ? "Business owner" : "Admin"}</p>
 
       {edit ? (
         <div className="card pad">
@@ -90,7 +91,7 @@ export default function Me() {
           <button className="btn sm ghost" onClick={() => setEdit(true)}>Edit profile</button>
           {(user.role === "owner" || user.role === "admin") && <Link href="/dashboard" className="btn sm dark">Business dashboard</Link>}
           {user.role === "admin" && <Link href="/admin" className="btn sm dark">Admin</Link>}
-          <Link href="/rewards" className="btn sm dark">🎟️ My rewards</Link>
+          <Link href="/rewards" className="btn sm dark"><Ico n="ticket" size={16} />My rewards</Link>
           <button className="btn sm danger" onClick={async () => { await db.signOut(); window.location.href = "/"; }}>Log out</button>
         </div>
       )}

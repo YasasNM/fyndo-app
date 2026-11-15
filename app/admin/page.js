@@ -1,4 +1,5 @@
 "use client";
+import { Ico } from "@/components/Icon";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { db } from "@/lib/data";
@@ -24,7 +25,7 @@ function Collections({ spots }) {
   const [err, setErr] = useState("");
   const load = () => db.getCollections().then(setList);
   useEffect(() => { load(); }, []);
-  const blank = { id: "", title: "", blurb: "", emoji: "✨", spot_ids: [], published: true, sort: 0 };
+  const blank = { id: "", title: "", blurb: "", emoji: "", spot_ids: [], published: true, sort: 0 };
   const save = async () => {
     if (!edit.title.trim()) return setErr("Add a title.");
     try { await db.saveCollection({ ...edit, id: edit.id || slug(edit.title) }); setEdit(null); setErr(""); load(); } catch (e) { setErr(e.message); }
@@ -83,7 +84,7 @@ function Reports({ spots }) {
             {!r.resolved && <button className="btn sm ghost" style={{ marginTop: 6 }} onClick={async () => { await db.resolveReport(r.id); load(); }}>Mark resolved</button>}
           </div>
         ))}
-        {list.length === 0 && <div className="empty">No reports. 🎉</div>}
+        {list.length === 0 && <div className="empty">No reports.</div>}
       </div>
     </>
   );
@@ -101,7 +102,7 @@ export default function Admin() {
   useEffect(() => { if (user === null) goLogin(); if (user && user.role === "admin") load(); }, [user]);
 
   if (!user) return <div className="loading">Loading...</div>;
-  if (user.role !== "admin") return <div className="empty"><div className="big">🔒</div>Admins only.</div>;
+  if (user.role !== "admin") return <div className="empty"><div className="big"><Ico n="lock" size={30} /></div>Admins only.</div>;
   if (!spots) return <div className="loading">Loading spots...</div>;
 
   if (editing) return <SpotForm initial={editing} isNew={!editing.id} onDone={(m) => { setEditing(null); setMsg(m || ""); load(); }} />;
@@ -130,8 +131,8 @@ export default function Admin() {
     <>
       <div className="tabs-in" style={{ marginTop: 4 }}>{[["spots", "Spots"], ["collections", "Lists"], ["reports", "Reports"]].map(([k, l]) => (
         <button key={k} className={tab === k ? "on" : ""} onClick={() => setTab(k)}>{l}</button>))}</div>
-      <div className="row between"><h1>Admin · Spots ({spots.length})</h1>
-        <div className="row"><button className="btn ghost" onClick={() => setFinder(!finder)}>🗺️ Find places (free)</button>
+      <div className="row between"><h1>Spots ({spots.length})</h1>
+        <div className="row"><button className="btn ghost" onClick={() => setFinder(!finder)}><Ico n="map" size={16} />Find places (free)</button>
           <button className="btn" onClick={() => setEditing({ ...BLANK })}>+ Add spot</button></div></div>
       {finder && <OsmFinder existing={spots.map((x) => x.name)} onPick={(r) => setEditing(fromOsm(r))} />}
       <p className="muted small" style={{ marginTop: 0 }}>Add places you have visited and checked. Mark them Verified once the menu and prices are confirmed.</p>
@@ -147,7 +148,7 @@ export default function Admin() {
                 <td>{s.area}</td><td>{s.category}</td>
                 <td>{s.verified ? <span className="badge">Verified</span> : <span className="badge grey">Unverified</span>}{" "}
                     {s.booking_enabled && <span className="badge book">Booking</span>}</td>
-                <td className="small">{s.owner_id ? "✓ Claimed" : <button className="linkbtn" onClick={() => owner(s)}>Set owner</button>}</td>
+                <td className="small">{s.owner_id ? "Claimed" : <button className="linkbtn" onClick={() => owner(s)}>Set owner</button>}</td>
                 <td style={{ whiteSpace: "nowrap" }}>
                   <button className="linkbtn" onClick={() => setEditing(s)}>Edit</button>{"  ·  "}
                   <button className="linkbtn" style={{ color: "var(--chili)" }} onClick={() => del(s)}>Delete</button>
@@ -194,7 +195,7 @@ function SpotForm({ initial, isNew, onDone }) {
 
   return (
     <div className="narrow">
-      <button className="linkbtn" style={{ marginTop: 16 }} onClick={() => onDone()}>← Back to list</button>
+      <button className="linkbtn" style={{ marginTop: 16 }} onClick={() => onDone()}>Back to list</button>
       <h1>{isNew ? "Add a spot" : `Edit ${initial.name}`}</h1>
       <div className="card pad">
         <OsmFinder existing={[]} onPick={(r) => setF({ ...f, name: r.name, lat: r.lat, lng: r.lng, phone: r.phone || f.phone,
@@ -202,7 +203,7 @@ function SpotForm({ initial, isNew, onDone }) {
           open_time: r.open_time || f.open_time, close_time: r.close_time || f.close_time })} />
         <details style={{ marginBottom: 12 }}><summary className="small muted" style={{ cursor: "pointer" }}>Optional: link Google Maps (needs a Google key and card)</summary>
         <div className="field" style={{ background: "var(--cream)", padding: 12, borderRadius: 12, marginTop: 8 }}>
-          <span>🔎 Link to Google Maps (shows live rating, hours, photos and reviews)</span>
+          <span>Link to Google Maps (shows live rating, hours, photos and reviews)</span>
           {f.google_place_id ? (
             <div className="row small">
               <span className="badge">Linked</span><code style={{ fontSize: 11 }}>{f.google_place_id}</code>

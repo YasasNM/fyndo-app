@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef } from "react";
 import "leaflet/dist/leaflet.css";
-import { CAT_EMOJI } from "@/components/SpotCard";
+import { ICON_MARKUP, CAT_ICON } from "@/components/Icon";
 
 // Free map: Leaflet + OpenStreetMap tiles (no key, no billing).
 // spots: array with lat/lng. me: optional { lat, lng }. height: px.
@@ -29,7 +29,7 @@ export default function SpotMap({ spots, me, height = 420, single = false }) {
       spots.filter((s) => s.lat != null && s.lng != null).forEach((s) => {
         const icon = L.divIcon({
           className: "fy-pin", iconSize: [34, 34], iconAnchor: [17, 32], popupAnchor: [0, -28],
-          html: `<div style="background:${s.color || "#FF8A1E"}">${CAT_EMOJI[s.category] || "📍"}</div>`,
+          html: `<div style="background:${s.color || "#F6B800"}"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#0d2422" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(45deg)">${ICON_MARKUP[CAT_ICON[s.category] || "pin"]}</svg></div>`,
         });
         const m = L.marker([s.lat, s.lng], { icon, title: s.name }).addTo(layerRef.current);
         if (!single) {
@@ -38,7 +38,7 @@ export default function SpotMap({ spots, me, height = 420, single = false }) {
           a.href = `/spot?id=${encodeURIComponent(s.id)}`;
           a.textContent = s.name; a.style.fontWeight = "700";
           const sub = document.createElement("div");
-          sub.textContent = `${s.area} · ${s.category}`; sub.style.fontSize = "12px";
+          sub.textContent = `${s.area}, ${s.category}`; sub.style.fontSize = "12px";
           box.append(a, sub);
           m.bindPopup(box);
         }

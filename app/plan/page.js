@@ -1,4 +1,5 @@
 "use client";
+import { Ico } from "@/components/Icon";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { db } from "@/lib/data";
@@ -9,6 +10,7 @@ import { AREAS } from "@/lib/seed";
 import { Thumb } from "@/components/SpotCard";
 import { lkr, niceTime, nextDays, shareNow, avgPrice, whyThis } from "@/lib/utils";
 
+const VIBE_ICON = { romantic: "heart", fun: "group", outdoor: "sun", chill: "cup" };
 const TIMES = ["16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00"];
 
 export default function PlanPage() {
@@ -38,7 +40,7 @@ export default function PlanPage() {
   const dateLabel = (days.find((d) => d.iso === f.date) || days[0]).label;
 
   const shareText = () =>
-    `Our Fyndo date plan for ${dateLabel} 💞\n` +
+    `Our Fyndo date plan for ${dateLabel}\n` +
     plan.stops.filter((s) => s.spot).map((s) => `${niceTime(s.time)}  ${s.label}: ${s.spot.name} (${s.spot.area})`).join("\n") +
     `\nAbout ${lkr(plan.total)} for two.`;
 
@@ -66,7 +68,7 @@ export default function PlanPage() {
 
   const save = async () => {
     if (!user) return goLogin();
-    try { await db.savePlan(`${plan.vibeLabel} · ${dateLabel}`, plan); setMsg("Plan saved. Find it in Saved."); }
+    try { await db.savePlan(`${plan.vibeLabel}, ${dateLabel}`, plan); setMsg("Plan saved. Find it in Saved."); }
     catch (e) { setMsg(e.message); }
   };
 
@@ -81,7 +83,7 @@ export default function PlanPage() {
       {step < 4 && (
         <>
           <div className="row between" style={{ marginTop: 16 }}>
-            {step > 0 ? <button className="linkbtn" onClick={() => setStep(step - 1)}>← Back</button> : <span />}
+            {step > 0 ? <button className="linkbtn" onClick={() => setStep(step - 1)}>Back</button> : <span />}
             <span className="small muted">Step {step + 1} of 4</span>
           </div>
           <div className="progress"><div style={{ width: `${((step + 1) / 4) * 100}%` }} /></div>
@@ -93,7 +95,7 @@ export default function PlanPage() {
           <h1>What's the vibe?</h1>
           {VIBES.map((v) => (
             <button key={v.id} className={"opt" + (f.vibe === v.id ? " on" : "")} onClick={() => set("vibe", v.id)}>
-              <span className="em">{v.emoji}</span>{v.label}
+              <span className="em"><Ico n={VIBE_ICON[v.id] || "heart"} size={20} /></span>{v.label}
             </button>
           ))}
           <Next disabled={!f.vibe} />
@@ -142,7 +144,7 @@ export default function PlanPage() {
         <>
           <h1>Anything else?</h1>
           <button className={"opt" + (f.veg ? " on" : "")} onClick={() => set("veg", !f.veg)}>
-            <span className="em">🥦</span>Vegetarian friendly places {f.veg ? "✓" : ""}
+            <span className="em"><Ico n="leaf" size={20} /></span>Vegetarian friendly places{f.veg ? " (on)" : ""}
           </button>
           <p className="small muted">More options (no alcohol, wheelchair access, parking) are coming soon.</p>
           <Next />
@@ -152,23 +154,23 @@ export default function PlanPage() {
       {step === 4 && !spots && <div className="loading">Building your plan...</div>}
       {plan && (
         <>
-          <h1>Your date plan 💞</h1>
-          <p className="muted" style={{ marginTop: 0 }}>{plan.vibeLabel} · {dateLabel} · {f.area || "Anywhere"}</p>
+          <h1>Your date plan</h1>
+          <p className="muted" style={{ marginTop: 0 }}>{plan.vibeLabel} on {dateLabel}, {f.area || "anywhere in Colombo"}</p>
           <div className="timeline">
             {plan.stops.map((s, i) => (
               <div key={i} className="stop">
-                <div className="small muted" style={{ marginBottom: 4 }}>{niceTime(s.time)} · {s.label}</div>
+                <div className="small muted" style={{ marginBottom: 4 }}><b>{niceTime(s.time)}</b> {s.label}</div>
                 {s.spot ? (
                   <div className="card">
                     <Thumb spot={s.spot} className="mini" />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <Link href={`/spot?id=${s.spot.id}`}><h3>{s.spot.name}</h3></Link>
-                      <div className="small muted">{s.spot.area} · about {avgPrice(s.spot) ? lkr(avgPrice(s.spot) * 2) : "free"} for two</div>
+                      <div className="small muted">{s.spot.area}, about {avgPrice(s.spot) ? lkr(avgPrice(s.spot) * 2) : "free"} for two</div>
                       <div className="small why">{whyThis(s.spot, { moods: vibeMoods, budget: f.budget, area: f.area })}</div>
                       <div className="row" style={{ marginTop: 6, gap: 14 }}>
-                        {s.alternatives > 0 && <button className="linkbtn" onClick={() => swap(i)}>↻ Swap</button>}
+                        {s.alternatives > 0 && <button className="linkbtn" onClick={() => swap(i)}>Swap this stop</button>}
                         {s.spot.booking_enabled && (
-                          <Link className="linkbtn" href={`/book?id=${s.spot.id}&date=${f.date}&time=${s.time}`}>📅 Book</Link>
+                          <Link className="linkbtn" href={`/book?id=${s.spot.id}&date=${f.date}&time=${s.time}`}>Book a table</Link>
                         )}
                       </div>
                     </div>
@@ -186,9 +188,9 @@ export default function PlanPage() {
           {msg && <div className={"alert" + (/^(Plan saved|Plan link)/.test(msg) ? " ok" : "")}>{msg}</div>}
           <div className="row" style={{ marginTop: 14 }}>
             <button className="btn" onClick={share}>Share plan</button>
-            <button className="btn ghost" onClick={copy}>🔗 Copy link</button>
-            <button className="btn ghost" onClick={addToCalendar}>📅 Add to calendar</button>
-            <Link className="btn ghost" href="/split">🧾 Split bill</Link>
+            <button className="btn ghost" onClick={copy}><Ico n="link" size={16} />Copy link</button>
+            <button className="btn ghost" onClick={addToCalendar}><Ico n="calendar" size={16} />Add to calendar</button>
+            <Link className="btn ghost" href="/split"><Ico n="receipt" size={16} />Split the bill</Link>
             <button className="btn ghost" onClick={save}>Save plan</button>
             <button className="btn ghost" onClick={() => { setStep(0); setSkip({}); setMsg(""); }}>Start over</button>
           </div>

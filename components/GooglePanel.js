@@ -1,4 +1,5 @@
 "use client";
+import { Ico } from "./Icon";
 import { useEffect, useState } from "react";
 import { googlePlace, photoSrc } from "@/lib/api";
 
@@ -38,18 +39,18 @@ export default function GooglePanel({ placeId, onInfo }) {
       <div className="pad">
         <div className="row between">
           <b>On Google Maps</b>
-          {g.rating && <span className="grating">★ {g.rating.toFixed(1)} <span className="muted small">({g.ratingCount.toLocaleString("en-US")})</span></span>}
+          {g.rating && <span className="grating">{g.rating.toFixed(1)} of 5 <span className="muted small">({g.ratingCount.toLocaleString("en-US")})</span></span>}
         </div>
         {g.openNow !== null && (
           <div className="small" style={{ color: g.openNow ? "var(--green)" : "var(--chili)", fontWeight: 600, marginTop: 4 }}>
             {g.openNow ? "Open now" : "Closed now"}
           </div>
         )}
-        {g.address && <div className="small" style={{ marginTop: 4 }}>📍 {g.address}</div>}
+        {g.address && <div className="small" style={{ marginTop: 4 }}><Ico n="pin" size={14} /> {g.address}</div>}
         <div className="row small" style={{ marginTop: 6, gap: 14 }}>
-          {g.phone && <a className="linkbtn" href={`tel:${g.phone.replace(/\s/g, "")}`}>📞 {g.phone}</a>}
-          {g.website && <a className="linkbtn" href={g.website} target="_blank" rel="noreferrer">🌐 Website</a>}
-          {g.hours.length > 0 && <button className="linkbtn" onClick={() => setShowHours(!showHours)}>🕒 {showHours ? "Hide" : "Opening"} hours</button>}
+          {g.phone && <a className="linkbtn" href={`tel:${g.phone.replace(/\s/g, "")}`}><Ico n="phone" size={14} /> {g.phone}</a>}
+          {g.website && <a className="linkbtn" href={g.website} target="_blank" rel="noreferrer"><Ico n="globe" size={14} /> Website</a>}
+          {g.hours.length > 0 && <button className="linkbtn" onClick={() => setShowHours(!showHours)}><Ico n="clock" size={14} /> {showHours ? "Hide" : "Opening"} hours</button>}
         </div>
         {showHours && <div className="small" style={{ marginTop: 6 }}>{g.hours.map((h) => <div key={h}>{h}</div>)}</div>}
 
@@ -63,10 +64,10 @@ export default function GooglePanel({ placeId, onInfo }) {
             {reviews.map((r, i) => (
               <div key={i} className="greview">
                 <div className="row" style={{ gap: 8 }}>
-                  {r.authorPhoto ? <img src={r.authorPhoto} alt="" className="gavatar" referrerPolicy="no-referrer" /> : <span className="gavatar">👤</span>}
+                  {r.authorPhoto ? <img src={r.authorPhoto} alt="" className="gavatar" referrerPolicy="no-referrer" /> : <span className="gavatar"><Ico n="user" size={16} /></span>}
                   <div>
                     <a href={r.authorUrl || r.url} target="_blank" rel="noreferrer" className="small" style={{ fontWeight: 600 }}>{r.author}</a>
-                    <div className="small muted">{"★".repeat(Math.round(r.rating || 0))} · {r.when}</div>
+                    <div className="small muted">{Math.round(r.rating || 0)} of 5, {r.when}</div>
                   </div>
                 </div>
                 <p className="small" style={{ margin: "6px 0 2px" }}>{r.text.length > 320 ? r.text.slice(0, 320) + "..." : r.text}</p>

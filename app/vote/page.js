@@ -1,4 +1,5 @@
 "use client";
+import { Ico } from "@/components/Icon";
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -32,9 +33,9 @@ function Vote() {
     return () => clearInterval(t);
   }, [id]); // eslint-disable-line
 
-  if (!id) return <div className="empty"><div className="big">🗳️</div>No vote link. Ask your friend to share it again.</div>;
+  if (!id) return <div className="empty"><div className="big"><Ico n="group" size={30} /></div>No vote link. Ask your friend to share it again.</div>;
   if (poll === undefined) return <div className="loading">Loading vote...</div>;
-  if (!poll) return <div className="empty"><div className="big">🗳️</div>This vote was not found.<br /><Link href="/" className="linkbtn">Go home</Link></div>;
+  if (!poll) return <div className="empty"><div className="big"><Ico n="group" size={30} /></div>This vote was not found.<br /><Link href="/" className="linkbtn">Go home</Link></div>;
 
   const total = poll.counts.reduce((a, b) => a + b, 0);
   const top = Math.max(...poll.counts);
@@ -47,7 +48,7 @@ function Vote() {
 
   return (
     <div className="narrow">
-      <h1>🗳️ {poll.title}</h1>
+      <h1>{poll.title}</h1>
       <p className="muted" style={{ marginTop: 0 }}>Tap your pick. You can change it. No account needed.</p>
       {err && <div className="alert">{err}</div>}
       <div className="stack">
@@ -58,10 +59,10 @@ function Vote() {
           return (
             <button key={i} className={"opt votebar" + (mine === i ? " on" : "")} onClick={() => vote(i)} style={{ "--pct": pct + "%" }}>
               <span style={{ flex: 1, position: "relative" }}>
-                <b>{o.name}</b>{leading && " 🏆"}
-                <span className="small muted" style={{ display: "block" }}>{[o.area, o.price].filter(Boolean).join(" · ")}</span>
+                <b>{o.name}</b>{leading && <span className="badge warn" style={{ marginLeft: 8 }}>Leading</span>}
+                <span className="small muted" style={{ display: "block" }}>{[o.area, o.price].filter(Boolean).join(", ")}</span>
               </span>
-              <span style={{ position: "relative", textAlign: "right" }}><b>{n}</b><span className="small muted"> · {pct}%</span>{mine === i && <div className="small">Your vote ✓</div>}</span>
+              <span style={{ position: "relative", textAlign: "right" }}><b>{n}</b><span className="small muted"> ({pct}%)</span>{mine === i && <div className="small">Your vote</div>}</span>
             </button>
           );
         })}

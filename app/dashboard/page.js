@@ -1,4 +1,5 @@
 "use client";
+import { Ico } from "@/components/Icon";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { db } from "@/lib/data";
@@ -24,10 +25,10 @@ export default function Dashboard() {
 
   if (user === undefined || user === null) return <div className="loading">Loading...</div>;
   if (user.role === "user")
-    return <div className="empty"><div className="big">🏪</div>This page is for business owners.<br />Own a place? Message us to claim your page.</div>;
+    return <div className="empty"><div className="big"><Ico n="store" size={30} /></div>This page is for business owners.<br />Own a place? Message us to claim your page.</div>;
   if (err) return <div className="alert">{err}</div>;
   if (!spots) return <div className="loading">Loading your places...</div>;
-  if (!spots.length) return <div className="empty"><div className="big">🏪</div>No places linked to your account yet.</div>;
+  if (!spots.length) return <div className="empty"><div className="big"><Ico n="store" size={30} /></div>No places linked to your account yet.</div>;
 
   const spot = spots.find((s) => s.id === sel) || spots[0];
   const refresh = (patch) => setSpots(spots.map((s) => (s.id === spot.id ? { ...s, ...patch } : s)));
@@ -41,7 +42,7 @@ export default function Dashboard() {
             {spots.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
         ) : <b>{spot.name}</b>}
-        <Link className="linkbtn" href={`/spot?id=${spot.id}`}>View public page →</Link>
+        <Link className="linkbtn" href={`/spot?id=${spot.id}`}>View public page</Link>
       </div>
       <Stats spotId={spot.id} />
       <div className="tabs-in">
@@ -105,8 +106,8 @@ function Bookings({ spot }) {
           {shown.map((b) => (
             <div key={b.id} className="card bk">
               <div>
-                <b>{b.date === today ? "Today" : b.date} · {niceTime(b.time)}</b> <span className="small muted">Ref {b.ref_code}</span>
-                <div className="small">{b.guest_name} · {b.guests} guests · <a href={`tel:${b.guest_phone}`} className="linkbtn">{b.guest_phone}</a></div>
+                <b>{b.date === today ? "Today" : b.date} at {niceTime(b.time)}</b> <span className="small muted">Ref {b.ref_code}</span>
+                <div className="small">{b.guest_name}, {b.guests} guests, <a href={`tel:${b.guest_phone}`} className="linkbtn">{b.guest_phone}</a></div>
                 {b.note && <div className="small muted">“{b.note}”</div>}
                 <div className="small muted">Source: {b.source}</div>
               </div>
@@ -166,7 +167,7 @@ function Settings({ spot, onSaved }) {
   const save = async () => {
     const patch = { booking_enabled: f.booking_enabled, booking_mode: f.booking_mode, tables_for_booking: f.tables_for_booking,
       max_party: f.max_party, slot_minutes: f.slot_minutes, booking_start: f.booking_start, booking_end: f.booking_end, cancel_hours: f.cancel_hours };
-    try { await db.updateSpot(spot.id, patch); onSaved(patch); setMsg("Saved ✓"); } catch (e) { setMsg(e.message); }
+    try { await db.updateSpot(spot.id, patch); onSaved(patch); setMsg("Saved"); } catch (e) { setMsg(e.message); }
   };
   return (
     <div className="card pad narrow" style={{ margin: 0 }}>
@@ -205,7 +206,7 @@ function EditPage({ spot, onSaved }) {
     const patch = { about: f.about, open_time: f.open_time, close_time: f.close_time, video_url: f.video_url, phone: f.phone,
       whatsapp: f.whatsapp, price_min: f.price_min, price_max: f.price_max, moods: f.moods, features: f.features || [],
       menu: menu.filter((m) => m.item), menu_updated_at: todayIso() };
-    try { await db.updateSpot(spot.id, patch); onSaved(patch); setMsg("Saved ✓"); } catch (e) { setMsg(e.message); }
+    try { await db.updateSpot(spot.id, patch); onSaved(patch); setMsg("Saved"); } catch (e) { setMsg(e.message); }
   };
   return (
     <div className="card pad narrow" style={{ margin: 0 }}>
@@ -230,7 +231,7 @@ function EditPage({ spot, onSaved }) {
             <input className="input" value={m.item} onChange={(e) => setMenu(i, "item", e.target.value)} placeholder="Item" />
             <input className="input" style={{ width: 100 }} type="number" value={m.price} onChange={(e) => setMenu(i, "price", e.target.value)} placeholder="LKR" />
             <input className="input" style={{ width: 150 }} value={(m.tags || []).join(", ")} onChange={(e) => setMenu(i, "tags", parseMenu("x|0|" + e.target.value)[0].tags || [])} placeholder="veg, spicy2, star" title="Labels: veg, vegan, halal, nuts, spicy1-3, star (signature)" />
-            <button className="linkbtn" onClick={() => setF({ ...f, menu: menu.filter((_, j) => j !== i) })}>✕</button>
+            <button className="linkbtn" onClick={() => setF({ ...f, menu: menu.filter((_, j) => j !== i) })} aria-label="Remove item"><Ico n="close" size={16} /></button>
           </div>
         ))}
         <button className="btn sm ghost" onClick={() => setF({ ...f, menu: [...menu, { item: "", price: 0 }] })}>+ Add item</button>

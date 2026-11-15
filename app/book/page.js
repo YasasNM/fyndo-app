@@ -1,4 +1,5 @@
 "use client";
+import { Ico } from "@/components/Icon";
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -41,7 +42,7 @@ function BookPage() {
   if (!user) return <div className="loading">Taking you to log in...</div>;
   if (!spot) return <div className="empty">Spot not found.</div>;
   if (!spot.booking_enabled)
-    return <div className="empty"><div className="big">📵</div>{spot.name} is not taking bookings on Fyndo right now.<br /><Link className="linkbtn" href={`/spot?id=${spot.id}`}>See other ways to contact them</Link></div>;
+    return <div className="empty"><div className="big"><Ico n="phone" size={30} /></div>{spot.name} is not taking bookings on Fyndo right now.<br /><Link className="linkbtn" href={`/spot?id=${spot.id}`}>See other ways to contact them</Link></div>;
 
   const nowMin = new Date().getHours() * 60 + new Date().getMinutes();
   const slots = bookingSlots(spot).map((t) => ({
@@ -68,7 +69,7 @@ function BookPage() {
     const confirmed = done.status === "confirmed";
     return (
       <div className="narrow center">
-        <div className="success" style={{ background: confirmed ? "var(--green)" : "var(--mango)" }}>{confirmed ? "✓" : "⏳"}</div>
+        <div className="success" style={{ background: confirmed ? "var(--green)" : "var(--mango)" }}><Ico n={confirmed ? "check" : "clock"} size={36} strokeWidth={2.6} /></div>
         <h1>{confirmed ? "Table booked!" : "Request sent!"}</h1>
         <p className="muted">{confirmed ? "See you there." : `${spot.name} will reply soon. Check "My bookings" for updates.`}</p>
         <div className="card pad" style={{ textAlign: "left", margin: "16px 0" }}>
@@ -81,9 +82,9 @@ function BookPage() {
         <p className="small muted">Free to cancel up to {spot.cancel_hours} hours before.</p>
         <div className="row" style={{ justifyContent: "center" }}>
           <a className="btn" target="_blank" rel="noreferrer"
-             href={shareWa(`Booked ${spot.name} on Fyndo for ${dl}, ${niceTime(done.time)} 💞 (Ref ${done.ref_code})`)}>Share with partner</a>
+             href={shareWa(`Booked ${spot.name} on Fyndo for ${dl}, ${niceTime(done.time)} (Ref ${done.ref_code})`)}>Share with partner</a>
           <button className="btn ghost" onClick={() => downloadIcs("fyndo-booking.ics", [{ title: `Table at ${spot.name}`, start: atDateTime(done.date, done.time),
-            minutes: 90, location: `${spot.name}, ${spot.area}`, notes: `Fyndo booking ref ${done.ref_code} for ${done.guests} guests` }])}>📅 Add to calendar</button>
+            minutes: 90, location: `${spot.name}, ${spot.area}`, notes: `Fyndo booking ref ${done.ref_code} for ${done.guests} guests` }])}><Ico n="calendar" size={16} />Add to calendar</button>
           <Link href="/me" className="btn ghost">My bookings</Link>
         </div>
       </div>
@@ -92,12 +93,12 @@ function BookPage() {
 
   return (
     <div className="narrow">
-      <Link href={`/spot?id=${spot.id}`} className="small muted" style={{ display: "inline-block", marginTop: 16 }}>← Back</Link>
+      <Link href={`/spot?id=${spot.id}`} className="small muted" style={{ display: "inline-block", marginTop: 16 }}>Back</Link>
       <div className="row" style={{ margin: "10px 0 6px" }}>
         <Thumb spot={spot} className="mini" />
         <div>
           <h1 style={{ margin: 0, fontSize: 22 }}>Book a table</h1>
-          <div className="muted small">{spot.name} · {spot.area}</div>
+          <div className="muted small">{spot.name}, {spot.area}</div>
           <span className={"badge " + (spot.booking_mode === "instant" ? "" : "warn")}>
             {spot.booking_mode === "instant" ? "Instant confirm" : "Owner confirms"}
           </span>
@@ -127,7 +128,7 @@ function BookPage() {
       <div className="slots" style={{ margin: "8px 0 18px" }}>
         {slots.map((s) => (
           <button key={s.t} className={"slot" + (time === s.t ? " on" : "")} disabled={s.full || s.past} onClick={() => setTime(s.t)}>
-            {niceTime(s.t)}{s.full ? " · full" : ""}
+            {niceTime(s.t)}{s.full ? " (full)" : ""}
           </button>
         ))}
       </div>
