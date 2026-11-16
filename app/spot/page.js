@@ -1,7 +1,6 @@
 "use client";
 import { Ico } from "@/components/Icon";
 import { Suspense, useEffect, useState } from "react";
-import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { db } from "@/lib/data";
@@ -14,9 +13,10 @@ import MenuPanel from "@/components/MenuPanel";
 import RewardsBox from "@/components/RewardsBox";
 import FeatureChips from "@/components/FeatureChips";
 import { RatingPill } from "@/components/Stars";
-import { embedUrl, mapsUrl, niceTime, priceLabel, waUrl, shareNow } from "@/lib/utils";
+import { embedUrl, niceTime, priceLabel, waUrl, shareNow } from "@/lib/utils";
 
-const SpotMap = dynamic(() => import("@/components/SpotMap"), { ssr: false, loading: () => <div className="skel" style={{ height: 240, borderRadius: 16 }} /> });
+import GoogleEmbed from "@/components/GoogleEmbed";
+import { directionsUrl } from "@/lib/gmaps";
 
 export default function SpotPageWrapper() {
   return <Suspense fallback={<div className="loading">Loading...</div>}><SpotPage /></Suspense>;
@@ -39,14 +39,6 @@ function SpotPage() {
   if (!spot) return <div className="empty"><div className="big"><Ico n="pin" size={30} /></div>This spot was not found. <Link href="/" className="linkbtn">Go home</Link></div>;
 
   const embed = embedUrl(spot.video_url);
-  // Places imported from OpenStreetMap carry their website and source note inside "about". Show them as UI, not raw text.
-  const aboutRaw = spot.about || "";
-  const siteMatch = aboutRaw.match(/Website:\s*(https?:\/\/\S+?)(?=\s|$)/i);
-  const website = siteMatch ? siteMatch[1].replace(/[.,]$/, "") : "";
-  const fromOsm = /Details come from OpenStreetMap/i.test(aboutRaw);
-  const hoursUnsure = /Opening hours not confirmed\./i.test(aboutRaw);
-  const aboutText = aboutRaw.replace(/Website:\s*\S+/i, "").replace(/Details come from OpenStreetMap\.\s*Fyndo has not checked this place yet\./i, "")
-    .replace(/Opening hours not confirmed\./i, "").replace(/\s{2,}/g, " ").trim();
   const toggle = async () => {
     if (!user) return goLogin();
     try { setSaved(await db.toggleSave(spot.id)); } catch (e) { setMsg(e.message); }
@@ -76,7 +68,7 @@ function SpotPage() {
         )}
       </div>
       <div>
-        <Link href="/explore" className="small muted">All places</Link>
+        <Link href="/" className="small muted">All places</Link>
         <h1 style={{ marginTop: 6 }}>{spot.name}</h1>
         <div className="row small">
           {spot.verified && <span className="badge">Verified</span>}
@@ -87,12 +79,10 @@ function SpotPage() {
         <div className="facts">
           <div><Ico n="pin" size={18} />{spot.area}<span className="tag">{spot.category}</span></div>
           <div><Ico n="receipt" size={18} />{priceLabel(spot)}</div>
-          <div><Ico n="clock" size={18} />Open {niceTime(spot.open_time)} to {niceTime(spot.close_time)}{hoursUnsure ? " (usual hours, not confirmed)" : ""}</div>
-          {website && <div><Ico n="globe" size={18} /><a className="linkbtn" href={website} target="_blank" rel="noopener noreferrer">Website</a></div>}
+          <div><Ico n="clock" size={18} />Open {niceTime(spot.open_time)} to {niceTime(spot.close_time)}</div>
         </div>
         <div className="row" style={{ gap: 6 }}>{spot.moods.map((m) => <span key={m} className="tag">{m}</span>)}</div>
-        {aboutText && <p>{aboutText}</p>}
-        {fromOsm && <p className="small muted" style={{ marginTop: aboutText ? -6 : 10 }}>Details come from OpenStreetMap. Fyndo has not checked this place yet.</p>}
+        {spot.about && <p>{spot.about}</p>}
 
         <div className="actionbar">
           {spot.booking_enabled ? (
@@ -102,14 +92,14 @@ function SpotPage() {
           ) : spot.phone ? (
             <a className="btn" href={`tel:${spot.phone}`}><Ico n="phone" size={18} />Call</a>
           ) : (
-            <a className="btn" href={spot.lat != null ? `https://www.google.com/maps/dir/?api=1&destination=${spot.lat},${spot.lng}` : (gInfo && gInfo.mapsUrl) || mapsUrl(spot)} target="_blank" rel="noreferrer"><Ico n="map" size={18} />Directions</a>
+            <a className="btn" href={directionsUrl(spot)} target="_blank" rel="noreferrer"><Ico n="map" size={18} />Directions</a>
           )}
           <button className="btn ghost" onClick={toggle} aria-pressed={saved}><Ico n="bookmark" size={18} style={saved ? { fill: "currentColor" } : undefined} />{saved ? "Saved" : "Save"}</button>
           <button className="btn ghost" onClick={share}><Ico n="share" size={18} />Share</button>
         </div>
         <div className="row small" style={{ gap: 16, marginTop: -6 }}>
           {(spot.booking_enabled || spot.whatsapp) && spot.phone && <a className="linkbtn" href={`tel:${spot.phone}`}>Call {spot.phone}</a>}
-          {(spot.booking_enabled || spot.whatsapp || spot.phone) && spot.lat != null && <a className="linkbtn" href={`https://www.google.com/maps/dir/?api=1&destination=${spot.lat},${spot.lng}`} target="_blank" rel="noreferrer">Directions</a>}
+          {(spot.booking_enabled || spot.whatsapp || spot.phone) && <a className="linkbtn" href={directionsUrl(spot)} target="_blank" rel="noreferrer">Directions</a>}
           <button className="linkbtn" onClick={copyLink}>Copy link</button>
         </div>
         {msg && <div className={"alert" + (msg === "Link copied." ? " ok" : "")}>{msg}</div>}
@@ -117,15 +107,9 @@ function SpotPage() {
         <FeatureChips ids={spot.features} />
         <MenuPanel spot={spot} />
         <RewardsBox spot={spot} user={user} />
-        {spot.lat != null && spot.lng != null && (
-          <div style={{ marginTop: 18 }}>
-            <SpotMap spots={[spot]} single height={240} />
-            <div className="row small" style={{ marginTop: 6 }}>
-              <a className="linkbtn" href={`https://www.google.com/maps/dir/?api=1&destination=${spot.lat},${spot.lng}`} target="_blank" rel="noreferrer">Directions in Google Maps</a>
-              <a className="linkbtn" href={`https://www.openstreetmap.org/?mlat=${spot.lat}&mlon=${spot.lng}#map=17/${spot.lat}/${spot.lng}`} target="_blank" rel="noreferrer">OpenStreetMap</a>
-            </div>
-          </div>
-        )}
+        <div style={{ marginTop: 18 }}>
+          <GoogleEmbed spot={spot} height={260} />
+        </div>
         <ReviewsPanel spotId={spot.id} user={user} onChange={(l) => l.length && setRating({ avg: l.reduce((a, r) => a + r.rating, 0) / l.length, count: l.length })} />
         <FeedbackBox spotId={spot.id} user={user} />
         <p className="small muted" style={{ marginTop: 10 }}><Link className="linkbtn" href="/split">Split the bill with friends</Link></p>

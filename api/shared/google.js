@@ -44,7 +44,7 @@ async function call(path, { method = "GET", fieldMask, body } = {}) {
 async function searchText(q) {
   const data = await call("/places:searchText", {
     method: "POST",
-    fieldMask: "places.id,places.displayName,places.formattedAddress,places.primaryTypeDisplayName,places.googleMapsUri",
+    fieldMask: "places.id,places.displayName,places.formattedAddress,places.primaryTypeDisplayName,places.googleMapsUri,places.location",
     body: { textQuery: q, regionCode: "LK", languageCode: "en", pageSize: 8,
             locationBias: { circle: { center: { latitude: 6.9, longitude: 79.86 }, radius: 50000 } } },
   });
@@ -54,6 +54,29 @@ async function searchText(q) {
     address: p.formattedAddress,
     type: p.primaryTypeDisplayName && p.primaryTypeDisplayName.text,
     mapsUrl: p.googleMapsUri,
+    lat: p.location ? p.location.latitude : null,
+    lng: p.location ? p.location.longitude : null,
+  }));
+}
+
+// Food and drink places around a point, most popular first (Places API Nearby Search, max 20 per call).
+const FOOD_TYPES = ["restaurant", "cafe", "coffee_shop", "bakery", "ice_cream_shop", "dessert_shop", "fast_food_restaurant", "tea_house", "sri_lankan_restaurant"];
+async function nearbyFood(lat, lng, radius = 1500) {
+  const data = await call("/places:searchNearby", {
+    method: "POST",
+    fieldMask: "places.id,places.displayName,places.formattedAddress,places.primaryType,places.primaryTypeDisplayName,places.googleMapsUri,places.location,places.businessStatus",
+    body: { includedTypes: FOOD_TYPES, maxResultCount: 20, rankPreference: "POPULARITY", languageCode: "en", regionCode: "LK",
+            locationRestriction: { circle: { center: { latitude: lat, longitude: lng }, radius } } },
+  });
+  return (data.places || []).filter((p) => !p.businessStatus || p.businessStatus === "OPERATIONAL").map((p) => ({
+    id: p.id,
+    name: p.displayName && p.displayName.text,
+    address: p.formattedAddress,
+    type: p.primaryType || "",
+    typeLabel: p.primaryTypeDisplayName && p.primaryTypeDisplayName.text,
+    mapsUrl: p.googleMapsUri,
+    lat: p.location ? p.location.latitude : null,
+    lng: p.location ? p.location.longitude : null,
   }));
 }
 
@@ -108,4 +131,4 @@ async function photoUrl(name, width) {
   return data.photoUri;
 }
 
-module.exports = { searchText, details, photoUrl };
+module.exports = { searchText, nearbyFood, details, photoUrl };

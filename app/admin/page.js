@@ -8,9 +8,8 @@ import { AREAS, CATEGORIES, MOODS } from "@/lib/seed";
 import { slug, todayIso, parseMenu, menuToText } from "@/lib/utils";
 import { FeaturePicker } from "@/components/OwnerExtras";
 import { SetupCheck, GoogleLinker } from "@/components/AdminGoogle";
-import StarterData from "@/components/AdminData";
+import AdminDiscover from "@/components/AdminDiscover";
 import { googleSearch } from "@/lib/api";
-import OsmFinder from "@/components/OsmFinder";
 
 const BLANK = {
   id: "", name: "", area: AREAS[0], category: CATEGORIES[0], price_min: 1000, price_max: 2000, moods: [], about: "",
@@ -19,7 +18,6 @@ const BLANK = {
   max_party: 6, slot_minutes: 30, booking_start: "18:00", booking_end: "21:30", cancel_hours: 2, color: "#FF8A1E",
 };
 
-const fromOsm = (r) => { const { address, ...rest } = r; return { ...BLANK, ...rest, area: r.area || BLANK.area, category: r.category || BLANK.category, phone: r.phone || "", about: r.about || "" }; };
 
 function Collections({ spots }) {
   const [list, setList] = useState(null);
@@ -136,12 +134,11 @@ export default function Admin() {
         <button key={k} className={tab === k ? "on" : ""} onClick={() => setTab(k)}>{l}</button>))}</div>
       <div className="row between"><h1>Spots ({spots.length})</h1>
         <div className="row"><button className="btn ghost" onClick={() => setLinker(!linker)}><Ico n="link" size={16} />Link to Google</button>
-          <button className="btn ghost" onClick={() => setFinder(!finder)}><Ico n="map" size={16} />Find places (free)</button>
+          <button className="btn ghost" onClick={() => setFinder(!finder)}><Ico n="search" size={16} />Add places from Google</button>
           <button className="btn" onClick={() => setEditing({ ...BLANK })}>+ Add spot</button></div></div>
       <SetupCheck spots={spots} />
-      <StarterData spots={spots} onDone={load} />
       {linker && <GoogleLinker spots={spots} onDone={(m) => { setMsg(m); setLinker(false); load(); }} />}
-      {finder && <OsmFinder existing={spots.map((x) => x.name)} onPick={(r) => setEditing(fromOsm(r))} />}
+      {finder && <AdminDiscover spots={spots} onDone={load} />}
       <p className="muted small" style={{ marginTop: 0 }}>Add places you have visited and checked. Mark them Verified once the menu and prices are confirmed.</p>
       {msg && <div className="alert ok">{msg}</div>}
       <input className="input" placeholder="Search spots..." value={q} onChange={(e) => setQ(e.target.value)} style={{ margin: "8px 0 12px" }} />
@@ -182,7 +179,7 @@ function SpotForm({ initial, isNew, onDone }) {
     setGBusy(false);
   };
   // Google's terms let us keep the place ID. The name is a starting point you check on your visit.
-  const pickGoogle = (g) => { setF({ ...f, google_place_id: g.id, name: f.name || g.name }); setGRes(null); };
+  const pickGoogle = (g) => { setF({ ...f, google_place_id: g.id, name: f.name || g.name, lat: g.lat ?? f.lat, lng: g.lng ?? f.lng }); setGRes(null); };
   const set = (k, num) => (e) => setF({ ...f, [k]: num ? Number(e.target.value) : e.target.value });
   const chk = (k) => (e) => setF({ ...f, [k]: e.target.checked });
   const toggleMood = (m) => setF({ ...f, moods: f.moods.includes(m) ? f.moods.filter((x) => x !== m) : [...f.moods, m] });
@@ -206,12 +203,8 @@ function SpotForm({ initial, isNew, onDone }) {
       <button className="linkbtn" style={{ marginTop: 16 }} onClick={() => onDone()}>Back to list</button>
       <h1>{isNew ? "Add a spot" : `Edit ${initial.name}`}</h1>
       <div className="card pad">
-        <OsmFinder existing={[]} onPick={(r) => setF({ ...f, name: r.name, lat: r.lat, lng: r.lng, phone: r.phone || f.phone,
-          about: f.about || r.about || "", area: r.area || f.area, category: r.category || f.category,
-          open_time: r.open_time || f.open_time, close_time: r.close_time || f.close_time })} />
-        <details style={{ marginBottom: 12 }}><summary className="small muted" style={{ cursor: "pointer" }}>Optional: link Google Maps (needs a Google key and card)</summary>
-        <div className="field" style={{ background: "var(--cream)", padding: 12, borderRadius: 12, marginTop: 8 }}>
-          <span>Link to Google Maps (shows live rating, hours, photos and reviews)</span>
+        <div className="field" style={{ background: "var(--cream)", padding: 12, borderRadius: 12 }}>
+          <span>Find it on Google Maps (fills the name and map position, and shows live photos, rating and hours)</span>
           {f.google_place_id ? (
             <div className="row small">
               <span className="badge">Linked</span><code style={{ fontSize: 11 }}>{f.google_place_id}</code>
@@ -225,10 +218,10 @@ function SpotForm({ initial, isNew, onDone }) {
           )}
           {gRes && (gRes.length ? gRes.map((g) => (
             <button key={g.id} className="opt" style={{ marginTop: 8, marginBottom: 0, padding: "9px 12px" }} onClick={() => pickGoogle(g)}>
-              <span><b>{g.name}</b><br /><span className="small muted">{g.type ? g.type + " · " : ""}{g.address}</span></span>
+              <span><b>{g.name}</b><br /><span className="small muted">{g.type ? g.type + ", " : ""}{g.address}</span></span>
             </button>
           )) : <div className="small muted" style={{ marginTop: 6 }}>No match on Google. Try another name.</div>)}
-        </div></details>
+        </div>
         <label className="field"><span>Name</span><input className="input" value={f.name} onChange={set("name")} /></label>
         <div className="grid2">
           <label className="field"><span>Area</span><select className="input" value={f.area} onChange={set("area")}>{AREAS.map((a) => <option key={a}>{a}</option>)}</select></label>
@@ -242,7 +235,7 @@ function SpotForm({ initial, isNew, onDone }) {
           <label className="field"><span>Phone</span><input className="input" value={f.phone || ""} onChange={set("phone")} /></label>
           <label className="field"><span>WhatsApp (94771234567)</span><input className="input" value={f.whatsapp || ""} onChange={set("whatsapp")} /></label>
         </div>
-        <p className="small muted" style={{ marginTop: -4 }}>Tip: "Find places (free)" fills the map position for you.</p>
+        <p className="small muted" style={{ marginTop: -4 }}>Tip: "Find it on Google Maps" above fills the map position for you.</p>
         <FeaturePicker value={f.features || []} onChange={(features) => setF({ ...f, features })} />
         <label className="field"><span>About</span><textarea className="input" rows={3} value={f.about} onChange={set("about")} /></label>
         <label className="field"><span>Video link (TikTok / Instagram / YouTube)</span><input className="input" value={f.video_url || ""} onChange={set("video_url")} /></label>
