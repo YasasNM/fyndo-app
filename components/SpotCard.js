@@ -1,10 +1,12 @@
 "use client";
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import Link from "next/link";
 import { priceLabel, isOpenAt } from "@/lib/utils";
 import { RatingPill } from "@/components/Stars";
 import { Ico, ICON_MARKUP, CAT_ICON } from "@/components/Icon";
 import { coverFor } from "@/lib/coverPhotos";
+import { photoMeta } from "@/lib/photoInfo";
+import { googleDown } from "@/lib/api";
 
 // Kept for old imports. Category icons are drawn in Icon.js now.
 export const CAT_EMOJI = {};
@@ -46,22 +48,27 @@ function nowHHMM() {
 // The image area of a card. Best photo first: Fyndo's own, then the real Google photo (fetched only when the card
 // is near the screen), with an example photo of the same kind of place underneath until the real one arrives.
 export function CardMedia({ spot, children }) {
-  const own = spot.photos && spot.photos[0];
+  const [ownFail, setOwnFail] = useState(false);
+  const own = !ownFail && spot.photos && spot.photos[0];
+  const meta = own ? photoMeta(spot, own) : null;
   const ex = own ? null : coverFor(spot);
-  const [gState, setG] = useState(spot.google_place_id && !own ? "loading" : "none"); // loading | ok | none
+  // Google is asked only after the page has loaded, and not at all while it is paused (daily limit reached).
+  const [gState, setG] = useState("wait"); // wait | loading | ok | none
+  useEffect(() => { setG(spot.google_place_id && !own && !googleDown() ? "loading" : "none"); }, [spot.google_place_id, own]);
   const showingExample = !own && gState !== "ok" && ex && !ex.real;
   return (
     <div className="pcard-media" style={{ "--c": spot.color || "#F6B800" }}>
-      {own ? <img className="pcard-img" src={own} alt="" loading="lazy" decoding="async" />
+      {own ? <img className="pcard-img" src={own} alt="" loading="lazy" decoding="async" referrerPolicy={meta.external ? "no-referrer" : undefined} onError={() => setOwnFail(true)} />
         : ex ? <img className="pcard-img" src={ex.src} alt="" loading="lazy" decoding="async" />
         : <Thumb spot={spot} className="pcard-img tile-fill" />}
-      {gState !== "none" && (
+      {(gState === "loading" || gState === "ok") && (
         <img className={"pcard-img pcard-google" + (gState === "ok" ? " in" : "")} src={`/api/cover?id=${encodeURIComponent(spot.google_place_id)}&w=600`}
           alt="" loading="lazy" decoding="async" referrerPolicy="no-referrer" onLoad={() => setG("ok")} onError={() => setG("none")} />
       )}
       <div className="pcard-shade" />
       {showingExample && <span className="pcard-example">Example photo</span>}
       {gState === "ok" && <span className="pcard-example">Photo: Google</span>}
+      {meta && meta.short && <span className="pcard-example">{meta.short}</span>}
       {children}
     </div>
   );

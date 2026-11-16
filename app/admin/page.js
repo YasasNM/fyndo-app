@@ -10,6 +10,8 @@ import { FeaturePicker } from "@/components/OwnerExtras";
 import { SetupCheck, GoogleLinker } from "@/components/AdminGoogle";
 import AdminDiscover from "@/components/AdminDiscover";
 import PhotoManager from "@/components/PhotoManager";
+import AdminPhotos, { PhotoSuggest } from "@/components/AdminPhotos";
+import AdminClaims from "@/components/AdminClaims";
 import { googleSearch } from "@/lib/api";
 
 const BLANK = {
@@ -97,8 +99,7 @@ export default function Admin() {
   const [editing, setEditing] = useState(null); // spot object or BLANK
   const [q, setQ] = useState("");
   const [msg, setMsg] = useState("");
-  const [finder, setFinder] = useState(false);
-  const [linker, setLinker] = useState(false);
+  const [tool, setTool] = useState("");
   const [tab, setTab] = useState("spots");
   const load = () => db.getSpots().then(setSpots);
   useEffect(() => { if (user === null) goLogin(); if (user && user.role === "admin") load(); }, [user]);
@@ -120,27 +121,63 @@ export default function Admin() {
     try { await db.assignOwner(s.id, email); setMsg(`Owner set for ${s.name}.`); load(); } catch (e) { setMsg(e.message); }
   };
 
+  const TABS = [["spots", "Spots"], ["tools", "Tools"], ["claims", "Owner claims"], ["collections", "Lists"], ["reports", "Reports"]];
+  const tabs = (
+    <div className="tabs-in" role="tablist" aria-label="Admin sections">{TABS.map(([k, l]) => (
+      <button key={k} role="tab" aria-selected={tab === k} className={tab === k ? "on" : ""} onClick={() => { setTab(k); setTool(""); }}>{l}</button>))}</div>
+  );
+
+  // Tools: one simple list; each tool opens on its own, with a way back.
+  const TOOLS = [
+    ["setup", "pin", "Setup check", "Is Google, the database and AI working?"],
+    ["photos", "star", "Find real photos", "Look up photos of places from open sources and their websites"],
+    ["discover", "search", "Add places from Google", "Popular food spots in an area"],
+    ["link", "link", "Link places to Google", "Match your places to Google Maps for live hours and ratings"],
+  ];
+  if (tab === "tools") {
+    const t = TOOLS.find((x) => x[0] === tool);
+    return (
+      <>
+        <h1>Admin</h1>
+        {tabs}
+        {msg && <div className="alert ok">{msg}</div>}
+        {!t ? (
+          <nav className="menu" aria-label="Admin tools" style={{ marginTop: 0 }}>
+            {TOOLS.map(([k, ic, title, sub]) => (
+              <button key={k} type="button" className="menu-btn" onClick={() => { setMsg(""); setTool(k); }}>
+                <Ico n={ic} size={20} /><span><b>{title}</b><span className="small muted">{sub}</span></span>
+              </button>
+            ))}
+          </nav>
+        ) : (
+          <>
+            <button className="linkbtn" onClick={() => setTool("")}>All tools</button>
+            <h2 style={{ marginTop: 8 }}>{t[2]}</h2>
+            {tool === "setup" && <SetupCheck spots={spots} />}
+            {tool === "photos" && <AdminPhotos spots={spots} onDone={load} />}
+            {tool === "discover" && <AdminDiscover spots={spots} onDone={load} />}
+            {tool === "link" && <GoogleLinker spots={spots} onDone={(m) => { setMsg(m); setTool(""); load(); }} />}
+          </>
+        )}
+      </>
+    );
+  }
+
   if (tab !== "spots") return (
     <>
       <h1>Admin</h1>
-      <div className="tabs-in">{[["spots", "Spots"], ["collections", "Lists"], ["reports", "Reports"]].map(([k, l]) => (
-        <button key={k} className={tab === k ? "on" : ""} onClick={() => setTab(k)}>{l}</button>))}</div>
-      {tab === "collections" ? <Collections spots={spots} /> : <Reports spots={spots} />}
+      {tabs}
+      {tab === "claims" ? <AdminClaims onChange={load} /> : tab === "collections" ? <Collections spots={spots} /> : <Reports spots={spots} />}
     </>
   );
 
   return (
     <>
-      <div className="tabs-in" style={{ marginTop: 4 }}>{[["spots", "Spots"], ["collections", "Lists"], ["reports", "Reports"]].map(([k, l]) => (
-        <button key={k} className={tab === k ? "on" : ""} onClick={() => setTab(k)}>{l}</button>))}</div>
-      <div className="row between"><h1>Spots ({spots.length})</h1>
-        <div className="row"><button className="btn ghost" onClick={() => setLinker(!linker)}><Ico n="link" size={16} />Link to Google</button>
-          <button className="btn ghost" onClick={() => setFinder(!finder)}><Ico n="search" size={16} />Add places from Google</button>
-          <button className="btn" onClick={() => setEditing({ ...BLANK })}>+ Add spot</button></div></div>
-      <SetupCheck spots={spots} />
-      {linker && <GoogleLinker spots={spots} onDone={(m) => { setMsg(m); setLinker(false); load(); }} />}
-      {finder && <AdminDiscover spots={spots} onDone={load} />}
-      <p className="muted small" style={{ marginTop: 0 }}>Add places you have visited and checked. Mark them Verified once the menu and prices are confirmed.</p>
+      <h1>Admin</h1>
+      {tabs}
+      <div className="row between"><h2 style={{ margin: 0 }}>Spots ({spots.length})</h2>
+        <button className="btn sm" onClick={() => setEditing({ ...BLANK })}><Ico n="plus" size={16} />Add spot</button></div>
+      <p className="muted small" style={{ marginTop: 6 }}>Add places you have visited and checked. Mark them Verified once the menu and prices are confirmed.</p>
       {msg && <div className="alert ok">{msg}</div>}
       <input className="input" placeholder="Search spots..." value={q} onChange={(e) => setQ(e.target.value)} style={{ margin: "8px 0 12px" }} />
       <div className="card" style={{ overflowX: "auto" }}>
@@ -154,7 +191,7 @@ export default function Admin() {
                 <td>{s.verified ? <span className="badge">Verified</span> : <span className="badge grey">Unverified</span>}{" "}
                     {s.booking_enabled && <span className="badge book">Booking</span>}{" "}
                     {s.google_place_id ? <span className="badge book">Google</span> : <span className="badge grey">No Google</span>}</td>
-                <td className="small">{s.owner_id ? "Claimed" : <button className="linkbtn" onClick={() => owner(s)}>Set owner</button>}</td>
+                <td className="small">{s.owner_id ? (s.owner_paid_until ? `Owner until ${new Date(s.owner_paid_until).toLocaleDateString("en-GB")}` : "Claimed") : <button className="linkbtn" onClick={() => owner(s)}>Set owner</button>}</td>
                 <td style={{ whiteSpace: "nowrap" }}>
                   <button className="linkbtn" onClick={() => setEditing(s)}>Edit</button>{"  ·  "}
                   <button className="linkbtn" style={{ color: "var(--chili)" }} onClick={() => del(s)}>Delete</button>
@@ -238,6 +275,9 @@ function SpotForm({ initial, isNew, onDone }) {
         </div>
         <p className="small muted" style={{ marginTop: -4 }}>Tip: "Find it on Google Maps" above fills the map position for you.</p>
         <FeaturePicker value={f.features || []} onChange={(features) => setF({ ...f, features })} />
+        <label className="field"><span>Website</span><input className="input" type="url" value={f.website || ""} onChange={set("website")} placeholder="https://..." /></label>
+        <PhotoSuggest spot={f} onAdd={(url, meta, website) => setF((x) => ({ ...x, photos: [...(x.photos || []), url].slice(0, 12),
+          photo_info: { ...(x.photo_info || {}), [url]: meta }, website: x.website || website || "" }))} />
         <PhotoManager spot={isNew ? { ...f, id: "" } : f} onChange={(photos) => setF((x) => ({ ...x, photos }))} />
         <label className="field"><span>About</span><textarea className="input" rows={3} value={f.about} onChange={set("about")} /></label>
         <label className="field"><span>Video link (TikTok / Instagram / YouTube)</span><input className="input" value={f.video_url || ""} onChange={set("video_url")} /></label>

@@ -18,6 +18,7 @@ import { embedUrl, niceTime, priceLabel, waUrl, shareNow } from "@/lib/utils";
 import dynamic from "next/dynamic";
 import PhotoGallery from "@/components/PhotoGallery";
 import { coverFor } from "@/lib/coverPhotos";
+import { galleryPhotos } from "@/lib/photoInfo";
 const SpotMap = dynamic(() => import("@/components/SpotMap"), { ssr: false, loading: () => <div className="skel" style={{ height: 240, borderRadius: 16 }} /> });
 import { directionsUrl } from "@/lib/gmaps";
 
@@ -61,18 +62,18 @@ function SpotPage() {
         {embed ? (
           <div className="video"><iframe src={embed} allow="autoplay; encrypted-media; fullscreen" allowFullScreen title="Video review" /></div>
         ) : spot.photos && spot.photos.length ? (
-          <div className="card" style={{ overflow: "hidden" }}><PhotoGallery photos={spot.photos.map((url) => ({ url }))} placeName={spot.name} /></div>
+          <div className="card" style={{ overflow: "hidden" }}><PhotoGallery photos={galleryPhotos(spot)} placeName={spot.name} /></div>
         ) : spot.google_place_id && !gFail ? null : coverFor(spot) ? (
           <figure className="photo spothero" style={{ "--ratio": 16 / 10 }}>
             <img src={coverFor(spot).large} alt={coverFor(spot).alt} />
-            {!coverFor(spot).real && <span className="pcard-example">Example photo of {spot.category === "Activity" ? "a place like this" : "the kind of food here"}</span>}
+            {!coverFor(spot).real && <span className="pcard-example">Example photo of {spot.category === "Activity" || coverFor(spot).scene ? "a place like this" : "the kind of food here"}</span>}
             <figcaption className="photocredit"><Link href="/credits">Photo credits</Link></figcaption>
           </figure>
         ) : (
           <Thumb spot={spot} className="video empty"><div className="small" style={{ marginTop: 10, position: "relative", zIndex: 1, color: "#fff", fontWeight: 600 }}>Video coming soon</div></Thumb>
         )}
         {embed && spot.photos && spot.photos.length > 0 && (
-          <div className="card" style={{ overflow: "hidden", marginTop: 14 }}><PhotoGallery photos={spot.photos.map((url) => ({ url }))} placeName={spot.name} /></div>
+          <div className="card" style={{ overflow: "hidden", marginTop: 14 }}><PhotoGallery photos={galleryPhotos(spot)} placeName={spot.name} /></div>
         )}
         {spot.google_place_id && <GooglePanel placeId={spot.google_place_id} onInfo={setGInfo} onFail={() => setGFail(true)} admin={Boolean(user && user.role === "admin")} />}
         {!spot.google_place_id && user && user.role === "admin" && (
@@ -136,6 +137,12 @@ function SpotPage() {
         <p className="small muted" style={{ marginTop: 16 }}>
           Wrong info? <a className="linkbtn" href={waUrl(CONFIG.whatsapp, `Hi Fyndo, the info for ${spot.name} needs an update: `)} target="_blank" rel="noreferrer">Tell us</a>
         </p>
+        {(!spot.owner_id || (spot.owner_paid_until && new Date(spot.owner_paid_until) < new Date())) && (
+          <Link href={`/claim?id=${encodeURIComponent(spot.id)}`} className="claimcta">
+            <Ico n="store" size={22} />
+            <span><b>Own or run {spot.name}?</b><span className="small">Claim this page to update your menu, prices, photos and bookings.</span></span>
+          </Link>
+        )}
       </div>
     </div>
   );

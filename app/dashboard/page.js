@@ -7,6 +7,7 @@ import { useUser, goLogin } from "@/lib/hooks";
 import { MOODS } from "@/lib/seed";
 import { RewardsTab, ReviewsTab, FeaturePicker } from "@/components/OwnerExtras";
 import PhotoManager from "@/components/PhotoManager";
+import { CONFIG } from "@/lib/config";
 import { niceTime, nextDays, todayIso, bookingSlots, STATUS_LABEL, parseMenu } from "@/lib/utils";
 
 const STATUS_BADGE = { confirmed: "", requested: "warn", declined: "red", cancelled: "grey", arrived: "book", no_show: "red" };
@@ -26,7 +27,12 @@ export default function Dashboard() {
 
   if (user === undefined || user === null) return <div className="loading">Loading...</div>;
   if (user.role === "user")
-    return <div className="empty"><div className="big"><Ico n="store" size={30} /></div>This page is for business owners.<br />Own a place? Message us to claim your page.</div>;
+    return (
+      <div className="empty"><div className="big"><Ico n="store" size={30} /></div>
+        <p style={{ margin: "0 0 14px" }}>This page is for business owners.<br />Run a restaurant or café on Fyndo? Claim it to manage its page.</p>
+        <Link className="btn" href="/claim">Claim your place</Link>
+      </div>
+    );
   if (err) return <div className="alert">{err}</div>;
   if (!spots) return <div className="loading">Loading your places...</div>;
   if (!spots.length) return <div className="empty"><div className="big"><Ico n="store" size={30} /></div>No places linked to your account yet.</div>;
@@ -45,6 +51,7 @@ export default function Dashboard() {
         ) : <b>{spot.name}</b>}
         <Link className="linkbtn" href={`/spot?id=${spot.id}`}>View public page</Link>
       </div>
+      <PlanNote spot={spot} admin={user.role === "admin"} />
       <Stats spotId={spot.id} />
       <div className="tabs-in">
         {[["bookings", "Bookings"], ["rewards", "Rewards & QR"], ["reviews", "Reviews & tips"], ["settings", "Booking settings"], ["page", "Edit page & menu"]].map(([k, l]) => (
@@ -58,6 +65,18 @@ export default function Dashboard() {
       {tab === "page" && <EditPage spot={spot} onSaved={refresh} />}
     </>
   );
+}
+
+// Yearly owner plan: when it ends, and a nudge to renew in the last month.
+function PlanNote({ spot, admin }) {
+  if (admin || !spot.owner_paid_until) return null;
+  const end = new Date(spot.owner_paid_until);
+  const days = Math.ceil((end - new Date()) / 86400000);
+  const when = end.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  const renew = <Link className="linkbtn" href={`/claim?id=${encodeURIComponent(spot.id)}`}>Renew for {CONFIG.owner.months} months</Link>;
+  if (days < 0) return <div className="alert">Your owner plan ended on {when}, so changes can&apos;t be saved. {renew}.</div>;
+  if (days <= 30) return <div className="alert">Your owner plan ends on {when} ({days} day{days === 1 ? "" : "s"} left). {renew}.</div>;
+  return <p className="small muted" style={{ margin: "6px 0 0" }}>Owner plan active until {when}.</p>;
 }
 
 function Stats({ spotId }) {

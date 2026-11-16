@@ -55,14 +55,32 @@ You'll do 6 parts. Take them in order. Each takes 5 to 15 minutes.
 1. **supabase.com** > New project. Name `fyndo`, region **Singapore**, strong password (save it).
 2. **SQL Editor** > New query > paste all of `supabase/schema.sql` > **Run**.
    (Already ran it before? Run it again. It safely adds the new Google column.)
-   **Then run `supabase/schema_v3.sql` and `supabase/schema_v4.sql` the same way** (v4 adds free photo storage).
+   **Then run `supabase/schema_v3.sql`, `supabase/schema_v4.sql` and `supabase/schema_v5.sql` the same way, in that order** (v4 adds free photo storage; v5 adds photo credits, place websites and restaurant owner claims).
    It adds QR check-ins and rewards, verified reviews, owner replies, private feedback, reports, collections and group votes. Safe to run again. Paste the file's contents, not its name.
 3. **Real places:** run `supabase/seed_google.sql` the same way. It adds 177 real restaurants, cafés, dessert places and things to do in Colombo 3, 4, 5, 7, Dehiwala and Mount Lavinia, each linked to its Google listing, with Google's price level and usual hours. Skip `seed.sql` (made-up samples).
 4. **Accounts (email verification and password reset):**
    - **Authentication > Sign In / Providers > Email**: turn **on** "Confirm email". New users must click the link in their email before they can log in.
    - **Authentication > URL Configuration**: set **Site URL** to your live address (for example `https://YOUR-SITE.azurestaticapps.net`). Under **Redirect URLs** add `https://YOUR-SITE.azurestaticapps.net/**` (and your custom domain if you have one).
-   - **Email sending (important for production):** Supabase's built-in email only sends a few emails an hour and is meant for testing. Under **Project Settings > Authentication > SMTP Settings**, connect a free email service such as **Brevo** (300 emails a day free) or **Resend** (3,000 a month free). Without it, sign-up and reset emails may not arrive.
+   - **Email sending (important for production):** Supabase's built-in email only sends a few emails an hour and is meant for testing, so connect your own sender. See **"Emails going to spam"** below for the setup that lands in the inbox.
    - Optional: **Authentication > Emails** lets you edit the wording of the confirmation and reset emails.
+
+### Emails going to spam: the fix
+**Why it happens:** the emails say they are from `fyndolk.official@gmail.com` but are sent by Brevo's servers. Gmail and Yahoo now check that mail "from" a gmail.com address really comes from Google (SPF/DKIM/DMARC). It doesn't, so it is marked as spam.
+
+**Free fix now: send through Gmail itself** (works up to about 500 emails a day):
+1. Sign in to `fyndolk.official@gmail.com` > **myaccount.google.com > Security** > turn on **2-Step Verification**.
+2. Open **myaccount.google.com/apppasswords**, create one named `Fyndo Supabase`, and copy the 16-letter code (this is a password: never put it in code or GitHub).
+3. Supabase > **Authentication > Emails > SMTP Settings** > **Enable custom SMTP**:
+   - Sender email: `fyndolk.official@gmail.com`, Sender name: `Fyndo`
+   - Host: `smtp.gmail.com`, Port: `465`
+   - Username: `fyndolk.official@gmail.com`, Password: the 16-letter code (no spaces)
+   - **Save**. Then **Authentication > Rate Limits**: set "emails sent per hour" to what you need (for example 100).
+4. Test: sign up with a new address, and also try "Forgot password". If an early email still lands in spam, open it and press **Report not spam**; this teaches Gmail quickly.
+5. In Brevo you can leave the account as it is; it is no longer used.
+
+**Best long-term fix (when you have a domain):** buy a domain (for example `fyndo.lk` or a `.com`), add it in Brevo under **Senders, Domains & Dedicated IPs > Domains > Authenticate**, add the DKIM, Brevo code and DMARC (`v=DMARC1; p=none`) records it shows to your domain's DNS, then send from `no-reply@yourdomain`. That has no 500-a-day limit.
+
+**Also check:** the Site URL in **Authentication > URL Configuration** is your real site address (links that point somewhere else look suspicious), and keep the email wording plain: a short sentence and the button, no ALL CAPS.
 5. **Project Settings > API**: keep the **Project URL** and **anon public key** open in a tab.
 
 ## Part 3: Create the Azure Static Web App (free)
@@ -123,8 +141,9 @@ These keys stay on the server. They are never sent to people's browsers.
    Edit the key > **API restrictions** > **Restrict key** > tick only **Places API (New)** > Save.
 5. **Protect your wallet (important):**
    - **Billing > Budgets & alerts** > create a budget of **USD 1** with email alerts. (Alerts warn you. They don't stop charges.)
-   - **APIs & Services > Places API (New) > Quotas**: lower the request limits to small numbers (for example 30 to 60 per minute). This is the hard stop.
-   - Fyndo also helps: reviews only load when someone taps "Show Google reviews", Google info is cached for 10 minutes, and each visitor has an hourly limit.
+   - **APIs & Services > Places API (New) > Quotas**: this is the hard stop. Google gives a free number of calls each month for each kind of request (see the Places API pricing page). Set each **per day** limit to about that monthly free number divided by 30, so you never pay. The ones Fyndo uses for visitors are **GetPlaceRequest** (place pages and card photos) and **GetPhotoMediaRequest** (photos). Text Search is only used by admins.
+   - If a daily limit is too low, Google photos and ratings simply stop for the rest of that day (it resets at midnight, US Pacific time). Visitors see Fyndo's own info and example photos; nothing breaks.
+   - Fyndo also helps: when Google says a limit is reached, the server stops asking Google for 15 minutes and every visitor's browser stops for 10, instead of hammering it. Google info is cached for 30 minutes on the server and in the browser, reviews only load when someone taps "Show Google reviews", and each visitor has an hourly limit. `GOOGLE_CARD_PHOTOS=off` in Azure turns off Google photos on cards completely.
 
 ### 5b. Azure OpenAI (for Ask Fyndo)
 1. Azure portal > search **Azure OpenAI** > **Create**. Resource group `fyndo-rg`, region **East US** (or any region that offers the model), tier **Standard S0**.
@@ -142,7 +161,22 @@ These keys stay on the server. They are never sent to people's browsers.
    ```
 3. Log out and in again. Open **Admin** > **+ Add spot** > **Find on Google** > type "name + area" > pick the right result.
 4. Fill in the Fyndo parts that Google doesn't have: price range, moods, your menu and prices, video link, booking. Tick **Verified** after you visit.
-5. Owners: they sign up, then **Admin > Set owner** with their email.
+5. Owners: they sign up, then **Admin > Set owner** with their email (or they claim their page themselves, below).
+
+### Real photos for places
+**Admin > Tools > Find real photos** goes through every place that has no photo and looks it up for free in three places it is allowed to show:
+OpenStreetMap (the place's photo, Wikimedia file or website), Wikimedia Commons (photos taken at the place whose title names it), and the place's own
+website (the picture it uses for link previews, or a large photo on its home page). Every photo keeps a credit ("From their website", "Wikimedia Commons").
+Many small places have no website or open photos, so expect some places to stay on example photos; owners can add their own once they claim the page.
+For one place: **Edit** it > **Find real photos**, then tick the ones you want. Photos never come from Google here, because Google's terms don't allow keeping its photos.
+
+### Restaurant owners claiming their page
+1. On any place without an owner, people see **"Own or run this place? Claim this page"** (also under **Me** and **Business**).
+2. They fill in their name, role and phone, upload proof (business registration, a bill in the business name, or a photo at the counter), and get a reference like `FYC-AB12CD`.
+3. They pay **LKR 5,000 for 12 months by bank transfer**: the app tells them to email `fyndolk.official@gmail.com` with the reference, you reply with your bank details, and they upload the receipt.
+4. **Admin > Owner claims**: open the proof, press **Payment received** when the money arrives, then **Approve owner**. They become the owner for 12 months, and the **Business** dashboard opens for them.
+5. In the last month the dashboard offers **Renew**: they send a short renewal claim and pay again; when you approve it, 12 months are added on top of the time left. If the plan runs out, their changes stop saving until they renew.
+Proof and receipts are private (only that person and admins can open them). To change the fee later, edit `owner.feeLkr` in `lib/config.js` and `fee_lkr` in `supabase/schema_v5.sql`.
 
 ---
 

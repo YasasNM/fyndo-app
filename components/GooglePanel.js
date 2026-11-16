@@ -24,7 +24,7 @@ export default function GooglePanel({ placeId, onInfo, onFail, admin }) {
   if (g === undefined) return <div className="card pad small muted gpanel">Loading info from Google Maps...</div>;
   if (g === null) {
     // Visitors just don't see the panel. Admins see why, so setup problems are easy to find.
-    return admin ? <div className="alert gpanel">Google info is hidden: {loadErr || "no reply from the server"}. Open Admin and look at the Setup check.</div> : null;
+    return admin ? <p className="small muted gpanel-note">Admin only: Google details are not showing here. {loadErr || "The server did not answer."} Visitors see Fyndo's own info.</p> : null;
   }
 
   const loadReviews = async () => {

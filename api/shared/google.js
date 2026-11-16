@@ -13,9 +13,9 @@ function key() {
 // Turns Google's long error text into something an admin can act on.
 function friendly(raw, status) {
   if (status === 429 || /quota/i.test(raw)) {
-    if (/per day/i.test(raw)) return "Google's daily search limit for this project is used up. Raise the daily Text Search limit in Google Cloud (APIs & Services, Places API (New), Quotas), or try again tomorrow.";
-    if (/per minute|per second/i.test(raw)) return "Too many Google searches at once. Wait a minute and try again.";
-    return "Google's search limit for this project has been reached. Check Quotas for Places API (New) in Google Cloud.";
+    if (/per day/i.test(raw)) return "Google's daily limit is used up (it resets at midnight, US Pacific time). Fyndo keeps working with its own info until then.";
+    if (/per minute|per second/i.test(raw)) return "Google is busy. Try again in a minute.";
+    return "Google's limit for this project has been reached. Fyndo keeps working with its own info.";
   }
   if (/api key not valid|API_KEY_INVALID/i.test(raw)) return "Google rejected the key. Check the GOOGLE_MAPS_API_KEY setting in Azure.";
   if (/has not been used|is disabled|SERVICE_DISABLED/i.test(raw)) return "Places API (New) is not turned on for this Google project. Enable it in Google Cloud, then try again.";
@@ -23,7 +23,16 @@ function friendly(raw, status) {
   return raw;
 }
 
+// Circuit breaker: once Google says a limit is used up, stop calling it for a while.
+// Thousands of visitors then get an instant "not available" (and Fyndo's own info) instead of
+// each request waiting on Google and burning the next minute's quota.
+let pausedUntil = 0, pauseMsg = "";
+const PAUSE_MS = 15 * 60 * 1000;
+function paused() { return Date.now() < pausedUntil ? pauseMsg : ""; }
+
 async function call(path, { method = "GET", fieldMask, body } = {}) {
+  const p = paused();
+  if (p) { const e = new Error(p); e.status = 429; e.quota = true; e.paused = true; throw e; }
   const res = await fetch(BASE + path, {
     method,
     headers: { "X-Goog-Api-Key": key(), ...(fieldMask ? { "X-Goog-FieldMask": fieldMask } : {}), ...(body ? { "Content-Type": "application/json" } : {}) },
@@ -35,6 +44,7 @@ async function call(path, { method = "GET", fieldMask, body } = {}) {
     const e = new Error(friendly(raw, res.status));
     e.status = res.status === 429 || /quota/i.test(raw) ? 429 : 502;
     e.quota = e.status === 429;
+    if (e.quota) { pausedUntil = Date.now() + (/per minute|per second/i.test(raw) ? 60 * 1000 : PAUSE_MS); pauseMsg = e.message; }
     throw e;
   }
   return data;
@@ -149,4 +159,11 @@ async function coverUrl(placeId, width) {
   return uri;
 }
 
-module.exports = { searchText, nearbyFood, details, photoUrl, coverUrl };
+// Just the place's own website address (used once by the admin photo finder).
+async function websiteFor(placeId) {
+  if (!/^[A-Za-z0-9_-]{10,300}$/.test(placeId || "")) return "";
+  const p = await call(`/places/${placeId}`, { fieldMask: "websiteUri" });
+  return p.websiteUri || "";
+}
+
+module.exports = { searchText, nearbyFood, details, photoUrl, coverUrl, websiteFor, paused, _resetPause: () => { pausedUntil = 0; } };
