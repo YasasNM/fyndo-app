@@ -126,17 +126,47 @@ export default function Home() {
     setBusy(false);
   };
 
+  // What's open right now; when nothing is (late night), the places that open soonest.
+  const nowT = (() => { const n = new Date(); return `${String(n.getHours()).padStart(2, "0")}:${String(n.getMinutes()).padStart(2, "0")}`; })();
+  const openList = (spots || []).filter((s) => isOpenAt(s, nowT)).slice(0, 8);
+  const toMins = (t) => { const [h, m] = String(t || "00:00").split(":").map(Number); return h * 60 + m; };
+  // Fewer than four open: top the row up with the places that open soonest, so it is never a lone card.
+  const soonList = openList.length >= 4 ? [] : (spots || []).filter((s) => !openList.includes(s)).sort((a, b) => {
+    const n = toMins(nowT), d = (s) => (toMins(s.open_time) - n + 1440) % 1440;
+    return d(a) - d(b);
+  }).slice(0, (openList.length ? 4 : 8) - openList.length);
+  const nearList = [...openList, ...soonList];
+
   return (
     <>
-      <section className="hero">
-        <div className="hero-text">
-          <h1>Find the real spots.</h1>
-          <p className="lede">See how a place really looks, what it really costs, and plan the whole night in a minute.</p>
+      {/* On phones this block re-orders: search blind, open places, then the intro and video (see .homehead in globals.css). */}
+      <div className="homehead">
+        <section className="hero">
+          <div className="hero-text">
+            <h1>Find the real spots.</h1>
+            <p className="lede">See how a place really looks, what it really costs, and plan the whole night in a minute.</p>
 
-          <AskFyndo spots={spots} />
+            <AskFyndo spots={spots} />
+          </div>
+          <HeroVideo className="hero-photo" />
+        </section>
+        <div className="moodrow">
+          <h2 className="rowlabel">Pick a mood</h2>
+          <div className="chips">
+            {MOODS.map((m) => (
+              <button key={m} className={"chip" + (mood === m ? " on" : "")} aria-pressed={mood === m} onClick={() => setMood(mood === m ? "" : m)}>{m}</button>
+            ))}
+          </div>
         </div>
-        <HeroVideo className="hero-photo" />
-      </section>
+        {spots && !filtering && view === "list" && nearList.length > 0 && (
+          <section className="opennear" aria-labelledby="opennear-h">
+            <h2 id="opennear-h">{openList.length ? "Open near you" : "Opening soonest"}</h2>
+            {!openList.length && <p className="small muted" style={{ margin: "-6px 0 8px" }}>Nothing is open right now. These open first.</p>}
+            {openList.length > 0 && soonList.length > 0 && <p className="small muted" style={{ margin: "-6px 0 8px" }}>{openList.length} open now, then the ones opening soonest.</p>}
+            <div className="hscroll">{nearList.map(card)}</div>
+          </section>
+        )}
+      </div>
 
       {rainy && (
         <div className="card pad rainbar">
@@ -150,15 +180,6 @@ export default function Home() {
         {OCCASIONS.map((o) => (
           <button key={o.id} className={"chip" + (occasion === o.id ? " on" : "")} aria-pressed={occasion === o.id} onClick={() => setOccasion(occasion === o.id ? "" : o.id)}>{o.label}</button>
         ))}
-      </div>
-
-      <div className="moodrow">
-      <h2 className="rowlabel">Pick a mood</h2>
-      <div className="chips">
-        {MOODS.map((m) => (
-          <button key={m} className={"chip" + (mood === m ? " on" : "")} aria-pressed={mood === m} onClick={() => setMood(mood === m ? "" : m)}>{m}</button>
-        ))}
-      </div>
       </div>
 
       <div className="filters">
@@ -247,7 +268,10 @@ export default function Home() {
             </div>
           ))}
           {topRated.length > 0 && (<><h2>Top rated by Fyndo users</h2><div className="hscroll">{topRated.map(card)}</div></>)}
-          {spots.some((s) => s.hidden_gem) && (<><h2>Hidden gems</h2><div className="grid">{spots.filter((s) => s.hidden_gem).map(card)}</div></>)}
+          {spots.some((s) => s.hidden_gem) && (<><h2>Hidden gems</h2><div className="hscroll">{spots.filter((s) => s.hidden_gem).map((s) => (
+            <SpotCard key={s.id} spot={s} rating={ratings[s.id]} distanceKm={dist(s)} why={whyFor(s)} inGems
+              pick={{ on: picked.includes(s.id), toggle: togglePick }} save={{ on: saves.ids.includes(s.id), toggle: saves.toggle }} />
+          ))}</div></>)}
           <h2>All spots</h2>
         </>
       )}

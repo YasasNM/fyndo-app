@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-17T00:00:00Z",
+  "title": "Design System: Fyndo",
+  "extensions": {
+    "colorMeta": {
+      "livery-red": { "role": "primary", "displayName": "Livery Red", "tonalRamp": ["#3d0a0e", "#5e1016", "#7d141c", "#9a1a23", "#b8202b", "#d24a53", "#e98b91", "#f8d6d8"] },
+      "route-yellow": { "role": "primary", "displayName": "Route Yellow", "tonalRamp": ["#3a3200", "#5e5000", "#866e00", "#a88800", "#ffd000", "#ffdc40", "#ffe988", "#fff3b0"] },
+      "board-black": { "role": "neutral", "displayName": "Board Black", "tonalRamp": ["#000000", "#0f0f0e", "#141414", "#1a1a18", "#252522", "#2e2e2b", "#3a3a36", "#4a4a45"] },
+      "board-white": { "role": "neutral", "displayName": "Board White", "tonalRamp": ["#5f5f58", "#85857d", "#a3a39a", "#b9b9b0", "#d8d8d0", "#e8e8e2", "#f2f2ee", "#ffffff"] },
+      "open-green": { "role": "secondary", "displayName": "Open Green", "tonalRamp": ["#06301b", "#0a4a2a", "#0f6539", "#13804a", "#2e9a63", "#63b98b", "#9be0b7", "#e4f3ea"] },
+      "chilli": { "role": "secondary", "displayName": "Chilli", "tonalRamp": ["#3a1c17", "#5e2118", "#8f2615", "#c8381f", "#da5e48", "#ff9a86", "#ffb8aa", "#fbe9e5"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Page titles, set in the route-board face." },
+      "numeral": { "displayName": "Route numeral", "purpose": "Per-person prices and stop numbers: the largest thing on a card." },
+      "label": { "displayName": "Plate label", "purpose": "Buttons, chips, tabs and area plates." },
+      "body": { "displayName": "Body", "purpose": "All reading text, in the hyperlegible face." }
+    },
+    "shadows": [
+      { "name": "button-lip", "value": "inset 0 -3px 0 var(--sun-edge)", "purpose": "Pressed-plate lip inside solid buttons; thins to 1px on press." },
+      { "name": "plate-ring", "value": "inset 0 0 0 2px var(--board)", "purpose": "The painted outline on area plates and mood chips." },
+      { "name": "float", "value": "0 8px 28px rgba(0,0,0,.28)", "purpose": "Only for the floating compare tray and tour card." }
+    ],
+    "motion": [
+      { "name": "press", "value": "0.12s cubic-bezier(0.2, 0.9, 0.3, 1)", "purpose": "Button and chip press feedback." },
+      { "name": "photo-zoom", "value": "0.5s cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Card photo eases in slightly on hover; off with reduced motion." }
+    ],
+    "breakpoints": [
+      { "name": "phone", "value": "760px" },
+      { "name": "narrow-card", "value": "280px (container)" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one main action on a screen: a yellow route plate with a pressed lip.",
+      "html": "<button class=\"ds-btn\">Book a table</button>",
+      "css": ".ds-btn { background: var(--plate, #ffd000); color: var(--board, #141414); border: 0; border-radius: 8px; padding: 12px 22px 15px; min-height: 48px; font-family: 'Saira Condensed', sans-serif; font-weight: 700; font-size: 18px; box-shadow: inset 0 -3px 0 var(--plate-edge, #a88800); cursor: pointer; transition: transform .12s, box-shadow .12s; } .ds-btn:hover { background: #ffdc40; } .ds-btn:active { transform: translateY(2px); box-shadow: inset 0 -1px 0 var(--plate-edge, #a88800); } .ds-btn:focus-visible { outline: 2.5px solid #141414; outline-offset: 3px; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Second choice beside a primary: white plate, outline, no lip.",
+      "html": "<button class=\"ds-btn-ghost\">Save</button>",
+      "css": ".ds-btn-ghost { background: #fff; color: #141414; border: 0; border-radius: 8px; padding: 12px 20px; min-height: 48px; font-family: 'Saira Condensed', sans-serif; font-weight: 700; font-size: 18px; box-shadow: inset 0 0 0 1.5px #b9b9b0; cursor: pointer; } .ds-btn-ghost:hover { background: #e8e8e2; box-shadow: inset 0 0 0 1.5px #3a3a36; } .ds-btn-ghost:focus-visible { outline: 2.5px solid #141414; outline-offset: 3px; }"
+    },
+    {
+      "name": "Mood Plate",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Filter chip as a painted plate; selected turns route yellow.",
+      "html": "<button class=\"ds-chip\">Date night</button> <button class=\"ds-chip on\">Street food</button>",
+      "css": ".ds-chip { background: #fff; color: #141414; border: 0; border-radius: 6px; padding: 7px 12px; min-height: 40px; font-family: 'Saira Condensed', sans-serif; font-weight: 700; font-size: 17px; box-shadow: inset 0 0 0 2px #141414; cursor: pointer; } .ds-chip:hover { background: #fff3b0; } .ds-chip.on { background: #ffd000; } .ds-chip:focus-visible { outline: 2.5px solid #141414; outline-offset: 2px; }"
+    },
+    {
+      "name": "Destination Blind",
+      "kind": "input",
+      "refersTo": "search-blind",
+      "description": "The search: a board-black field with route-yellow lettering.",
+      "html": "<input class=\"ds-blind\" placeholder=\"Where to tonight?\" aria-label=\"Ask Fyndo\">",
+      "css": ".ds-blind { background: #141414; color: #ffd000; border: 2px solid #141414; border-radius: 8px; min-height: 52px; padding: 0 14px; font-family: 'Saira Condensed', sans-serif; font-weight: 700; font-size: 20px; width: 100%; } .ds-blind::placeholder { color: #d9b400; } .ds-blind:focus { outline: none; box-shadow: 0 0 0 3px #ffd000; }"
+    },
+    {
+      "name": "Area Plate",
+      "kind": "custom",
+      "refersTo": "area-plate",
+      "description": "Where a place is, with its open (green) or closed (chilli) mark always in the first cell.",
+      "html": "<span class=\"ds-plate\"><i class=\"ds-dot open\"></i>Colombo 4</span> <span class=\"ds-plate\"><i class=\"ds-dot\"></i>Colombo 3</span>",
+      "css": ".ds-plate { display: inline-flex; align-items: center; gap: 7px; padding: 4px 9px 3px; border-radius: 5px; background: #ffd000; color: #141414; box-shadow: inset 0 0 0 2px #141414; font-family: 'Saira Condensed', sans-serif; font-weight: 800; font-size: 18px; line-height: 1.05; } .ds-dot { width: 10px; height: 10px; border-radius: 50%; background: #c8381f; box-shadow: 0 0 0 2px #141414; } .ds-dot.open { background: #13804a; }"
+    },
+    {
+      "name": "Place Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Photo first, area plate on the photo, name left and the per-person price as a route numeral right.",
+      "html": "<article class=\"ds-card\"><div class=\"ds-card-ph\"><span class=\"ds-plate\"><i class=\"ds-dot open\"></i>Colombo 4</span></div><div class=\"ds-card-b\"><div><b class=\"ds-name\">Kottu Corner</b><div class=\"ds-sub\">Street food, open till 2:00 AM</div></div><div class=\"ds-price\"><b>600–1,000</b><span>LKR per person</span></div></div></article>",
+      "css": ".ds-card { width: 320px; background: #fff; border: 1px solid #d8d8d0; border-radius: 10px; overflow: hidden; font-family: 'Atkinson Hyperlegible', sans-serif; } .ds-card-ph { position: relative; aspect-ratio: 4/3; background: linear-gradient(135deg,#7a4a22,#c4843a 60%,#efc77f); } .ds-card-ph .ds-plate { position: absolute; left: 10px; top: 10px; display: inline-flex; align-items: center; gap: 7px; padding: 4px 9px 3px; border-radius: 5px; background: #ffd000; color: #141414; box-shadow: inset 0 0 0 2px #141414; font: 800 18px/1.05 'Saira Condensed', sans-serif; } .ds-card-ph .ds-dot { width: 10px; height: 10px; border-radius: 50%; background: #13804a; box-shadow: 0 0 0 2px #141414; } .ds-card-b { display: flex; justify-content: space-between; gap: 12px; padding: 11px 12px 14px; } .ds-name { font-size: 17px; color: #141414; } .ds-sub { font-size: 13px; color: #5f5f58; margin-top: 3px; } .ds-price { text-align: right; } .ds-price b { display: block; font: 800 30px/.9 'Saira Condensed', sans-serif; color: #141414; } .ds-price span { font-size: 11px; color: #5f5f58; }"
+    },
+    {
+      "name": "Header Band",
+      "kind": "nav",
+      "refersTo": "header",
+      "description": "The red livery band; the current page is a yellow plate.",
+      "html": "<header class=\"ds-band\"><b class=\"ds-brand\">Fyndo</b><nav><a class=\"on\">Home</a><a>Plan</a><a>Saved</a></nav></header>",
+      "css": ".ds-band { display: flex; align-items: center; gap: 16px; padding: 10px 16px 12px; background: #b8202b; border-bottom: 1px solid #9a1a23; color: #fff; } .ds-brand { font: 800 30px/1 'Saira Condensed', sans-serif; } .ds-band nav { margin-left: auto; display: flex; gap: 2px; } .ds-band a { padding: 8px 12px; border-radius: 6px; font: 700 18px 'Saira Condensed', sans-serif; color: #ffe1e3; cursor: pointer; } .ds-band a:hover { background: rgba(0,0,0,.16); color: #fff; } .ds-band a.on { background: #ffd000; color: #141414; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Galle Road bus board",
+    "overview": "Fyndo borrows the working signage of Colombo's buses: the red livery band, the yellow route board, the black destination blind. Every place reads like a stop on that board: its area on a yellow plate, its per-person price set as the route number. The world lends four things only, type, palette, density and one signature move; the layout, navigation and controls stay the ordinary ones people already know from apps. The ground is a cool board-white, never cream. Red owns the shell and nothing else. Yellow on black is reserved for the things that orient you or act: area plates, the search blind, the selected plate and the one primary action. Hierarchy comes from scale, not from many sizes: huge condensed numerals for prices and route numbers, small plain labels for everything else.",
+    "keyCharacteristics": [
+      "Red livery band at the top on every screen; the active page is a yellow plate in it (desktop) or a red marker in the bottom bar (phone).",
+      "Yellow area plates with a 2px board-black ring, carrying the open/closed mark in their first cell.",
+      "Prices as route-board numerals in Saira Condensed 800, with \"LKR per person\" beneath.",
+      "The planner drawn as a route: a red line with numbered yellow stop plates.",
+      "Atkinson Hyperlegible for all reading text: built for low vision, second-language readers and outdoor light."
+    ],
+    "rules": [
+      { "name": "The Shell Red Rule", "body": "Red is the bus, not the cargo: it lives in the header band, the active nav marker and the route line, never as a card fill or a text colour for content.", "section": "colors" },
+      { "name": "The Plate Rule", "body": "Yellow appears only where it orients or acts: an area plate, the search blind, a selected plate, the primary button. A screen with yellow decoration has lost its signage.", "section": "colors" },
+      { "name": "The Scale Rule", "body": "Rank by scale contrast: a price or route number is huge, its label is small, and there is no in-between size competing with them.", "section": "typography" },
+      { "name": "The Sentence Case Rule", "body": "Plates, buttons and heads are sentence case; no tracked capitals.", "section": "typography" },
+      { "name": "The Painted Board Rule", "body": "Surfaces are flat like painted signage; anything that lifts does so because it floats over content or responds to a press.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep red to the shell: header band, active nav marker, route line, saved state.",
+      "Do put area and price on every place surface as a plate and a route numeral.",
+      "Do keep the open/closed mark inside the area plate, in the same place on every card.",
+      "Do use Atkinson Hyperlegible for anything longer than a label."
+    ],
+    "donts": [
+      "Don't use a cream or warm paper ground; the ground is cool board-white (#f2f2ee).",
+      "Don't add yellow as decoration; it marks plates, the search blind, selection and the primary action only.",
+      "Don't set prices or names in tracked capitals, or add labels above headings.",
+      "Don't turn the bus world into a costume: no fake route numbers, ticket stubs or destination-blind animations on working screens."
+    ]
+  }
+}

@@ -33,7 +33,7 @@ export default function AskFyndo({ spots }) {
       <form onSubmit={(e) => { e.preventDefault(); go(); }} className="ask-in">
         <span className="ask-ic"><Ico n="search" size={20} /></span>
         <input className="input" value={q} onChange={(e) => setQ(e.target.value)} maxLength={300}
-               placeholder="Describe your night, e.g. quiet dinner under 6000" aria-label="Ask Fyndo" />
+               placeholder="Where to tonight?" aria-label="Ask Fyndo" />
         <button className="btn" disabled={busy || q.trim().length < 3}>{busy ? "Finding..." : "Find"}</button>
       </form>
       {!res && (

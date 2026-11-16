@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { db } from "@/lib/data";
 import { useUser, goLogin } from "@/lib/hooks";
-import { Thumb } from "@/components/SpotCard";
+import { Thumb, priceParts, nowHHMM } from "@/components/SpotCard";
 import { CONFIG } from "@/lib/config";
 import GooglePanel from "@/components/GooglePanel";
 import ReviewsPanel, { FeedbackBox } from "@/components/ReviewsPanel";
@@ -13,7 +13,7 @@ import MenuPanel from "@/components/MenuPanel";
 import RewardsBox from "@/components/RewardsBox";
 import FeatureChips from "@/components/FeatureChips";
 import { RatingPill } from "@/components/Stars";
-import { embedUrl, niceTime, priceLabel, waUrl, shareNow } from "@/lib/utils";
+import { embedUrl, niceTime, priceLabel, waUrl, shareNow, isOpenAt } from "@/lib/utils";
 
 import dynamic from "next/dynamic";
 import PhotoGallery from "@/components/PhotoGallery";
@@ -92,11 +92,24 @@ function SpotPage() {
           {spot.booking_enabled && <span className="badge book">Booking on</span>}
           <RatingPill rating={rating} />
         </div>
-        <div className="facts">
-          <div><Ico n="pin" size={18} />{spot.area}<span className="tag">{spot.category}</span></div>
-          <div><Ico n="receipt" size={18} />{priceLabel(spot)}</div>
-          <div><Ico n="clock" size={18} />Open {niceTime(spot.open_time)} to {niceTime(spot.close_time)}</div>
-        </div>
+        {(() => {
+          const open = isOpenAt(spot, nowHHMM());
+          const price = priceParts(spot);
+          return (
+            <div className="spotboard">
+              <div className="spotboard-left">
+                <span className="pcard-area static"><i className={"pcard-state " + (open ? "open" : "closed")} aria-hidden="true" />{spot.area}</span>
+                <div className="small" style={{ marginTop: 8 }}>
+                  <b>{spot.category}</b>, {open ? "open now" : "closed now"}
+                  <div className="muted"><Ico n="clock" size={14} /> {niceTime(spot.open_time)} to {niceTime(spot.close_time)}</div>
+                </div>
+              </div>
+              <div className="pcard-price spotprice" aria-label={priceLabel(spot)}>
+                {price.big ? <b>{price.big}</b> : null}{price.unit && <span>{price.unit}</span>}
+              </div>
+            </div>
+          );
+        })()}
         <div className="row" style={{ gap: 6 }}>{spot.moods.map((m) => <span key={m} className="tag">{m}</span>)}</div>
         {spot.about && <p>{spot.about}</p>}
 
