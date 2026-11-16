@@ -7,6 +7,7 @@ import { db } from "@/lib/data";
 import { useSpots, useUser, goLogin } from "@/lib/hooks";
 import { VIBES, buildPlan } from "@/lib/planner";
 import { downloadIcs, atDateTime } from "@/lib/ics";
+import { useSunsets } from "@/lib/sun";
 import { AREAS } from "@/lib/seed";
 import { Thumb } from "@/components/SpotCard";
 import { lkr, niceTime, nextDays, shareNow, avgPrice, whyThis } from "@/lib/utils";
@@ -23,6 +24,7 @@ export default function PlanPage() {
   const [f, setF] = useState({ vibe: "", budget: 5000, area: "", date: days[0].iso, start: "17:30", veg: false });
   const [skip, setSkip] = useState({});
   const [msg, setMsg] = useState("");
+  const sunsets = useSunsets();
   // Opened from Ask Fyndo with ?vibe=...: jump straight to the plan
   useEffect(() => {
     const p = new URLSearchParams(window.location.search);
@@ -158,6 +160,9 @@ export default function PlanPage() {
         <>
           <h1>Your date plan</h1>
           <p className="muted" style={{ marginTop: 0 }}>{plan.vibeLabel} on {dateLabel}, {f.area || "anywhere in Colombo"}</p>
+          {sunsets[f.date] && (
+            <p className="small" style={{ marginTop: -4 }}><Ico n="sun" size={16} /> Sunset that day is at {niceTime(sunsets[f.date])}.{f.vibe === "outdoor" ? " Aim to reach your first stop 30 minutes before." : ""}</p>
+          )}
           <div className="timeline">
             {plan.stops.map((s, i) => (
               <div key={i} className="stop">
@@ -192,13 +197,15 @@ export default function PlanPage() {
           <div className="total" style={{ marginTop: 14 }}><span>Estimated total for two</span><span>{lkr(plan.total)}</span></div>
           {plan.total > f.budget && <p className="small muted">A bit over your budget. Swap a stop to bring it down.</p>}
           {msg && <div className={"alert" + (/^(Plan saved|Plan link)/.test(msg) ? " ok" : "")}>{msg}</div>}
-          <div className="row" style={{ marginTop: 14 }}>
-            <button className="btn" onClick={share}>Share plan</button>
-            <button className="btn ghost" onClick={copy}><Ico n="link" size={16} />Copy link</button>
-            <button className="btn ghost" onClick={addToCalendar}><Ico n="calendar" size={16} />Add to calendar</button>
-            <Link className="btn ghost" href="/split"><Ico n="receipt" size={16} />Split the bill</Link>
-            <button className="btn ghost" onClick={save}>Save plan</button>
-            <button className="btn ghost" onClick={() => { setStep(0); setSkip({}); setMsg(""); }}>Start over</button>
+          <div className="actionbar">
+            <button className="btn" onClick={share}><Ico n="share" size={18} />Share plan</button>
+            <button className="btn ghost" onClick={save}><Ico n="bookmark" size={18} />Save plan</button>
+          </div>
+          <div className="row small" style={{ gap: 16, marginTop: -6 }}>
+            <button className="linkbtn" onClick={copy}>Copy link</button>
+            <button className="linkbtn" onClick={addToCalendar}>Add to calendar</button>
+            <Link className="linkbtn" href="/split">Split the bill</Link>
+            <button className="linkbtn" onClick={() => { setStep(0); setSkip({}); setMsg(""); }}>Start over</button>
           </div>
         </>
       )}

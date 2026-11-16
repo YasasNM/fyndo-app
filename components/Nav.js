@@ -4,23 +4,20 @@ import { usePathname } from "next/navigation";
 import { PlayPin } from "./Logo";
 import { Ico } from "./Icon";
 import { isLive } from "@/lib/data";
-import { useUser } from "@/lib/hooks";
 
 const LINKS = [
   { href: "/", label: "Home", ic: "home" },
+  { href: "/explore", label: "Explore", ic: "search" },
   { href: "/plan", label: "Plan", ic: "route" },
   { href: "/saved", label: "Saved", ic: "bookmark" },
-  { href: "/rewards", label: "Rewards", ic: "ticket" },
   { href: "/me", label: "Me", ic: "user" },
 ];
 
 export default function Nav() {
   const path = usePathname();
-  const user = useUser();
-  const links = [...LINKS];
-  if (user && (user.role === "owner" || user.role === "admin")) links.splice(4, 0, { href: "/dashboard", label: "Business", ic: "store" });
-  if (user && user.role === "admin") links.splice(5, 0, { href: "/admin", label: "Admin", ic: "shield" });
-  const on = (h) => (h === "/" ? path === "/" : path.startsWith(h));
+  const links = LINKS;
+  const MORE = ["/rewards", "/dashboard", "/admin", "/login"];
+  const on = (h) => (h === "/" ? path === "/" : h === "/me" ? path.startsWith("/me") || MORE.some((m) => path.startsWith(m)) : path.startsWith(h));
   return (
     <>
       {!isLive && (

@@ -56,7 +56,8 @@ You'll do 6 parts. Take them in order. Each takes 5 to 15 minutes.
 2. **SQL Editor** > New query > paste all of `supabase/schema.sql` > **Run**.
    (Already ran it before? Run it again. It safely adds the new Google column.)
    **Then run `supabase/schema_v3.sql` the same way.** It adds QR check-ins and rewards, verified reviews, owner replies, private feedback, reports, collections and group votes. Safe to run again. Paste the file's contents, not its name.
-3. **Skip `seed.sql`** for real launch. You'll add real places from Google in Part 6.
+   **Real places:** run `supabase/seed_real.sql` the same way. It adds 71 real restaurants, cafés and dessert spots in Colombo 3, 4, 5, 7, Dehiwala and Mount Lavinia, with names, map positions, phones and hours from OpenStreetMap. It has no prices or menus, and nothing is marked Verified. Admins can also add the same places with one click in **Admin > Starter data**.
+3. **Skip `seed.sql`** for real launch. It only has made-up sample places. To remove them later, use **Admin > Starter data > Remove sample places**. You'll add real places from Google in Part 6.
 4. **Authentication > Sign In / Providers > Email**: turn off "Confirm email" for now.
 5. **Project Settings > API**: keep the **Project URL** and **anon public key** open in a tab.
 

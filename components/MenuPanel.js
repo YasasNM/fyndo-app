@@ -5,12 +5,14 @@ import { CONFIG } from "@/lib/config";
 import { DISH_TAGS } from "@/lib/features";
 import { dishNote } from "@/lib/glossary";
 import { billEstimate, lkr, usd } from "@/lib/utils";
+import { useUsdRate } from "@/lib/rates";
 
 // Menu with dish labels, a tourist explanation, optional USD, and a "what will it cost?" estimator.
 export default function MenuPanel({ spot }) {
   const menu = spot.menu || [];
   const [qty, setQty] = useState({});
   const [tourist, setTourist] = useState(false);
+  const fx = useUsdRate();
   useEffect(() => { try { setTourist(localStorage.getItem("fyndo_tourist") === "1"); } catch {} }, []);
   const flip = () => { const v = !tourist; setTourist(v); try { localStorage.setItem("fyndo_tourist", v ? "1" : "0"); } catch {} };
 
@@ -18,7 +20,7 @@ export default function MenuPanel({ spot }) {
   const change = (i, d) => setQty((q) => ({ ...q, [i]: Math.max(0, Math.min(20, (q[i] || 0) + d)) }));
   const sub = menu.reduce((a, m, i) => a + (qty[i] || 0) * (Number(m.price) || 0), 0);
   const est = billEstimate(sub, CONFIG);
-  const price = (n) => (tourist ? `${lkr(n)} (${usd(n, CONFIG.usdRate)})` : lkr(n));
+  const price = (n) => (tourist ? `${lkr(n)} (${usd(n, fx.rate)})` : lkr(n));
   const stars = menu.filter((m) => (m.tags || []).includes("star")).slice(0, 3);
 
   return (
@@ -50,6 +52,7 @@ export default function MenuPanel({ spot }) {
           );
         })}
         {spot.menu_updated_at && <div className="small muted" style={{ marginTop: 8 }}>Prices checked on {spot.menu_updated_at}</div>}
+        {tourist && <div className="small muted" style={{ marginTop: 4 }}>US dollars at {fx.live ? "today's" : "an approximate"} rate of LKR {Math.round(fx.rate)} per $1{fx.live ? " (rates by exchangerate-api.com)" : ""}.</div>}
       </div>
 
       {sub > 0 && (

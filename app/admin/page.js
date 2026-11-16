@@ -8,6 +8,7 @@ import { AREAS, CATEGORIES, MOODS } from "@/lib/seed";
 import { slug, todayIso, parseMenu, menuToText } from "@/lib/utils";
 import { FeaturePicker } from "@/components/OwnerExtras";
 import { SetupCheck, GoogleLinker } from "@/components/AdminGoogle";
+import StarterData from "@/components/AdminData";
 import { googleSearch } from "@/lib/api";
 import OsmFinder from "@/components/OsmFinder";
 
@@ -138,6 +139,7 @@ export default function Admin() {
           <button className="btn ghost" onClick={() => setFinder(!finder)}><Ico n="map" size={16} />Find places (free)</button>
           <button className="btn" onClick={() => setEditing({ ...BLANK })}>+ Add spot</button></div></div>
       <SetupCheck spots={spots} />
+      <StarterData spots={spots} onDone={load} />
       {linker && <GoogleLinker spots={spots} onDone={(m) => { setMsg(m); setLinker(false); load(); }} />}
       {finder && <OsmFinder existing={spots.map((x) => x.name)} onPick={(r) => setEditing(fromOsm(r))} />}
       <p className="muted small" style={{ marginTop: 0 }}>Add places you have visited and checked. Mark them Verified once the menu and prices are confirmed.</p>

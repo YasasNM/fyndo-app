@@ -89,12 +89,16 @@ export default function Me() {
       ) : (
         <div className="row">
           <button className="btn sm ghost" onClick={() => setEdit(true)}>Edit profile</button>
-          {(user.role === "owner" || user.role === "admin") && <Link href="/dashboard" className="btn sm dark">Business dashboard</Link>}
-          {user.role === "admin" && <Link href="/admin" className="btn sm dark">Admin</Link>}
-          <Link href="/rewards" className="btn sm dark"><Ico n="ticket" size={16} />My rewards</Link>
           <button className="btn sm danger" onClick={async () => { await db.signOut(); window.location.href = "/"; }}>Log out</button>
         </div>
       )}
+
+      <nav className="menu" aria-label="Your Fyndo">
+        <Link href="/rewards"><Ico n="ticket" size={20} /><span><b>Rewards</b><span className="small muted">Points, stamp cards and badges</span></span></Link>
+        {(user.role === "owner" || user.role === "admin") && <Link href="/dashboard"><Ico n="store" size={20} /><span><b>Business dashboard</b><span className="small muted">Bookings, QR poster, reviews</span></span></Link>}
+        {user.role === "admin" && <Link href="/admin"><Ico n="shield" size={20} /><span><b>Admin</b><span className="small muted">Places, lists, reports, setup check</span></span></Link>}
+        <Link href="/?tour=1"><Ico n="compass" size={20} /><span><b>Take the quick tour again</b><span className="small muted">Three short steps on the home page</span></span></Link>
+      </nav>
 
       <h2>Upcoming bookings</h2>
       {upcoming.length ? <div className="stack">{upcoming.map((b) => <Row key={b.id} b={b} />)}</div>
