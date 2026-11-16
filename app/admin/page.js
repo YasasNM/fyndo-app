@@ -9,6 +9,7 @@ import { slug, todayIso, parseMenu, menuToText } from "@/lib/utils";
 import { FeaturePicker } from "@/components/OwnerExtras";
 import { SetupCheck, GoogleLinker } from "@/components/AdminGoogle";
 import AdminDiscover from "@/components/AdminDiscover";
+import PhotoManager from "@/components/PhotoManager";
 import { googleSearch } from "@/lib/api";
 
 const BLANK = {
@@ -237,6 +238,7 @@ function SpotForm({ initial, isNew, onDone }) {
         </div>
         <p className="small muted" style={{ marginTop: -4 }}>Tip: "Find it on Google Maps" above fills the map position for you.</p>
         <FeaturePicker value={f.features || []} onChange={(features) => setF({ ...f, features })} />
+        <PhotoManager spot={isNew ? { ...f, id: "" } : f} onChange={(photos) => setF((x) => ({ ...x, photos }))} />
         <label className="field"><span>About</span><textarea className="input" rows={3} value={f.about} onChange={set("about")} /></label>
         <label className="field"><span>Video link (TikTok / Instagram / YouTube)</span><input className="input" value={f.video_url || ""} onChange={set("video_url")} /></label>
         <div className="field"><span>Moods</span>

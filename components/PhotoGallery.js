@@ -5,6 +5,8 @@ import { photoSrc } from "@/lib/api";
 
 // Google photos for a place. To keep Google costs low only the photo you are looking at is loaded:
 // the cover first, then one more each time you move to the next one.
+const srcOf = (ph, w) => ph.url || photoSrc(ph.name, w);
+
 export default function PhotoGallery({ photos, placeName }) {
   const [i, setI] = useState(0);
   const [open, setOpen] = useState(false);
@@ -47,7 +49,7 @@ export default function PhotoGallery({ photos, placeName }) {
     <>
       <div className="gal" onTouchStart={(e) => (touchX.current = e.touches[0].clientX)} onTouchEnd={swipe}>
         <button ref={openerRef} type="button" className="gal-img" onClick={() => setOpen(true)} aria-label={`Open photo ${i + 1} of ${n} of ${placeName} full screen`}>
-          <img src={photoSrc(cur.name, 900)} alt={`Photo ${i + 1} of ${placeName}`} loading="lazy" />
+          <img src={srcOf(cur, 900)} alt={`Photo ${i + 1} of ${placeName}`} loading="lazy" />
         </button>
         {cur.author && <span className="gcredit">Photo: {cur.author}</span>}
         {n > 1 && (
@@ -72,11 +74,11 @@ export default function PhotoGallery({ photos, placeName }) {
           </div>
           <div className="lb-stage" onClick={(e) => e.stopPropagation()} onTouchStart={(e) => (touchX.current = e.touches[0].clientX)} onTouchEnd={swipe}>
             {n > 1 && <button type="button" className="lb-btn lb-l" onClick={prev} aria-label="Previous photo"><Ico n="arrow" size={22} style={{ transform: "scaleX(-1)" }} /></button>}
-            <img src={photoSrc(cur.name, 1400)} alt={`Photo ${i + 1} of ${placeName}`} />
+            <img src={srcOf(cur, 1400)} alt={`Photo ${i + 1} of ${placeName}`} />
             {n > 1 && <button type="button" className="lb-btn lb-r" onClick={next} aria-label="Next photo"><Ico n="arrow" size={22} /></button>}
           </div>
           <div className="lb-foot" onClick={(e) => e.stopPropagation()}>
-            <a className="linkbtn" href={cur.mapsUrl} target="_blank" rel="noreferrer">View on Google Maps</a>
+            {cur.mapsUrl && <a className="linkbtn" href={cur.mapsUrl} target="_blank" rel="noreferrer">View on Google Maps</a>}
           </div>
         </div>
       )}

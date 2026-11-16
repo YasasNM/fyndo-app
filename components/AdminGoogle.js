@@ -43,7 +43,6 @@ export function SetupCheck({ spots }) {
         <div style={{ marginTop: 6 }}>
           <Row ok label="Server functions are running" />
           <Row ok={h.google} label="Google key is set in Azure" hint="Add GOOGLE_MAPS_API_KEY under Environment variables, then Apply." />
-          <Row ok={Boolean(h.mapsBrowser)} label="Google browser key for maps is set" hint="Add GOOGLE_MAPS_BROWSER_KEY (a separate key restricted to your website, with Maps JavaScript API and Maps Embed API turned on)." />
           <Row ok={h.supabase} label="Supabase is connected on the server" hint="Add SUPABASE_URL and SUPABASE_ANON_KEY under Environment variables." />
           <Row ok={Boolean(h.ai)} label={h.ai ? `AI for Ask Fyndo: ${h.ai === "gemini" ? "Gemini" : "Azure OpenAI"}` : "AI for Ask Fyndo"} hint="Optional. Add GEMINI_API_KEY (free). Without it Ask Fyndo uses simple keyword matching." />
           <Row ok={spots.length === 0 || linked > 0} label={`Places linked to Google: ${linked} of ${spots.length}`} hint="Google photos, ratings and hours only show on linked places. Use Link to Google below." />

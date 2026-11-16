@@ -15,7 +15,9 @@ import FeatureChips from "@/components/FeatureChips";
 import { RatingPill } from "@/components/Stars";
 import { embedUrl, niceTime, priceLabel, waUrl, shareNow } from "@/lib/utils";
 
-import GoogleEmbed from "@/components/GoogleEmbed";
+import dynamic from "next/dynamic";
+import PhotoGallery from "@/components/PhotoGallery";
+const SpotMap = dynamic(() => import("@/components/SpotMap"), { ssr: false, loading: () => <div className="skel" style={{ height: 240, borderRadius: 16 }} /> });
 import { directionsUrl } from "@/lib/gmaps";
 
 export default function SpotPageWrapper() {
@@ -30,6 +32,7 @@ function SpotPage() {
   const [msg, setMsg] = useState("");
   const [gInfo, setGInfo] = useState(null);
   const [rating, setRating] = useState(null);
+  const [showGoogle, setShowGoogle] = useState(false);
 
   useEffect(() => { db.getSpot(id).then(setSpot).catch(() => setSpot(null)); }, [id]);
   useEffect(() => { db.getRatings().then((r) => setRating(r[id] || null)).catch(() => {}); }, [id]);
@@ -56,10 +59,17 @@ function SpotPage() {
       <div>
         {embed ? (
           <div className="video"><iframe src={embed} allow="autoplay; encrypted-media; fullscreen" allowFullScreen title="Video review" /></div>
+        ) : spot.photos && spot.photos.length ? (
+          <div className="card" style={{ overflow: "hidden" }}><PhotoGallery photos={spot.photos.map((url) => ({ url }))} placeName={spot.name} /></div>
         ) : (
           <Thumb spot={spot} className="video empty"><div className="small" style={{ marginTop: 10, position: "relative", zIndex: 1, color: "#fff", fontWeight: 600 }}>Video coming soon</div></Thumb>
         )}
-        {spot.google_place_id && <GooglePanel placeId={spot.google_place_id} onInfo={setGInfo} admin={Boolean(user && user.role === "admin")} />}
+        {embed && spot.photos && spot.photos.length > 0 && (
+          <div className="card" style={{ overflow: "hidden", marginTop: 14 }}><PhotoGallery photos={spot.photos.map((url) => ({ url }))} placeName={spot.name} /></div>
+        )}
+        {spot.google_place_id && (showGoogle
+          ? <GooglePanel placeId={spot.google_place_id} onInfo={setGInfo} admin={Boolean(user && user.role === "admin")} />
+          : <button className="btn ghost block" style={{ marginTop: 14 }} onClick={() => setShowGoogle(true)}><Ico n="globe" size={18} />Show Google photos, rating and hours</button>)}
         {!spot.google_place_id && user && user.role === "admin" && (
           <div className="card pad small" style={{ marginTop: 14 }}>
             <b>Admin note:</b> this place is not linked to Google, so there are no Google photos, ratings or hours here.{" "}
@@ -107,9 +117,14 @@ function SpotPage() {
         <FeatureChips ids={spot.features} />
         <MenuPanel spot={spot} />
         <RewardsBox spot={spot} user={user} />
-        <div style={{ marginTop: 18 }}>
-          <GoogleEmbed spot={spot} height={260} />
-        </div>
+        {spot.lat != null && spot.lng != null && (
+          <div style={{ marginTop: 18 }}>
+            <SpotMap spots={[spot]} single height={240} />
+            <div className="row small" style={{ marginTop: 6 }}>
+              <a className="linkbtn" href={directionsUrl(spot)} target="_blank" rel="noreferrer">Directions in Google Maps</a>
+            </div>
+          </div>
+        )}
         <ReviewsPanel spotId={spot.id} user={user} onChange={(l) => l.length && setRating({ avg: l.reduce((a, r) => a + r.rating, 0) / l.length, count: l.length })} />
         <FeedbackBox spotId={spot.id} user={user} />
         <p className="small muted" style={{ marginTop: 10 }}><Link className="linkbtn" href="/split">Split the bill with friends</Link></p>

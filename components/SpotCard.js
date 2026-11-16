@@ -26,7 +26,11 @@ export function Thumb({ spot, className = "thumb", children }) {
         </defs>
         <rect width="100%" height="100%" fill={`url(#p${uid})`} />
       </svg>
-      <span className="sticker"><Ico n={icon} size="60%" strokeWidth={1.6} /></span>
+      {spot.photos && spot.photos[0] ? (
+        <img className="tile-photo" src={spot.photos[0]} alt="" loading="lazy" />
+      ) : (
+        <span className="sticker"><Ico n={icon} size="60%" strokeWidth={1.6} /></span>
+      )}
       {children}
     </div>
   );

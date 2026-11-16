@@ -55,7 +55,8 @@ You'll do 6 parts. Take them in order. Each takes 5 to 15 minutes.
 1. **supabase.com** > New project. Name `fyndo`, region **Singapore**, strong password (save it).
 2. **SQL Editor** > New query > paste all of `supabase/schema.sql` > **Run**.
    (Already ran it before? Run it again. It safely adds the new Google column.)
-   **Then run `supabase/schema_v3.sql` the same way.** It adds QR check-ins and rewards, verified reviews, owner replies, private feedback, reports, collections and group votes. Safe to run again. Paste the file's contents, not its name.
+   **Then run `supabase/schema_v3.sql` and `supabase/schema_v4.sql` the same way** (v4 adds free photo storage).
+   It adds QR check-ins and rewards, verified reviews, owner replies, private feedback, reports, collections and group votes. Safe to run again. Paste the file's contents, not its name.
 3. **Skip `seed.sql`** for real launch. It only has made-up sample places. You'll add real places from Google in Part 6 (**Admin > Add places from Google**).
 4. **Authentication > Sign In / Providers > Email**: turn off "Confirm email" for now.
 5. **Project Settings > API**: keep the **Project URL** and **anon public key** open in a tab.
@@ -94,7 +95,6 @@ Azure portal > your Static Web App > **Settings > Environment variables** > add 
 | `SUPABASE_URL` | same as Part 2 |
 | `SUPABASE_ANON_KEY` | same as Part 2 |
 | `GOOGLE_MAPS_API_KEY` | Part 5a below (server key) |
-| `GOOGLE_MAPS_BROWSER_KEY` | Part 5c below (browser key for the maps) |
 | `AZURE_OPENAI_ENDPOINT` | Part 5b below |
 | `AZURE_OPENAI_API_KEY` | Part 5b below |
 | `AZURE_OPENAI_DEPLOYMENT` | Part 5b below (the deployment name, e.g. `gpt-4o-mini`) |
@@ -118,16 +118,6 @@ These keys stay on the server. They are never sent to people's browsers.
    - **Billing > Budgets & alerts** > create a budget of **USD 1** with email alerts. (Alerts warn you. They don't stop charges.)
    - **APIs & Services > Places API (New) > Quotas**: lower the request limits to small numbers (for example 30 to 60 per minute). This is the hard stop.
    - Fyndo also helps: reviews only load when someone taps "Show Google reviews", Google info is cached for 10 minutes, and each visitor has an hourly limit.
-
-### 5c. Google browser key for maps (Maps JavaScript API + Maps Embed API)
-The maps in Fyndo are Google Maps. They run in the visitor's browser, so they need their **own** key that visitors can see. Keep it locked to your website.
-1. Google Cloud > **APIs & Services > Library**: enable **Maps JavaScript API** and **Maps Embed API**.
-2. **Credentials > Create credentials > API key**. Edit it:
-   - **Application restrictions > Websites**: add `https://YOUR-SITE.azurestaticapps.net/*` (and your custom domain if you have one).
-   - **API restrictions**: tick only **Maps JavaScript API** and **Maps Embed API**.
-3. Azure > your Static Web App > **Environment variables**: add `GOOGLE_MAPS_BROWSER_KEY` with this key, then **Apply**.
-
-Costs: Maps Embed API (spot maps and date routes) is free with no limit. Maps JavaScript API (the map with all the pins) has a free monthly allowance; set a daily quota for it too.
 
 ### 5b. Azure OpenAI (for Ask Fyndo)
 1. Azure portal > search **Azure OpenAI** > **Create**. Resource group `fyndo-rg`, region **East US** (or any region that offers the model), tier **Standard S0**.

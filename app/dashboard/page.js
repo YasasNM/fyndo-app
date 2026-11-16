@@ -6,6 +6,7 @@ import { db } from "@/lib/data";
 import { useUser, goLogin } from "@/lib/hooks";
 import { MOODS } from "@/lib/seed";
 import { RewardsTab, ReviewsTab, FeaturePicker } from "@/components/OwnerExtras";
+import PhotoManager from "@/components/PhotoManager";
 import { niceTime, nextDays, todayIso, bookingSlots, STATUS_LABEL, parseMenu } from "@/lib/utils";
 
 const STATUS_BADGE = { confirmed: "", requested: "warn", declined: "red", cancelled: "grey", arrived: "book", no_show: "red" };
@@ -225,6 +226,7 @@ function EditPage({ spot, onSaved }) {
         <div className="row" style={{ gap: 6 }}>{MOODS.map((m) => <button key={m} className={"chip" + (f.moods.includes(m) ? " on" : "")} onClick={() => toggleMood(m)}>{m}</button>)}</div>
       </div>
       <FeaturePicker value={f.features || []} onChange={(features) => setF({ ...f, features })} />
+      <PhotoManager spot={f} onChange={(photos) => { setF((x) => ({ ...x, photos })); onSaved({ photos }); }} />
       <div className="field"><span>Menu & prices</span>
         {menu.map((m, i) => (
           <div key={i} className="row" style={{ marginBottom: 6, flexWrap: "nowrap" }}>
