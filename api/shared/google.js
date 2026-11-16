@@ -131,4 +131,22 @@ async function photoUrl(name, width) {
   return data.photoUri;
 }
 
-module.exports = { searchText, nearbyFood, details, photoUrl };
+// Cover photo for a place card: the first Google photo. The short-lived photo address is kept in memory
+// for up to 50 minutes so many visitors seeing the same card cost one Google call, not one each.
+const coverCache = new Map();
+async function coverUrl(placeId, width) {
+  if (!/^[A-Za-z0-9_-]{10,300}$/.test(placeId)) { const e = new Error("Bad place ID"); e.status = 400; throw e; }
+  const w = Math.min(Math.max(Number(width) || 600, 200), 1200);
+  const key = placeId + ":" + w;
+  const hit = coverCache.get(key);
+  if (hit && Date.now() - hit.at < 50 * 60 * 1000) return hit.uri;
+  const p = await call(`/places/${placeId}`, { fieldMask: "photos" });
+  const ph = (p.photos || [])[0];
+  if (!ph) { const e = new Error("No photo"); e.status = 404; throw e; }
+  const uri = await photoUrl(ph.name, w);
+  if (coverCache.size > 3000) coverCache.clear();
+  coverCache.set(key, { uri, at: Date.now() });
+  return uri;
+}
+
+module.exports = { searchText, nearbyFood, details, photoUrl, coverUrl };

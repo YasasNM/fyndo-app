@@ -5,9 +5,9 @@ import dynamic from "next/dynamic";
 import SpotCard, { SkeletonGrid } from "@/components/SpotCard";
 import AskFyndo from "@/components/AskFyndo";
 import Tour from "@/components/Tour";
-import Photo from "@/components/Photo";
+import HeroVideo from "@/components/HeroVideo";
 import { db } from "@/lib/data";
-import { useSpots, useRatings, usePopular, useLocation, useCollections, goLogin, useUser } from "@/lib/hooks";
+import { useSpots, useRatings, usePopular, useLocation, useCollections, goLogin, useUser, useSaves } from "@/lib/hooks";
 import { useWeather } from "@/lib/weather";
 import { MOODS, CATEGORIES, AREAS } from "@/lib/seed";
 import { FEATURES, OCCASIONS } from "@/lib/features";
@@ -39,6 +39,7 @@ export default function Home() {
   const weather = useWeather();
   const user = useUser();
   const loc = useLocation();
+  const saves = useSaves(user);
   const [q, setQ] = useState("");
   const [mood, setMood] = useState("");
   const [occasion, setOccasion] = useState("");
@@ -108,7 +109,7 @@ export default function Home() {
   const whyFor = (s) => (mood || occ) ? whyThis(s, { moods: mood ? [mood] : occ ? occ.moods : [], rating: ratings[s.id] }) : "";
   const card = (s) => (
     <SpotCard key={s.id} spot={s} rating={ratings[s.id]} distanceKm={dist(s)} why={whyFor(s)}
-      pick={{ on: picked.includes(s.id), toggle: togglePick }} />
+      pick={{ on: picked.includes(s.id), toggle: togglePick }} save={{ on: saves.ids.includes(s.id), toggle: saves.toggle }} />
   );
 
   const startVote = async () => {
@@ -134,7 +135,7 @@ export default function Home() {
 
           <AskFyndo spots={spots} />
         </div>
-        <Photo slug="galle-face" className="hero-photo" eager sizes="(max-width: 760px) 100vw, 440px" />
+        <HeroVideo className="hero-photo" />
       </section>
 
       {rainy && (

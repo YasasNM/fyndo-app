@@ -24,6 +24,13 @@ export default function Credits() {
         ))}
       </div>
 
+      <h2>Video</h2>
+      <div className="card pad small">
+        <b>Kottu roti being made at a roadside stall</b> (8-second excerpt, sound removed).<br />
+        By Nahid Sultan. <a className="linkbtn" href="https://commons.wikimedia.org/wiki/File:Making_of_Kothu_Roti,_Sri_Lanka.webm" target="_blank" rel="noreferrer">Source</a>
+        {" · "}<a className="linkbtn" href="https://creativecommons.org/licenses/by/3.0" target="_blank" rel="noreferrer">CC BY 3.0</a>
+      </div>
+
       <h2>Data and maps</h2>
       <ul className="small" style={{ paddingLeft: 18 }}>
         <li>Places, photos, ratings and reviews marked Google come from Google Maps.</li>

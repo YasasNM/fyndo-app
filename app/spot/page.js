@@ -17,6 +17,7 @@ import { embedUrl, niceTime, priceLabel, waUrl, shareNow } from "@/lib/utils";
 
 import dynamic from "next/dynamic";
 import PhotoGallery from "@/components/PhotoGallery";
+import { coverFor } from "@/lib/coverPhotos";
 const SpotMap = dynamic(() => import("@/components/SpotMap"), { ssr: false, loading: () => <div className="skel" style={{ height: 240, borderRadius: 16 }} /> });
 import { directionsUrl } from "@/lib/gmaps";
 
@@ -61,7 +62,13 @@ function SpotPage() {
           <div className="video"><iframe src={embed} allow="autoplay; encrypted-media; fullscreen" allowFullScreen title="Video review" /></div>
         ) : spot.photos && spot.photos.length ? (
           <div className="card" style={{ overflow: "hidden" }}><PhotoGallery photos={spot.photos.map((url) => ({ url }))} placeName={spot.name} /></div>
-        ) : spot.google_place_id && !gFail ? null : (
+        ) : spot.google_place_id && !gFail ? null : coverFor(spot) ? (
+          <figure className="photo spothero" style={{ "--ratio": 16 / 10 }}>
+            <img src={coverFor(spot).large} alt={coverFor(spot).alt} />
+            {!coverFor(spot).real && <span className="pcard-example">Example photo of {spot.category === "Activity" ? "a place like this" : "the kind of food here"}</span>}
+            <figcaption className="photocredit"><Link href="/credits">Photo credits</Link></figcaption>
+          </figure>
+        ) : (
           <Thumb spot={spot} className="video empty"><div className="small" style={{ marginTop: 10, position: "relative", zIndex: 1, color: "#fff", fontWeight: 600 }}>Video coming soon</div></Thumb>
         )}
         {embed && spot.photos && spot.photos.length > 0 && (

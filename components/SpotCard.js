@@ -1,13 +1,15 @@
-import { useId } from "react";
+"use client";
+import { useId, useState } from "react";
 import Link from "next/link";
 import { priceLabel, isOpenAt } from "@/lib/utils";
 import { RatingPill } from "@/components/Stars";
 import { Ico, ICON_MARKUP, CAT_ICON } from "@/components/Icon";
+import { coverFor } from "@/lib/coverPhotos";
 
 // Kept for old imports. Category icons are drawn in Icon.js now.
 export const CAT_EMOJI = {};
 
-// Cover tile: the place's own colour, printed with a repeating drawing of its category, and a sticker on top.
+// Pattern tile: the place's colour printed with its category. Used where no photo exists at all.
 export function Thumb({ spot, className = "thumb", children }) {
   const uid = useId().replace(/[^a-z0-9]/gi, "");
   const icon = CAT_ICON[spot.category] || "pin";
@@ -41,43 +43,77 @@ function nowHHMM() {
   return `${String(n.getHours()).padStart(2, "0")}:${String(n.getMinutes()).padStart(2, "0")}`;
 }
 
-// rating: { avg, count } (optional), distanceKm: number (optional), why: string (optional)
-// pick: { on, toggle(id) } shows a small tick to select the card for Compare / Vote.
-export default function SpotCard({ spot, rating, distanceKm, why, pick }) {
+// The image area of a card. Best photo first: Fyndo's own, then the real Google photo (fetched only when the card
+// is near the screen), with an example photo of the same kind of place underneath until the real one arrives.
+export function CardMedia({ spot, children }) {
+  const own = spot.photos && spot.photos[0];
+  const ex = own ? null : coverFor(spot);
+  const [gState, setG] = useState(spot.google_place_id && !own ? "loading" : "none"); // loading | ok | none
+  const showingExample = !own && gState !== "ok" && ex && !ex.real;
+  return (
+    <div className="pcard-media" style={{ "--c": spot.color || "#F6B800" }}>
+      {own ? <img className="pcard-img" src={own} alt="" loading="lazy" decoding="async" />
+        : ex ? <img className="pcard-img" src={ex.src} alt="" loading="lazy" decoding="async" />
+        : <Thumb spot={spot} className="pcard-img tile-fill" />}
+      {gState !== "none" && (
+        <img className={"pcard-img pcard-google" + (gState === "ok" ? " in" : "")} src={`/api/cover?id=${encodeURIComponent(spot.google_place_id)}&w=600`}
+          alt="" loading="lazy" decoding="async" referrerPolicy="no-referrer" onLoad={() => setG("ok")} onError={() => setG("none")} />
+      )}
+      <div className="pcard-shade" />
+      {showingExample && <span className="pcard-example">Example photo</span>}
+      {gState === "ok" && <span className="pcard-example">Photo: Google</span>}
+      {children}
+    </div>
+  );
+}
+
+// rating: { avg, count }; distanceKm; why: string; pick: { on, toggle(id) } for Compare / Vote;
+// save: { on, toggle(id) } shows a bookmark on the photo.
+export default function SpotCard({ spot, rating, distanceKm, why, pick, save }) {
   const open = isOpenAt(spot, nowHHMM());
   return (
-    <Link href={`/spot?id=${spot.id}`} className="card spot-card">
-      <Thumb spot={spot}>
-        <div className="tagl">
-          {spot.verified && <span className="badge">Verified</span>}
-          {spot.hidden_gem && <span className="badge gem">Hidden gem</span>}
+    <article className="pcard">
+      <Link href={`/spot?id=${spot.id}`} className="pcard-link">
+        <CardMedia spot={spot}>
+          <div className="pcard-badges">
+            {spot.verified && <span className="badge">Verified</span>}
+            {spot.hidden_gem && <span className="badge gem">Hidden gem</span>}
+          </div>
+          <div className="pcard-title">
+            <h3>{spot.name}</h3>
+            <span className="pcard-sub">
+              <Ico n="pin" size={13} />{spot.area}
+              {distanceKm != null && `, ${distanceKm < 10 ? distanceKm.toFixed(1) : Math.round(distanceKm)} km`}
+              {spot.video_url && <span className="pcard-video"><Ico n="play" size={11} />Video</span>}
+            </span>
+          </div>
+        </CardMedia>
+        <div className="pcard-body">
+          <div className="pcard-row">
+            <span className="tag">{spot.category}</span>
+            <b className="card-price">{priceLabel(spot)}</b>
+          </div>
+          <div className="pcard-row">
+            <span className={open ? "open-now" : "closed-now"}>{open ? "Open now" : "Closed"}</span>
+            <RatingPill rating={rating} />
+            {spot.booking_enabled && <span className="meta"><Ico n="calendar" size={13} />Bookable</span>}
+          </div>
+          {why && <div className="small why">{why}</div>}
         </div>
-        {spot.video_url && <div className="play" aria-label="Has video"><Ico n="play" size={14} /></div>}
-        {pick && (
-          <button type="button" className={"pickbtn" + (pick.on ? " on" : "")} aria-pressed={pick.on}
-            aria-label={pick.on ? `Remove ${spot.name} from selection` : `Select ${spot.name} to compare or vote`}
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); pick.toggle(spot.id); }}>
-            <Ico n={pick.on ? "check" : "plus"} size={16} strokeWidth={2.4} />
-          </button>
-        )}
-      </Thumb>
-      <div className="body">
-        <div className="card-top">
-          <h3>{spot.name}</h3>
-          <b className="card-price">{priceLabel(spot)}</b>
-        </div>
-        <div className="card-meta">
-          <span className="meta"><Ico n="pin" size={14} />{spot.area}{distanceKm != null && ` (${distanceKm < 10 ? distanceKm.toFixed(1) : Math.round(distanceKm)} km)`}</span>
-          <span className="tag">{spot.category}</span>
-        </div>
-        <div className="card-foot">
-          <span className={open ? "open-now" : "closed-now"}>{open ? "Open now" : "Closed"}</span>
-          <RatingPill rating={rating} />
-          {spot.booking_enabled && <span className="meta"><Ico n="calendar" size={14} />Bookable</span>}
-        </div>
-        {why && <div className="small why">{why}</div>}
-      </div>
-    </Link>
+      </Link>
+      {save && (
+        <button type="button" className={"pcard-save" + (save.on ? " on" : "")} aria-pressed={save.on}
+          aria-label={save.on ? `Remove ${spot.name} from saved` : `Save ${spot.name}`} onClick={() => save.toggle(spot.id)}>
+          <Ico n="bookmark" size={18} strokeWidth={2} />
+        </button>
+      )}
+      {pick && (
+        <button type="button" className={"pcard-pick" + (pick.on ? " on" : "")} aria-pressed={pick.on}
+          aria-label={pick.on ? `Remove ${spot.name} from compare` : `Add ${spot.name} to compare or vote`} onClick={() => pick.toggle(spot.id)}>
+          <Ico n={pick.on ? "check" : "plus"} size={14} strokeWidth={2.4} />{pick.on ? "Added" : "Compare"}
+        </button>
+      )}
+    </article>
   );
 }
 
