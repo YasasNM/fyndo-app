@@ -57,8 +57,12 @@ You'll do 6 parts. Take them in order. Each takes 5 to 15 minutes.
    (Already ran it before? Run it again. It safely adds the new Google column.)
    **Then run `supabase/schema_v3.sql` and `supabase/schema_v4.sql` the same way** (v4 adds free photo storage).
    It adds QR check-ins and rewards, verified reviews, owner replies, private feedback, reports, collections and group votes. Safe to run again. Paste the file's contents, not its name.
-3. **Skip `seed.sql`** for real launch. It only has made-up sample places. You'll add real places from Google in Part 6 (**Admin > Add places from Google**).
-4. **Authentication > Sign In / Providers > Email**: turn off "Confirm email" for now.
+3. **Real places:** run `supabase/seed_google.sql` the same way. It adds 177 real restaurants, cafés, dessert places and things to do in Colombo 3, 4, 5, 7, Dehiwala and Mount Lavinia, each linked to its Google listing, with Google's price level and usual hours. Skip `seed.sql` (made-up samples).
+4. **Accounts (email verification and password reset):**
+   - **Authentication > Sign In / Providers > Email**: turn **on** "Confirm email". New users must click the link in their email before they can log in.
+   - **Authentication > URL Configuration**: set **Site URL** to your live address (for example `https://YOUR-SITE.azurestaticapps.net`). Under **Redirect URLs** add `https://YOUR-SITE.azurestaticapps.net/**` (and your custom domain if you have one).
+   - **Email sending (important for production):** Supabase's built-in email only sends a few emails an hour and is meant for testing. Under **Project Settings > Authentication > SMTP Settings**, connect a free email service such as **Brevo** (300 emails a day free) or **Resend** (3,000 a month free). Without it, sign-up and reset emails may not arrive.
+   - Optional: **Authentication > Emails** lets you edit the wording of the confirmation and reset emails.
 5. **Project Settings > API**: keep the **Project URL** and **anon public key** open in a tab.
 
 ## Part 3: Create the Azure Static Web App (free)
@@ -99,9 +103,12 @@ Azure portal > your Static Web App > **Settings > Environment variables** > add 
 | `AZURE_OPENAI_API_KEY` | Part 5b below |
 | `AZURE_OPENAI_DEPLOYMENT` | Part 5b below (the deployment name, e.g. `gpt-4o-mini`) |
 
-| `GEMINI_API_KEY` | **Free AI option.** Get a key at aistudio.google.com (no card). Use it instead of Azure OpenAI. Optional `GEMINI_MODEL` if you want a different model (default `gemini-2.5-flash`). |
+| `GROQ_API_KEY` | **Free AI (recommended).** console.groq.com, no card. About 1,000 Ask Fyndo questions a day free. |
+| `CEREBRAS_API_KEY` | **Free AI backup.** cloud.cerebras.ai, no card. About 14,400 a day free. |
+| `GEMINI_API_KEY` | Free AI, aistudio.google.com, no card (small daily limit; free-tier questions may be used by Google for training). |
+| `OPENROUTER_API_KEY` | Free AI, openrouter.ai `:free` models, about 50 a day. |
 
-You only need **one** AI option (Gemini or Azure OpenAI). If both are set, Gemini is used first and Azure is the backup.
+You only need **one** AI key. Add more and Fyndo tries them in order (Groq, Cerebras, Gemini, OpenRouter, then Azure OpenAI), moving to the next if one is busy or out of free quota. Without any, Ask Fyndo still works with simple keyword matching.
 The free Gemini tier may use what people type to improve Google's products. Fyndo only sends the search sentence, never names or emails.
 
 These keys stay on the server. They are never sent to people's browsers.

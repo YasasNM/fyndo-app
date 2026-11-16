@@ -32,7 +32,7 @@ function SpotPage() {
   const [msg, setMsg] = useState("");
   const [gInfo, setGInfo] = useState(null);
   const [rating, setRating] = useState(null);
-  const [showGoogle, setShowGoogle] = useState(false);
+  const [gFail, setGFail] = useState(false);
 
   useEffect(() => { db.getSpot(id).then(setSpot).catch(() => setSpot(null)); }, [id]);
   useEffect(() => { db.getRatings().then((r) => setRating(r[id] || null)).catch(() => {}); }, [id]);
@@ -61,15 +61,13 @@ function SpotPage() {
           <div className="video"><iframe src={embed} allow="autoplay; encrypted-media; fullscreen" allowFullScreen title="Video review" /></div>
         ) : spot.photos && spot.photos.length ? (
           <div className="card" style={{ overflow: "hidden" }}><PhotoGallery photos={spot.photos.map((url) => ({ url }))} placeName={spot.name} /></div>
-        ) : (
+        ) : spot.google_place_id && !gFail ? null : (
           <Thumb spot={spot} className="video empty"><div className="small" style={{ marginTop: 10, position: "relative", zIndex: 1, color: "#fff", fontWeight: 600 }}>Video coming soon</div></Thumb>
         )}
         {embed && spot.photos && spot.photos.length > 0 && (
           <div className="card" style={{ overflow: "hidden", marginTop: 14 }}><PhotoGallery photos={spot.photos.map((url) => ({ url }))} placeName={spot.name} /></div>
         )}
-        {spot.google_place_id && (showGoogle
-          ? <GooglePanel placeId={spot.google_place_id} onInfo={setGInfo} admin={Boolean(user && user.role === "admin")} />
-          : <button className="btn ghost block" style={{ marginTop: 14 }} onClick={() => setShowGoogle(true)}><Ico n="globe" size={18} />Show Google photos, rating and hours</button>)}
+        {spot.google_place_id && <GooglePanel placeId={spot.google_place_id} onInfo={setGInfo} onFail={() => setGFail(true)} admin={Boolean(user && user.role === "admin")} />}
         {!spot.google_place_id && user && user.role === "admin" && (
           <div className="card pad small" style={{ marginTop: 14 }}>
             <b>Admin note:</b> this place is not linked to Google, so there are no Google photos, ratings or hours here.{" "}

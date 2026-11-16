@@ -2,11 +2,10 @@
 const { json } = require("../shared/util");
 
 module.exports = async function (context) {
-  const azureAi = Boolean(process.env.AZURE_OPENAI_ENDPOINT && process.env.AZURE_OPENAI_API_KEY && process.env.AZURE_OPENAI_DEPLOYMENT);
   context.res = json(200, {
     ok: true,
     google: Boolean(process.env.GOOGLE_MAPS_API_KEY),
     supabase: Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY),
-    ai: process.env.GEMINI_API_KEY ? "gemini" : azureAi ? "azure" : null,
+    ai: require("../ask/index.js").providers().map((x) => x.name).join(", ") || null,
   });
 };

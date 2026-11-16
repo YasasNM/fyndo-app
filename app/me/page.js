@@ -32,6 +32,33 @@ function InstallCard() {
   );
 }
 
+function ChangePassword() {
+  const [open, setOpen] = useState(false);
+  const [p1, setP1] = useState(""); const [p2, setP2] = useState("");
+  const [msg, setMsg] = useState(null); const [busy, setBusy] = useState(false);
+  const save = async (e) => {
+    e.preventDefault(); setMsg(null);
+    if (p1.length < 8 || !/[a-z]/i.test(p1) || !/\d/.test(p1)) return setMsg({ ok: false, t: "Use at least 8 characters, with letters and numbers." });
+    if (p1 !== p2) return setMsg({ ok: false, t: "The two passwords don't match." });
+    setBusy(true);
+    try { await db.updatePassword(p1); setMsg({ ok: true, t: "Password changed." }); setP1(""); setP2(""); setOpen(false); }
+    catch (e2) { setMsg({ ok: false, t: e2.message }); }
+    setBusy(false);
+  };
+  return (
+    <div style={{ marginTop: 12 }}>
+      {msg && <div className={"alert" + (msg.ok ? " ok" : "")} role="status">{msg.t}</div>}
+      {!open ? <button className="btn sm ghost" onClick={() => setOpen(true)}>Change password</button> : (
+        <form className="card pad" onSubmit={save}>
+          <label className="field"><span>New password</span><input className="input" type="password" autoComplete="new-password" required value={p1} onChange={(e) => setP1(e.target.value)} /></label>
+          <label className="field"><span>Type it again</span><input className="input" type="password" autoComplete="new-password" required value={p2} onChange={(e) => setP2(e.target.value)} /></label>
+          <div className="row"><button className="btn sm" disabled={busy}>{busy ? "Saving..." : "Save password"}</button><button type="button" className="btn sm ghost" onClick={() => setOpen(false)}>Cancel</button></div>
+        </form>
+      )}
+    </div>
+  );
+}
+
 export default function Me() {
   const user = useUser();
   const [list, setList] = useState([]);
@@ -92,6 +119,7 @@ export default function Me() {
           <button className="btn sm danger" onClick={async () => { await db.signOut(); window.location.href = "/"; }}>Log out</button>
         </div>
       )}
+      {isLive && !edit && <ChangePassword />}
 
       <nav className="menu" aria-label="Your Fyndo">
         <Link href="/rewards"><Ico n="ticket" size={20} /><span><b>Rewards</b><span className="small muted">Points, stamp cards and badges</span></span></Link>
@@ -107,6 +135,7 @@ export default function Me() {
 
       <h2>App</h2>
       <InstallCard />
+      <p className="small muted" style={{ marginTop: 14 }}><Link className="linkbtn" href="/credits">Photo and data credits</Link></p>
       {!isLive && (
         <p className="small muted" style={{ marginTop: 16 }}>
           Demo mode. <button className="linkbtn" onClick={async () => { await db.resetDemo(); window.location.href = "/"; }}>Reset demo data</button>

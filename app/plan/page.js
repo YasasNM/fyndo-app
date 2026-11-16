@@ -10,6 +10,7 @@ import { downloadIcs, atDateTime } from "@/lib/ics";
 import { useSunsets } from "@/lib/sun";
 import { AREAS } from "@/lib/seed";
 import { Thumb } from "@/components/SpotCard";
+import Photo from "@/components/Photo";
 import { lkr, niceTime, nextDays, shareNow, avgPrice, whyThis } from "@/lib/utils";
 
 const RouteMap = dynamic(() => import("@/components/RouteMap"), { ssr: false, loading: () => <div className="skel" style={{ height: 260, borderRadius: 16, marginTop: 14 }} /> });
@@ -96,6 +97,7 @@ export default function PlanPage() {
 
       {step === 0 && (
         <>
+          <Photo slug="watalappan" className="planphoto" sizes="(max-width: 760px) 100vw, 560px" />
           <h1>What's the vibe?</h1>
           {VIBES.map((v) => (
             <button key={v.id} className={"opt" + (f.vibe === v.id ? " on" : "")} onClick={() => set("vibe", v.id)}>

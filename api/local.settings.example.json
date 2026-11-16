@@ -2,6 +2,8 @@
   "IsEncrypted": false,
   "Values": {
     "GOOGLE_MAPS_API_KEY": "paste-your-google-key",
+    "GROQ_API_KEY": "free-key-from-console.groq.com",
+    "CEREBRAS_API_KEY": "optional-free-key-from-cloud.cerebras.ai",
     "GEMINI_API_KEY": "optional-free-key-from-aistudio.google.com",
     "AZURE_OPENAI_ENDPOINT": "https://your-resource.openai.azure.com",
     "AZURE_OPENAI_API_KEY": "paste-your-azure-openai-key",

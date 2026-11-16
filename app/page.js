@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import SpotCard, { SkeletonGrid } from "@/components/SpotCard";
 import AskFyndo from "@/components/AskFyndo";
 import Tour from "@/components/Tour";
+import Photo from "@/components/Photo";
 import { db } from "@/lib/data";
 import { useSpots, useRatings, usePopular, useLocation, useCollections, goLogin, useUser } from "@/lib/hooks";
 import { useWeather } from "@/lib/weather";
@@ -126,10 +127,15 @@ export default function Home() {
 
   return (
     <>
-      <h1>Find the real spots.</h1>
-      <p className="lede">See how a place really looks, what it really costs, and plan the whole night in a minute.</p>
+      <section className="hero">
+        <div className="hero-text">
+          <h1>Find the real spots.</h1>
+          <p className="lede">See how a place really looks, what it really costs, and plan the whole night in a minute.</p>
 
-      <AskFyndo spots={spots} />
+          <AskFyndo spots={spots} />
+        </div>
+        <Photo slug="galle-face" className="hero-photo" eager sizes="(max-width: 760px) 100vw, 440px" />
+      </section>
 
       {rainy && (
         <div className="card pad rainbar">
@@ -213,11 +219,13 @@ export default function Home() {
 
       {view === "list" && !filtering && (
         <div className="quick">
-          <Link href="/plan" className="qtile dark">
+          <Link href="/plan" className="qtile dark has-photo">
+            <img className="qtile-bg" src="/img/mount-lavinia-500.jpg" alt="" aria-hidden="true" loading="lazy" />
             <span className="ico-wrap"><Ico n="route" size={22} /></span>
             <span><b>Plan a date in 60 seconds</b><span className="s">Pick a vibe and budget. We build the whole night.</span></span>
           </Link>
-          <Link href="/watch" className="qtile">
+          <Link href="/watch" className="qtile has-photo light">
+            <img className="qtile-bg" src="/img/kottu-500.jpg" alt="" aria-hidden="true" loading="lazy" />
             <span className="ico-wrap"><Ico n="film" size={22} /></span>
             <span><b>Watch</b><span className="s">Short videos of real places</span></span>
           </Link>

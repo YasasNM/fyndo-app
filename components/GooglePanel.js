@@ -7,7 +7,7 @@ import PhotoGallery from "./PhotoGallery";
 // Live info from Google for a spot that has a google_place_id.
 // Follows Google's display rules: "Google Maps" attribution, photo and review authors credited,
 // links back to Google Maps, review order notice.
-export default function GooglePanel({ placeId, onInfo, admin }) {
+export default function GooglePanel({ placeId, onInfo, onFail, admin }) {
   const [g, setG] = useState(undefined);
   const [reviews, setReviews] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -17,7 +17,7 @@ export default function GooglePanel({ placeId, onInfo, admin }) {
 
   useEffect(() => {
     let on = true;
-    googlePlace(placeId).then((d) => { if (on) { setG(d); onInfo && onInfo(d); } }).catch((e) => { if (on) { setG(null); setLoadErr(e.message); } });
+    googlePlace(placeId).then((d) => { if (on) { setG(d); onInfo && onInfo(d); } }).catch((e) => { if (on) { setG(null); setLoadErr(e.message); onFail && onFail(); } });
     return () => { on = false; };
   }, [placeId]); // eslint-disable-line
 

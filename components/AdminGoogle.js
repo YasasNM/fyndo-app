@@ -44,7 +44,7 @@ export function SetupCheck({ spots }) {
           <Row ok label="Server functions are running" />
           <Row ok={h.google} label="Google key is set in Azure" hint="Add GOOGLE_MAPS_API_KEY under Environment variables, then Apply." />
           <Row ok={h.supabase} label="Supabase is connected on the server" hint="Add SUPABASE_URL and SUPABASE_ANON_KEY under Environment variables." />
-          <Row ok={Boolean(h.ai)} label={h.ai ? `AI for Ask Fyndo: ${h.ai === "gemini" ? "Gemini" : "Azure OpenAI"}` : "AI for Ask Fyndo"} hint="Optional. Add GEMINI_API_KEY (free). Without it Ask Fyndo uses simple keyword matching." />
+          <Row ok={Boolean(h.ai)} label={h.ai ? `AI for Ask Fyndo: ${h.ai}` : "AI for Ask Fyndo"} hint="Optional. Add a free key: GROQ_API_KEY (console.groq.com) or CEREBRAS_API_KEY. Without one, Ask Fyndo uses simple keyword matching." />
           <Row ok={spots.length === 0 || linked > 0} label={`Places linked to Google: ${linked} of ${spots.length}`} hint="Google photos, ratings and hours only show on linked places. Use Link to Google below." />
           {h.google && (
             <div style={{ marginTop: 10 }}>

@@ -46,12 +46,43 @@ function sanitize(o) {
   };
 }
 
-// Two AI options, use whichever you have a key for:
-//  - Google Gemini (free tier from Google AI Studio, no card): set GEMINI_API_KEY (optional GEMINI_MODEL)
-//  - Azure OpenAI: set AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY, AZURE_OPENAI_DEPLOYMENT
-// Only the user's sentence is sent. No names, emails or other personal data.
+// Free AI providers, tried in this order. Add a key for any of them (all have free tiers with no card):
+//  GROQ_API_KEY       console.groq.com        Llama 3.3 70B, about 1,000 requests a day free
+//  CEREBRAS_API_KEY   cloud.cerebras.ai       gpt-oss-120b, about 14,400 requests a day free
+//  GEMINI_API_KEY     aistudio.google.com     free tier (small daily limit on Flash models)
+//  OPENROUTER_API_KEY openrouter.ai           ":free" models, about 50 requests a day
+//  Azure OpenAI (AZURE_OPENAI_*) is used last, if set.
+// If one is busy or out of quota, the next one answers. Only the user's sentence is sent, never names or emails.
+const OPENAI_STYLE = [
+  { name: "groq", key: "GROQ_API_KEY", url: "https://api.groq.com/openai/v1/chat/completions", model: "GROQ_MODEL", def: "llama-3.3-70b-versatile" },
+  { name: "cerebras", key: "CEREBRAS_API_KEY", url: "https://api.cerebras.ai/v1/chat/completions", model: "CEREBRAS_MODEL", def: "gpt-oss-120b" },
+  { name: "openrouter", key: "OPENROUTER_API_KEY", url: "https://openrouter.ai/api/v1/chat/completions", model: "OPENROUTER_MODEL", def: "meta-llama/llama-3.3-70b-instruct:free" },
+];
+
+// Pull the JSON object out of a reply, even if the model wrapped it in ```json fences or added words.
+function extractJson(text) {
+  const t = String(text || "");
+  try { return JSON.parse(t); } catch {}
+  const m = t.match(/\{[\s\S]*\}/);
+  if (m) { try { return JSON.parse(m[0]); } catch {} }
+  return {};
+}
+
+async function askOpenAIStyle(p, q, log) {
+  const res = await fetch(p.url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env[p.key]}` },
+    body: JSON.stringify({ model: process.env[p.model] || p.def, temperature: 0.2, max_tokens: 600,
+      response_format: { type: "json_object" },
+      messages: [{ role: "system", content: SYSTEM }, { role: "user", content: q }] }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) { log && log.error && log.error(`${p.name} error`, res.status, data && data.error && (data.error.message || data.error)); return null; }
+  return (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || null;
+}
+
 async function askGemini(q, log) {
-  const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+  const model = process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
   const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY },
@@ -64,7 +95,7 @@ async function askGemini(q, log) {
   const data = await res.json().catch(() => ({}));
   if (!res.ok) { log && log.error && log.error("Gemini error", res.status, data && data.error && data.error.message); return null; }
   const parts = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts;
-  return (parts && parts.map((p) => p.text || "").join("")) || "";
+  return (parts && parts.map((x) => x.text || "").join("")) || null;
 }
 
 async function askAzure(q, log) {
@@ -73,37 +104,38 @@ async function askAzure(q, log) {
   const res = await fetch(`${endpoint}/openai/deployments/${encodeURIComponent(process.env.AZURE_OPENAI_DEPLOYMENT)}/chat/completions?api-version=${apiVersion}`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "api-key": process.env.AZURE_OPENAI_API_KEY },
-    body: JSON.stringify({
-      messages: [{ role: "system", content: SYSTEM }, { role: "user", content: q }],
-      response_format: { type: "json_object" },
-    }),
+    body: JSON.stringify({ messages: [{ role: "system", content: SYSTEM }, { role: "user", content: q }], response_format: { type: "json_object" } }),
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) { log && log.error && log.error("Azure OpenAI error", res.status, data && data.error); return null; }
-  return (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || "";
+  return (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || null;
+}
+
+// The providers that have keys, in order.
+function providers() {
+  const list = OPENAI_STYLE.filter((p) => process.env[p.key]).map((p) => ({ name: p.name, run: (q, log) => askOpenAIStyle(p, q, log) }));
+  if (process.env.GEMINI_API_KEY) list.splice(Math.min(2, list.length), 0, { name: "gemini", run: askGemini });
+  if (process.env.AZURE_OPENAI_ENDPOINT && process.env.AZURE_OPENAI_API_KEY && process.env.AZURE_OPENAI_DEPLOYMENT) list.push({ name: "azure", run: askAzure });
+  return list;
 }
 
 module.exports = async function (context, req) {
-  const hasGemini = Boolean(process.env.GEMINI_API_KEY);
-  const hasAzure = Boolean(process.env.AZURE_OPENAI_ENDPOINT && process.env.AZURE_OPENAI_API_KEY && process.env.AZURE_OPENAI_DEPLOYMENT);
   try {
     const q = clean(req.body && req.body.q, 300);
     if (q.length < 3) return (context.res = json(400, { error: "Tell me a bit more." }));
-    if (!hasGemini && !hasAzure) return (context.res = json(503, { error: "AI is not set up yet." }));
+    const list = providers();
+    if (!list.length) return (context.res = json(503, { error: "AI is not set up yet." }));
     if (rateLimited(req, "ask", 30)) return (context.res = json(429, { error: "You've asked a lot! Try again in a bit." }));
-
-    const log = context.log;
-    let text = hasGemini ? await askGemini(q, log) : await askAzure(q, log);
-    // If Gemini is busy and Azure is also set up, try Azure before giving up.
-    if (text === null && hasGemini && hasAzure) text = await askAzure(q, log);
-    if (text === null) return (context.res = json(502, { error: "AI is busy right now." }));
-
-    let parsed = {};
-    try { parsed = JSON.parse(text || "{}"); } catch { parsed = {}; }
-    context.res = json(200, sanitize(parsed));
+    for (const p of list) {
+      let text = null;
+      try { text = await p.run(q, context.log); } catch (e) { context.log && context.log.error && context.log.error(p.name, e.message); }
+      if (text) return (context.res = json(200, { ...sanitize(extractJson(text)), provider: p.name }));
+    }
+    context.res = json(502, { error: "AI is busy right now." });
   } catch (e) {
     context.res = json(500, { error: "AI request failed." });
   }
 };
 
+module.exports.providers = providers;
 module.exports.sanitize = sanitize;
