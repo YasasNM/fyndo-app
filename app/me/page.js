@@ -5,6 +5,7 @@ import Link from "next/link";
 import { db, isLive } from "@/lib/data";
 import { useUser } from "@/lib/hooks";
 import Avatar from "@/components/Avatar";
+import { AppearancePicker } from "@/components/ThemeToggle";
 import { niceTime, STATUS_LABEL, toMin, todayIso } from "@/lib/utils";
 
 const STATUS_BADGE = { confirmed: "", requested: "warn", declined: "red", cancelled: "grey", arrived: "book", no_show: "red" };
@@ -65,14 +66,18 @@ export default function Me() {
   const [list, setList] = useState([]);
   const [edit, setEdit] = useState(false);
   const [f, setF] = useState({ name: "", phone: "" });
+  const [bye, setBye] = useState(false);       // asking "Log out?"
+  const [leaving, setLeaving] = useState(false);
+  const logOut = async () => { setLeaving(true); try { await db.signOut(); } finally { window.location.href = "/"; } };
   const load = () => db.myBookings().then(setList);
   useEffect(() => { if (user) { load(); setF({ name: user.name || "", phone: user.phone || "" }); } }, [user]);
 
   if (user === undefined) return <div className="loading">Loading...</div>;
   if (!user) return (
     <div className="narrow">
-      <div className="empty"><div className="big"><Ico n="user" size={30} /></div>Log in to see your bookings and profile.<br /><br />
+      <div className="empty"><div className="big"><Ico n="user" size={30} /></div><h1 className="empty-title">Log in to see your bookings and profile</h1>
         <Link href="/login?next=/me" className="btn">Log in or sign up</Link></div>
+      <AppearancePicker />
       <InstallCard />
       <p className="small muted legal-links" style={{ marginTop: 14 }}>
         <Link className="linkbtn" href="/privacy">Privacy policy</Link>
@@ -131,10 +136,18 @@ export default function Me() {
           <label className="field"><span>Phone</span><input className="input" value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} /></label>
           <div className="row"><button className="btn sm" onClick={saveProfile}>Save</button><button className="btn sm ghost" onClick={() => setEdit(false)}>Cancel</button></div>
         </div>
+      ) : bye ? (
+        <div className="card pad" role="alertdialog" aria-labelledby="byeq">
+          <p id="byeq" style={{ marginTop: 0 }}><b>Log out of Fyndo?</b><br /><span className="small muted">Your saves, plans and bookings stay in your account for next time.</span></p>
+          <div className="row">
+            <button className="btn sm danger" onClick={logOut} disabled={leaving} autoFocus>{leaving ? "Logging out..." : "Log out"}</button>
+            <button className="btn sm ghost" onClick={() => setBye(false)} disabled={leaving}>Stay logged in</button>
+          </div>
+        </div>
       ) : (
         <div className="row">
           <button className="btn sm ghost" onClick={() => setEdit(true)}>Account details</button>
-          <button className="btn sm danger" onClick={async () => { await db.signOut(); window.location.href = "/"; }}>Log out</button>
+          <button className="btn sm danger" onClick={() => setBye(true)}>Log out</button>
         </div>
       )}
       {isLive && !edit && <ChangePassword />}
@@ -154,6 +167,7 @@ export default function Me() {
       {past.length > 0 && (<><h2>Past and cancelled</h2><div className="stack">{past.map((b) => <Row key={b.id} b={b} />)}</div></>)}
 
       <h2>App</h2>
+      <AppearancePicker />
       <InstallCard />
       <p className="small muted legal-links" style={{ marginTop: 14 }}>
         <Link className="linkbtn" href="/privacy">Privacy policy</Link>

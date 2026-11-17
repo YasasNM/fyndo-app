@@ -18,7 +18,7 @@ export default function Saved() {
 
   if (user === undefined) return <div className="loading">Loading...</div>;
   if (!user) return (
-    <div className="empty"><div className="big"><Ico n="bookmark" size={30} /></div>Log in to save spots and date plans.<br /><br />
+    <div className="empty"><div className="big"><Ico n="bookmark" size={30} /></div><h1 className="empty-title">Log in to save spots and date plans</h1>
       <Link href="/login?next=/saved" className="btn">Log in</Link></div>
   );
 

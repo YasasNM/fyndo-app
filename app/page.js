@@ -22,6 +22,15 @@ const BUDGETS = [
   { id: "2500", label: "Under LKR 2,500 pp" },
   { id: "5000", label: "Under LKR 5,000 pp" },
 ];
+// Every feature one tap from home.
+const SHORTCUTS = [
+  { href: "/plan", label: "Plan a night", ic: "route" },
+  { href: "/watch", label: "Watch", ic: "film" },
+  { href: "/feed", label: "Friends", ic: "group" },
+  { href: "/split", label: "Split a bill", ic: "receipt" },
+  { href: "/rewards", label: "Rewards", ic: "ticket" },
+  { href: "/saved", label: "Saved", ic: "bookmark" },
+];
 const SORTS = [
   { id: "best", label: "Best match" },
   { id: "rating", label: "Top rated" },
@@ -139,17 +148,25 @@ export default function Home() {
 
   return (
     <>
-      {/* On phones this block re-orders: search blind, open places, then the intro and video (see .homehead in globals.css). */}
+      {/* On phones this block re-orders: question and search first, then shortcuts, moods and what's open, then the photos (see .homehead in globals.css). */}
       <div className="homehead">
         <section className="hero">
           <div className="hero-text">
-            <h1>Find the real spots.</h1>
-            <p className="lede">See how a place really looks, what it really costs, and plan the whole night in a minute.</p>
+            <h1>Where to tonight?</h1>
+            <p className="lede">Real photos, real prices per person, and the whole night planned in a minute.</p>
 
             <AskFyndo spots={spots} />
           </div>
           <HeroSlides className="hero-photo" />
         </section>
+        <nav className="suggest" aria-label="Shortcuts">
+          {SHORTCUTS.map((s) => (
+            <Link key={s.href} href={s.href} className={"suggest-tile" + (s.href === "/plan" ? " suggest-plan" : "")}>
+              <Ico n={s.ic} size={24} strokeWidth={1.7} />
+              <span>{s.label}</span>
+            </Link>
+          ))}
+        </nav>
         <div className="moodrow">
           <h2 className="rowlabel">Pick a mood</h2>
           <div className="chips">
@@ -236,21 +253,6 @@ export default function Home() {
         <div style={{ marginTop: 12 }}>
           <SpotMap spots={filtered} me={loc.pos} height={460} />
           <p className="small muted">{filtered.filter((s) => s.lat != null).length} of {filtered.length} spots have a map position. Tap a pin to open it.</p>
-        </div>
-      )}
-
-      {view === "list" && !filtering && (
-        <div className="quick">
-          <Link href="/plan" className="qtile dark has-photo">
-            <img className="qtile-bg" src="/img/mount-lavinia-500.jpg" alt="" aria-hidden="true" loading="lazy" />
-            <span className="ico-wrap"><Ico n="route" size={22} /></span>
-            <span><b>Plan a date in 60 seconds</b><span className="s">Pick a vibe and budget. We build the whole night.</span></span>
-          </Link>
-          <Link href="/watch" className="qtile has-photo light">
-            <img className="qtile-bg" src="/img/kottu-500.jpg" alt="" aria-hidden="true" loading="lazy" />
-            <span className="ico-wrap"><Ico n="film" size={22} /></span>
-            <span><b>Watch</b><span className="s">Short videos of real places</span></span>
-          </Link>
         </div>
       )}
 

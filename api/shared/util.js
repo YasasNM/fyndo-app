@@ -55,7 +55,7 @@ async function requireAdmin(req) {
   if (!auth.startsWith("Bearer ") || auth.length < 20) return { ok: false, status: 401, error: "Please log in as admin." };
   const headers = { apikey: anon, Authorization: auth };
   let u;
-  try { u = await fetch(`${url}/auth/v1/user`, { headers }); }
+  try { u = await fetch(`${url}/auth/v1/user`, { headers, signal: AbortSignal.timeout(8000) }); }
   catch { return { ok: false, status: 502, error: "Could not reach Supabase. Check the SUPABASE_URL setting for typos." }; }
   if (!u.ok) {
     const body = await u.json().catch(() => ({}));
@@ -64,8 +64,11 @@ async function requireAdmin(req) {
     return { ok: false, status: 401, error: `Supabase did not accept the login (${u.status}${why ? ": " + why : ""}).${hint}` };
   }
   const user = await u.json();
-  const p = await fetch(`${url}/rest/v1/profiles?id=eq.${encodeURIComponent(user.id)}&select=role`, { headers });
-  const rows = p.ok ? await p.json() : [];
+  let rows = [];
+  try {
+    const p = await fetch(`${url}/rest/v1/profiles?id=eq.${encodeURIComponent(user.id)}&select=role`, { headers, signal: AbortSignal.timeout(8000) });
+    rows = p.ok ? await p.json().catch(() => []) : [];
+  } catch { return { ok: false, status: 502, error: "Could not reach Supabase. Try again in a minute." }; }
   if (!rows[0] || rows[0].role !== "admin") return { ok: false, status: 403, error: "Admins only." };
   return { ok: true, user };
 }

@@ -39,10 +39,10 @@ function BookPage() {
   useEffect(() => { if (spot) db.getSlotCounts(spot.id, date).then(setCounts).catch(() => setCounts({})); }, [spot, date]);
 
   if (spot === undefined || user === undefined) return <div className="loading">Loading...</div>;
-  if (!user) return <div className="loading">Taking you to log in...</div>;
-  if (!spot) return <div className="empty">Spot not found.</div>;
+  if (!user) return <div className="loading"><h1 className="empty-title">Taking you to log in...</h1></div>;
+  if (!spot) return <div className="empty"><h1 className="empty-title">This place was not found</h1><Link className="linkbtn" href="/">Go home</Link></div>;
   if (!spot.booking_enabled)
-    return <div className="empty"><div className="big"><Ico n="phone" size={30} /></div>{spot.name} is not taking bookings on Fyndo right now.<br /><Link className="linkbtn" href={`/spot?id=${spot.id}`}>See other ways to contact them</Link></div>;
+    return <div className="empty"><div className="big"><Ico n="phone" size={30} /></div><h1 className="empty-title">{spot.name} is not taking bookings on Fyndo right now</h1><Link className="linkbtn" href={`/spot?id=${spot.id}`}>See other ways to contact them</Link></div>;
 
   const nowMin = new Date().getHours() * 60 + new Date().getMinutes();
   const slots = bookingSlots(spot).map((t) => ({
@@ -69,7 +69,7 @@ function BookPage() {
     const confirmed = done.status === "confirmed";
     return (
       <div className="narrow center">
-        <div className="success" style={{ background: confirmed ? "var(--green)" : "var(--mango)" }}><Ico n={confirmed ? "check" : "clock"} size={36} strokeWidth={2.6} /></div>
+        <div className="success" style={{ background: confirmed ? "var(--green)" : "var(--primary)", color: confirmed ? "var(--on-green)" : "var(--on-primary)" }}><Ico n={confirmed ? "check" : "clock"} size={36} strokeWidth={2.6} /></div>
         <h1>{confirmed ? "Table booked!" : "Request sent!"}</h1>
         <p className="muted">{confirmed ? "See you there." : `${spot.name} will reply soon. Check "My bookings" for updates.`}</p>
         <div className="card pad" style={{ textAlign: "left", margin: "16px 0" }}>

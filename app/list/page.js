@@ -23,7 +23,7 @@ function ListPage() {
   const [msg, setMsg] = useState("");
   useEffect(() => { db.getList(id).then(setL).catch(() => setL(null)); }, [id]);
   if (l === undefined || !spots) return <div className="loading">Loading...</div>;
-  if (!l) return <div className="empty"><div className="big"><Ico n="list" size={30} /></div>This list is private or was removed.<br /><Link className="linkbtn" href="/feed">Find people and lists</Link></div>;
+  if (!l) return <div className="empty"><div className="big"><Ico n="list" size={30} /></div><h1 className="empty-title">This list is private or was removed</h1><Link className="linkbtn" href="/feed">Find people and lists</Link></div>;
   const places = l.spot_ids.map((sid) => spots.find((s) => s.id === sid)).filter(Boolean);
   const mine = user && user.id === l.user_id;
   const report = async () => {

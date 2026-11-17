@@ -44,7 +44,7 @@ function SpotPage() {
   useEffect(() => { if (user) db.getSaves().then((l) => setSaved(l.includes(id))); }, [user, id]);
 
   if (spot === undefined) return <div className="loading">Loading...</div>;
-  if (!spot) return <div className="empty"><div className="big"><Ico n="pin" size={30} /></div>This spot was not found. <Link href="/" className="linkbtn">Go home</Link></div>;
+  if (!spot) return <div className="empty"><div className="big"><Ico n="pin" size={30} /></div><h1 className="empty-title">This place was not found</h1><Link href="/" className="linkbtn">Go home</Link></div>;
 
   const embed = embedUrl(spot.video_url);
   const toggle = async () => {

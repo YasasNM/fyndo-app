@@ -3,6 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { PlayPin } from "./Logo";
 import { Ico } from "./Icon";
+import ThemeToggle from "./ThemeToggle";
 import { isLive } from "@/lib/data";
 import { useUser } from "@/lib/hooks";
 
@@ -33,16 +34,17 @@ export default function Nav() {
       )}
       <header className="topbar">
         <div className="topbar-in">
-          <Link href="/" className="brand" aria-label="Fyndo home"><PlayPin /> Fyndo</Link>
+          <Link href="/" className="brand" aria-label="Fyndo home"><PlayPin size={22} /> Fyndo</Link>
           <nav className="toplinks" aria-label="Main">
             {links.map((l) => <Link key={l.href} href={l.href} className={on(l.href) ? "on" : ""} aria-current={on(l.href) ? "page" : undefined}>{l.label}</Link>)}
           </nav>
+          <ThemeToggle />
         </div>
       </header>
       <nav className="tabs" aria-label="Main">
         {links.filter((l) => PHONE.includes(l.href)).map((l) => (
           <Link key={l.href} href={l.href} className={on(l.href) ? "on" : ""} aria-current={on(l.href) ? "page" : undefined}>
-            <span className="ic"><Ico n={l.ic} size={21} strokeWidth={on(l.href) ? 2.1 : 1.8} /></span>{l.label}
+            <span className="ic"><Ico n={l.ic} size={22} strokeWidth={on(l.href) ? 2.2 : 1.7} /></span>{l.label}
           </Link>
         ))}
       </nav>

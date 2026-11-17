@@ -33,11 +33,20 @@ function paused() { return Date.now() < pausedUntil ? pauseMsg : ""; }
 async function call(path, { method = "GET", fieldMask, body } = {}) {
   const p = paused();
   if (p) { const e = new Error(p); e.status = 429; e.quota = true; e.paused = true; throw e; }
-  const res = await fetch(BASE + path, {
-    method,
-    headers: { "X-Goog-Api-Key": key(), ...(fieldMask ? { "X-Goog-FieldMask": fieldMask } : {}), ...(body ? { "Content-Type": "application/json" } : {}) },
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  let res;
+  try {
+    res = await fetch(BASE + path, {
+      method,
+      headers: { "X-Goog-Api-Key": key(), ...(fieldMask ? { "X-Goog-FieldMask": fieldMask } : {}), ...(body ? { "Content-Type": "application/json" } : {}) },
+      body: body ? JSON.stringify(body) : undefined,
+      signal: AbortSignal.timeout(10000), // never keep a visitor waiting on a slow Google answer
+    });
+  } catch (err) {
+    if (err && err.status) throw err; // missing key: keep that message
+    const e = new Error("Could not reach Google right now. Fyndo's own info still works; try again in a minute.");
+    e.status = 502;
+    throw e;
+  }
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
     const raw = (data.error && data.error.message) || "Google request failed";

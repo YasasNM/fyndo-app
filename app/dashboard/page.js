@@ -30,13 +30,13 @@ export default function Dashboard() {
   if (user.role === "user")
     return (
       <div className="empty"><div className="big"><Ico n="store" size={30} /></div>
-        <p style={{ margin: "0 0 14px" }}>This page is for business owners.<br />Run a restaurant or café on Fyndo? Claim it to manage its page.</p>
+        <h1 className="empty-title">This page is for business owners</h1><p style={{ margin: "0 0 14px" }}>Run a restaurant or café on Fyndo? Claim it to manage its page.</p>
         <Link className="btn" href="/claim">Claim your place</Link>
       </div>
     );
-  if (err) return <div className="alert">{err}</div>;
+  if (err) return <div className="narrow"><h1>Business dashboard</h1><div className="alert">{err}</div></div>;
   if (!spots) return <div className="loading">Loading your places...</div>;
-  if (!spots.length) return <div className="empty"><div className="big"><Ico n="store" size={30} /></div>No places linked to your account yet.</div>;
+  if (!spots.length) return <div className="empty"><div className="big"><Ico n="store" size={30} /></div><h1 className="empty-title">No places linked to your account yet</h1></div>;
 
   const spot = spots.find((s) => s.id === sel) || spots[0];
   const refresh = (patch) => setSpots(spots.map((s) => (s.id === spot.id ? { ...s, ...patch } : s)));

@@ -92,21 +92,17 @@ export default function SpotCard({ spot, rating, distanceKm, why, pick, save, in
   return (
     <article className="pcard">
       <Link href={`/spot?id=${spot.id}`} className="pcard-link" aria-label={`${spot.name}, ${spot.area}, ${open ? "open now" : "closed"}, ${priceLabel(spot)}`}>
-        <CardMedia spot={spot}>
-          {/* Fixed cell: the area plate always carries the open/closed mark in the same corner. */}
-          <span className="pcard-area"><i className={"pcard-state " + (open ? "open" : "closed")} aria-hidden="true" />{spot.area}</span>
-        </CardMedia>
+        <CardMedia spot={spot} />
         <div className="pcard-body">
+          <div className="pcard-namecol">
+            <h3>{spot.name}</h3>
+            <div className="pcard-sub">{spot.area}, {spot.category}{km && `, ${km}`}</div>
+          </div>
           <div className="pcard-main">
-            <div className="pcard-namecol">
-              <h3>{spot.name}</h3>
-              <div className="pcard-sub">
-                {spot.category}, {open ? `open till ${niceTime(spot.close_time)}` : "closed now"}{km && `, ${km}`}
-              </div>
-            </div>
+            <span className={open ? "open-now" : "closed-now"}>{open ? `Open till ${niceTime(spot.close_time)}` : "Closed now"}</span>
             {price.big ? (
-              <div className="pcard-price"><b>{price.big}</b>{price.unit && <span>{price.unit}</span>}</div>
-            ) : <div className="pcard-price none"><span>{price.unit}</span></div>}
+              <span className="pcard-price"><b>{price.big === "Free" ? "Free" : `LKR ${price.big}`}</b>{price.unit && <span> pp</span>}</span>
+            ) : <span className="pcard-price none"><span>No prices yet</span></span>}
           </div>
           {(spot.verified || gem || rating || spot.booking_enabled || spot.video_url) && (
             <div className="pcard-marks">

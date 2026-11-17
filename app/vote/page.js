@@ -33,9 +33,9 @@ function Vote() {
     return () => clearInterval(t);
   }, [id]); // eslint-disable-line
 
-  if (!id) return <div className="empty"><div className="big"><Ico n="group" size={30} /></div>No vote link. Ask your friend to share it again.</div>;
+  if (!id) return <div className="empty"><div className="big"><Ico n="group" size={30} /></div><h1 className="empty-title">No vote link</h1><p>Ask your friend to share it again.</p></div>;
   if (poll === undefined) return <div className="loading">Loading vote...</div>;
-  if (!poll) return <div className="empty"><div className="big"><Ico n="group" size={30} /></div>This vote was not found.<br /><Link href="/" className="linkbtn">Go home</Link></div>;
+  if (!poll) return <div className="empty"><div className="big"><Ico n="group" size={30} /></div><h1 className="empty-title">This vote was not found</h1><Link href="/" className="linkbtn">Go home</Link></div>;
 
   const total = poll.counts.reduce((a, b) => a + b, 0);
   const top = Math.max(...poll.counts);

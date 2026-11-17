@@ -7,7 +7,7 @@ import { Ico } from "./Icon";
 const STEPS = [
   { sel: ".ask", title: "Say what you feel like", body: "Type it the way you would tell a friend. Fyndo turns it into real places and a plan." },
   { sel: ".moodrow", title: "Or tap a mood", body: "One tap filters every place in Colombo. Tap it again to clear." },
-  { sel: ".qtile.dark", title: "Let Fyndo plan the night", body: "Pick a vibe and a budget. You get stops, times, a route and the cost for two." },
+  { sel: ".suggest-plan", title: "Let Fyndo plan the night", body: "Pick a vibe and a budget. You get stops, times, a route and the cost for two." },
 ];
 const KEY = "fyndo_tour_v1";
 

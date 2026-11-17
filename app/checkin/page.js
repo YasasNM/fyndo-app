@@ -40,9 +40,9 @@ function Checkin() {
       .catch((e) => setErr(e.message));
   }, [user, id, code]);
 
-  if (!id || !code) return <div className="empty"><div className="big"><Ico n="qr" size={30} /></div>Scan the QR code on the table to check in.</div>;
+  if (!id || !code) return <div className="empty"><div className="big"><Ico n="qr" size={30} /></div><h1 className="empty-title">Scan the QR code on the table to check in</h1></div>;
   if (spot === undefined || user === undefined) return <div className="loading">Loading...</div>;
-  if (!spot) return <div className="empty"><div className="big"><Ico n="pin" size={30} /></div>This place was not found.</div>;
+  if (!spot) return <div className="empty"><div className="big"><Ico n="pin" size={30} /></div><h1 className="empty-title">This place was not found</h1></div>;
 
   const st = res ? stampsFor(res.visits, spot.stamp_goal || 6) : null;
   const saveDiary = async () => {

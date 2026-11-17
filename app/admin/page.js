@@ -114,7 +114,7 @@ export default function Admin() {
   useEffect(() => { if (user === null) goLogin(); if (user && user.role === "admin") load(); }, [user]);
 
   if (!user) return <div className="loading">Loading...</div>;
-  if (user.role !== "admin") return <div className="empty"><div className="big"><Ico n="lock" size={30} /></div>Admins only.</div>;
+  if (user.role !== "admin") return <div className="empty"><div className="big"><Ico n="lock" size={30} /></div><h1 className="empty-title">Admins only</h1></div>;
   if (!spots) return <div className="loading">Loading spots...</div>;
 
   if (editing) return <SpotForm initial={editing} isNew={!editing.id} onDone={(m) => { setEditing(null); setMsg(m || ""); load(); }} />;

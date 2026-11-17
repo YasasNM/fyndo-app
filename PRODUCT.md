@@ -35,6 +35,7 @@ Mobile-first web app (installable PWA) used outdoors and in the evening, on mid-
 
 ## Brand Commitments
 - Name "Fyndo" and the map-pin logo mark are kept. Colours, typefaces and style are free to change (owner confirmed).
+- Standing look (owner, November 2026): luxury and minimal in the manner of Uber and Letterboxd: monochrome, photo posters, many features one tap away, light and dark modes. Uber and Letterboxd set the craft bar; never copy their logos, colours or names.
 - Plain, friendly English; sentence case; no hype.
 - Owner contact: fyndolk.official@gmail.com.
 

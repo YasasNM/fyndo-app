@@ -31,7 +31,7 @@ export default function Rewards() {
 
   if (user === undefined) return <div className="loading">Loading...</div>;
   if (!user) return (
-    <div className="empty"><div className="big"><Ico n="ticket" size={30} /></div>Log in to collect points and stamps at your favourite places.<br /><br />
+    <div className="empty"><div className="big"><Ico n="ticket" size={30} /></div><h1 className="empty-title">Log in to collect points and stamps at your favourite places</h1>
       <Link href="/login?next=/rewards" className="btn">Log in or sign up</Link></div>
   );
   if (!list || !stats) return <div className="loading">Loading your rewards...</div>;
@@ -43,7 +43,7 @@ export default function Rewards() {
       <div className="tier">
         <div className="row between">
           <div><div className="small" style={{ opacity: 0.8 }}>Your level</div>
-            <h2 style={{ margin: 0, color: "#fff" }}>{tier.cur.label}</h2></div>
+            <h2 style={{ margin: 0, color: "var(--on-panel)" }}>{tier.cur.label}</h2></div>
           <div style={{ textAlign: "right" }}><div style={{ fontSize: 30, fontWeight: 700 }}>{stats.points}</div><div className="small" style={{ opacity: 0.8 }}>points</div></div>
         </div>
         <div className="progress"><div style={{ width: `${tier.pct}%` }} /></div>

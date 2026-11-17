@@ -34,7 +34,7 @@ function Profile() {
   useEffect(() => { if (p && user) db.isFollowing(p.id).then(setFollowing).catch(() => {}); }, [p && p.id, user]); // eslint-disable-line
 
   if (p === undefined) return <div className="loading">Loading...</div>;
-  if (!p) return <div className="empty"><div className="big"><Ico n="user" size={30} /></div>No one has the username @{name}.<br /><Link className="linkbtn" href="/feed">Find people</Link></div>;
+  if (!p) return <div className="empty"><div className="big"><Ico n="user" size={30} /></div><h1 className="empty-title">{name ? `No one has the username @${name}` : "Find people on Fyndo"}</h1><Link className="linkbtn" href="/feed">Find people</Link></div>;
   const mine = user && user.id === p.id;
   const byId = (id) => (spots || []).find((s) => s.id === id);
   const favs = (p.favorites || []).map(byId).filter(Boolean);

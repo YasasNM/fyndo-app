@@ -20,7 +20,7 @@ function Compare() {
   const ratings = useRatings();
   const picked = useMemo(() => (spots ? ids.map((i) => spots.find((s) => s.id === i)).filter(Boolean) : []), [spots, ids.join(",")]); // eslint-disable-line
   if (!spots) return <div className="loading">Loading...</div>;
-  if (picked.length < 2) return <div className="empty"><div className="big"><Ico n="scale" size={30} /></div>Pick 2 or 3 places on the home page to compare.<br /><Link href="/" className="linkbtn">Go home</Link></div>;
+  if (picked.length < 2) return <div className="empty"><div className="big"><Ico n="scale" size={30} /></div><h1 className="empty-title">Pick 2 or 3 places on the home page to compare</h1><Link href="/" className="linkbtn">Go home</Link></div>;
 
   const now = new Date();
   const t = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
