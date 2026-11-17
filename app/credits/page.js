@@ -1,4 +1,5 @@
 import { PHOTOS } from "@/lib/photoCredits";
+import Link from "next/link";
 
 export const metadata = { title: "Credits: Fyndo" };
 
@@ -38,6 +39,11 @@ export default function Credits() {
         <li>Weather and sunset times: <a className="linkbtn" href="https://open-meteo.com" target="_blank" rel="noreferrer">Open-Meteo</a>.</li>
         <li>Exchange rates: <a className="linkbtn" href="https://www.exchangerate-api.com" target="_blank" rel="noreferrer">ExchangeRate-API</a>.</li>
       </ul>
+
+      <p className="small muted legal-links" style={{ marginTop: 28 }}>
+        <Link className="linkbtn" href="/privacy">Privacy policy</Link>
+        <Link className="linkbtn" href="/terms">Terms of use</Link>
+      </p>
     </div>
   );
 }

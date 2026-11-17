@@ -727,3 +727,12 @@ a.rainbar { color: inherit; }
 .findpick.on { outline: 2.5px solid var(--green); outline-offset: 2px; cursor: default; }
 .findpick.on span { background: var(--green); color: #fff; }
 .findpick:hover:not(.on) img { opacity: 0.9; }
+
+/* Bot check (Cloudflare Turnstile) on log in and sign up: space reserved so the button doesn't jump. */
+.captcha { min-height: 65px; margin: 0 0 10px; }
+
+/* Privacy policy and terms: readable lists and spacing. */
+.legal p, .legal li { line-height: 1.6; }
+.legal ul { padding-left: 20px; margin: 0 0 14px; }
+.legal li + li { margin-top: 6px; }
+.legal-links { display: flex; flex-wrap: wrap; gap: 6px 18px; }

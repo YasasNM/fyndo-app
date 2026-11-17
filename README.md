@@ -55,7 +55,7 @@ You'll do 6 parts. Take them in order. Each takes 5 to 15 minutes.
 1. **supabase.com** > New project. Name `fyndo`, region **Singapore**, strong password (save it).
 2. **SQL Editor** > New query > paste all of `supabase/schema.sql` > **Run**.
    (Already ran it before? Run it again. It safely adds the new Google column.)
-   **Then run `supabase/schema_v3.sql`, `supabase/schema_v4.sql`, `supabase/schema_v5.sql`, `supabase/schema_v6.sql` and `supabase/schema_v7.sql` the same way, in that order** (v4 adds free photo storage; v5 adds photo credits, place websites and restaurant owner claims; v6 adds official links, visitor photos and the weekly photo job; v7 adds profiles, follows, likes and lists).
+   **Then run `supabase/schema_v3.sql`, `supabase/schema_v4.sql`, `supabase/schema_v5.sql`, `supabase/schema_v6.sql`, `supabase/schema_v7.sql` and `supabase/schema_v8.sql` the same way, in that order** (v4 adds free photo storage; v5 adds photo credits, place websites and restaurant owner claims; v6 adds official links, visitor photos and the weekly photo job; v7 adds profiles, follows, likes and lists; v8 tightens security: private reviews, safe links, daily spam limits).
    It adds QR check-ins and rewards, verified reviews, owner replies, private feedback, reports, collections and group votes. Safe to run again. Paste the file's contents, not its name.
 3. **Real places:** run `supabase/seed_google.sql` the same way. It adds 177 real restaurants, cafés, dessert places and things to do in Colombo 3, 4, 5, 7, Dehiwala and Mount Lavinia, each linked to its Google listing, with Google's price level and usual hours. Skip `seed.sql` (made-up samples).
 4. **Accounts (email verification and password reset):**
@@ -235,3 +235,21 @@ Database keys for the website go in `.env.local` (copy `.env.example`).
 - Only admins can search Google (checked on the server with their Supabase login).
 - AI answers are cleaned: only known areas, moods and types are accepted, and places come only from Fyndo's own list.
 - Database rules: users see only their own bookings, saves and plans. Owners see only their own place. Nobody can over-book a slot or confirm their own booking.
+- Database limits (v8): daily caps on reviews, reports, follows, likes, votes and messages stop spam bots. Private profiles stay private in reviews. Links on places must be real web addresses; profile photos must be uploaded in Fyndo.
+- Browser protections: a strict Content Security Policy, HTTPS only (HSTS), no framing by other sites. Set in `public/staticwebapp.config.json`.
+- Log in, sign up and password reset can require a bot check (Cloudflare Turnstile, free). See below.
+- Raw data exports (the `Res data/` folder) are never committed. They are in `.gitignore`.
+
+### Security checklist (do these once)
+1. **Run `supabase/schema_v8.sql`** in the Supabase SQL Editor.
+2. **Bot check (recommended):**
+   - **dash.cloudflare.com > Turnstile > Add widget.** Add your site's domain and choose **Managed**.
+   - **GitHub repo > Settings > Secrets and variables > Actions > New repository secret.** Name `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, value: the **site key**. Push any change so the site rebuilds.
+   - **After the new build is live,** go to **Supabase > Authentication > Attack Protection.** Turn on **CAPTCHA protection**, choose **Turnstile** and paste the **secret key**. Turning it on before the site key is live blocks every login.
+3. **Supabase > Authentication > Providers > Email:** set the minimum password length to 8, and turn on **Secure email change** and **Secure password change**.
+4. **Supabase > Authentication > Rate Limits:** keep the defaults or lower them. Don't raise them.
+5. **Turn on 2-step sign-in for every admin account.** Use it on Supabase, GitHub, Azure, Google Cloud and the Fyndo Gmail account.
+6. **Replace any key that was ever pasted into a chat, email or file.** That includes the Google Maps key and the Gmail app password. Create a new one, update it in Azure or Supabase, then delete the old one.
+7. **GitHub repo > Settings > Code security:** turn on **Dependabot alerts**, **Dependabot security updates** and **Secret scanning**. `.github/dependabot.yml` already asks for weekly update checks.
+8. **Backups:** the free Supabase plan has no automatic backups. Once a week, open **Database > Backups**, or run `supabase db dump` on your laptop. Keep the file somewhere private, never in this repo. The Pro plan makes daily backups.
+9. **Legal pages:** `/privacy` and `/terms` are live. Update them whenever Fyndo starts keeping or sharing something new.

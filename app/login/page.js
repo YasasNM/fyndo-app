@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { db, isLive } from "@/lib/data";
 import { Ico } from "@/components/Icon";
 import Photo from "@/components/Photo";
+import Link from "next/link";
+import Captcha, { CAPTCHA_KEY } from "@/components/Captcha";
 
 // Log in, sign up (with email confirmation), forgot password. One screen, several clear states.
 // mode: in | up | forgot | check-signup | check-reset
@@ -13,7 +15,13 @@ export default function Login() {
   const [err, setErr] = useState(null); // { text, code }
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
+  const [cap, setCap] = useState("");      // bot-check token (only when Turnstile is set up)
+  const [capKey, setCapKey] = useState(0); // remounts the check: each token works once
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+  const freshCheck = () => { setCap(""); setCapKey((k) => k + 1); };
+  const needCheck = () => {
+    if (isLive && CAPTCHA_KEY && !cap) throw Object.assign(new Error("Please finish the bot check above the button."), { code: "form" });
+  };
 
   useEffect(() => {
     if (new URLSearchParams(window.location.search).get("confirmed") === "1") setNote("Your email is confirmed. You can log in now.");
@@ -21,7 +29,8 @@ export default function Login() {
 
   const go = () => {
     const next = new URLSearchParams(window.location.search).get("next");
-    window.location.href = next && next.startsWith("/") ? next : "/";
+    // Only paths on this site: "//other.site" or "/\other.site" would leave Fyndo.
+    window.location.href = next && /^\/(?![\/\\])/.test(next) ? next : "/";
   };
   const switchTo = (m) => { setMode(m); setErr(null); setNote(""); };
   const pwOk = (p) => p.length >= 8 && /[a-z]/i.test(p) && /\d/.test(p);
@@ -29,24 +38,28 @@ export default function Login() {
   const submit = async (e) => {
     e.preventDefault(); setErr(null); setNote(""); setBusy(true);
     try {
-      if (mode === "in") { await db.signIn(f.email, f.password); go(); }
+      if (mode === "in") { needCheck(); await db.signIn(f.email, f.password, cap); go(); }
       else if (mode === "up") {
         if (!f.name.trim()) throw Object.assign(new Error("Please add your name."), { code: "form" });
         if (isLive && !pwOk(f.password)) throw Object.assign(new Error("Use at least 8 characters, with letters and numbers."), { code: "form" });
         if (isLive && f.password !== f.password2) throw Object.assign(new Error("The two passwords don't match."), { code: "form" });
-        const r = await db.signUp(f.email, f.password, f.name.trim(), f.phone.trim());
+        needCheck();
+        const r = await db.signUp(f.email, f.password, f.name.trim(), f.phone.trim(), cap);
         if (r && r.needsConfirm) setMode("check-signup"); else go();
       } else if (mode === "forgot") {
-        await db.sendPasswordReset(f.email);
+        needCheck();
+        await db.sendPasswordReset(f.email, cap);
         setMode("check-reset");
       }
     } catch (e2) { setErr({ text: e2.message, code: e2.code }); }
+    if (cap) freshCheck();
     setBusy(false);
   };
   const resend = async () => {
     setBusy(true); setErr(null);
-    try { await db.resendConfirmation(f.email); setNote(`We sent a new confirmation link to ${f.email}.`); }
+    try { needCheck(); await db.resendConfirmation(f.email, cap); setNote(`We sent a new confirmation link to ${f.email}.`); }
     catch (e2) { setErr({ text: e2.message, code: e2.code }); }
+    if (cap) freshCheck();
     setBusy(false);
   };
   const demoLogin = async (email) => { await db.signIn(email, "demo"); go(); };
@@ -64,6 +77,7 @@ export default function Login() {
           <p className="small muted">No email after a few minutes? Check spam or promotions, then send it again.</p>
           {note && <div className="alert ok">{note}</div>}
           {err && <div className="alert">{err.text}</div>}
+          {isLive && <Captcha key={capKey} onToken={setCap} onError={(t) => setErr({ text: t })} />}
           <div className="row">
             <button className="btn" onClick={resend} disabled={busy}>{busy ? "Sending..." : "Send the link again"}</button>
             <button className="btn ghost" onClick={() => switchTo("in")}>Back to log in</button>
@@ -134,6 +148,13 @@ export default function Login() {
                   {err.code === "invalid" && <button type="button" className="linkbtn" onClick={() => switchTo("forgot")}>Forgot password?</button>}
                 </span>
               </div>
+            )}
+            {isLive && <Captcha key={capKey} onToken={setCap} onError={(t) => setErr({ text: t })} />}
+            {mode === "up" && (
+              <p className="small muted" style={{ margin: "0 0 10px" }}>
+                By creating an account you agree to the <Link className="linkbtn" href="/terms">Terms</Link> and
+                the <Link className="linkbtn" href="/privacy">Privacy policy</Link>.
+              </p>
             )}
             <button className="btn block" disabled={busy}>
               {busy ? "Please wait..." : mode === "in" ? "Log in" : mode === "up" ? "Create account" : "Send reset link"}

@@ -4,3 +4,8 @@ out
 .env.local
 api/local.settings.json
 .vercel
+
+# Raw data exports (third-party personal data, never commit)
+Res data/
+dataset_*.json
+*.scrape.json

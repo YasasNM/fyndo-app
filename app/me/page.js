@@ -74,6 +74,11 @@ export default function Me() {
       <div className="empty"><div className="big"><Ico n="user" size={30} /></div>Log in to see your bookings and profile.<br /><br />
         <Link href="/login?next=/me" className="btn">Log in or sign up</Link></div>
       <InstallCard />
+      <p className="small muted legal-links" style={{ marginTop: 14 }}>
+        <Link className="linkbtn" href="/privacy">Privacy policy</Link>
+        <Link className="linkbtn" href="/terms">Terms of use</Link>
+        <Link className="linkbtn" href="/credits">Photo and data credits</Link>
+      </p>
     </div>
   );
 
@@ -150,7 +155,11 @@ export default function Me() {
 
       <h2>App</h2>
       <InstallCard />
-      <p className="small muted" style={{ marginTop: 14 }}><Link className="linkbtn" href="/credits">Photo and data credits</Link></p>
+      <p className="small muted legal-links" style={{ marginTop: 14 }}>
+        <Link className="linkbtn" href="/privacy">Privacy policy</Link>
+        <Link className="linkbtn" href="/terms">Terms of use</Link>
+        <Link className="linkbtn" href="/credits">Photo and data credits</Link>
+      </p>
       {!isLive && (
         <p className="small muted" style={{ marginTop: 16 }}>
           Demo mode. <button className="linkbtn" onClick={async () => { await db.resetDemo(); window.location.href = "/"; }}>Reset demo data</button>
