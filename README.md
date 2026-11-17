@@ -127,6 +127,11 @@ Azure portal > your Static Web App > **Settings > Environment variables** > add 
 | `OPENROUTER_API_KEY` | Free AI, openrouter.ai `:free` models, about 50 a day. |
 
 You only need **one** AI key. Add more and Fyndo tries them in order (Groq, Cerebras, Gemini, OpenRouter, then Azure OpenAI), moving to the next if one is busy or out of free quota. Without any, Ask Fyndo still works with simple keyword matching.
+
+The same free AI keys also power two decision helpers, and neither can invent a place or a price:
+- **Plan a date, tuned by AI:** the planner's rules shortlist up to 8 suitable Fyndo places for each stop (open at that time, inside the budget, right vibe). The AI then chooses the best combination for the person's wishes ("she loves seafood"), with a one-line reason per stop and a tip. Every choice is checked on the server (it must come from the shortlist, no place twice, the night must fit the budget); if a provider fails the checks the next one is asked, and if none answers the rules' plan simply stays.
+- **Help me choose** on the Compare page: the AI recommends one of the 2 or 3 places using only the details in the table and what the person says matters.
+Only public place details and the person's own note are sent to the AI, never names, emails or phone numbers.
 The free Gemini tier may use what people type to improve Google's products. Fyndo only sends the search sentence, never names or emails.
 
 These keys stay on the server. They are never sent to people's browsers.

@@ -637,6 +637,16 @@ a.rainbar { color: inherit; }
 .claimdl dd { margin: 0; overflow-wrap: anywhere; }
 @media (max-width: 480px) { .claimdl { grid-template-columns: minmax(0, 1fr); } .claimdl dd { margin-bottom: 6px; } }
 
+/* ---------- AI help: plan tuning and "Help me choose" ---------- */
+.aistatus { min-height: 1.4em; margin: -2px 0 10px; color: var(--ink-2); display: flex; align-items: center; gap: 6px; }
+.aidot { width: 8px; height: 8px; border-radius: 50%; background: var(--plate); box-shadow: 0 0 0 2px var(--board); }
+@media (prefers-reduced-motion: no-preference) { .aidot { animation: aiPulse 1s ease-in-out infinite alternate; } }
+@keyframes aiPulse { from { opacity: 0.35; } to { opacity: 1; } }
+.aipick { margin-left: 8px; padding: 1px 6px; border-radius: 4px; background: var(--plate); color: var(--board); font-weight: 700; font-size: 11.5px; }
+.aitip { margin: 8px 0 0; padding: 10px 12px; border-radius: var(--r-ctl); background: var(--plate-soft); color: var(--ink); }
+.helpchoose { margin-top: 16px; }
+.helpchoose-notes { margin: 0 0 10px; padding-left: 18px; display: grid; gap: 4px; }
+
 /* ---------- official links and embeds ---------- */
 .official h2 { margin-bottom: 10px; }
 .embed-load { display: flex; align-items: center; gap: 12px; width: 100%; margin-top: 10px; padding: 12px 14px; border: 1.5px solid var(--line); border-radius: var(--r-card);

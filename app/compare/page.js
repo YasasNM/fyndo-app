@@ -1,6 +1,8 @@
 "use client";
 import { Ico } from "@/components/Icon";
-import { Suspense, useMemo } from "react";
+import { Suspense, useMemo, useState } from "react";
+import { decide } from "@/lib/api";
+import { compactSpot } from "@/lib/planner";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useSpots, useRatings } from "@/lib/hooks";
@@ -54,9 +56,50 @@ function Compare() {
           </tbody>
         </table>
       </div>
+      <HelpChoose picked={picked} ratings={ratings} now={t} />
       <div className="row" style={{ marginTop: 12 }}>
         <Link className="btn ghost" href="/">Back to places</Link>
       </div>
     </>
+  );
+}
+
+// "Help me choose": a free AI recommends one of these places, using only the details in the table above.
+function HelpChoose({ picked, ratings, now }) {
+  const [need, setNeed] = useState("");
+  const [res, setRes] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  const ask = async (e) => {
+    e.preventDefault();
+    setBusy(true); setErr(""); setRes(null);
+    try { setRes(await decide({ need, now, places: picked.map((s) => compactSpot(s, ratings, null, now)) })); }
+    catch (x) { setErr(x.status === 429 ? x.message : "AI is busy right now. The table above has everything to compare."); }
+    setBusy(false);
+  };
+  const byId = Object.fromEntries(picked.map((s) => [s.id, s]));
+  const pick = res && byId[res.pick];
+  return (
+    <section className="card pad helpchoose" aria-labelledby="help-h">
+      <h2 id="help-h" style={{ marginTop: 0 }}>Help me choose</h2>
+      <form onSubmit={ask}>
+        <label className="field" style={{ marginBottom: 10 }}><span>What matters most to you? (optional)</span>
+          <input className="input" value={need} maxLength={200} onChange={(e) => setNeed(e.target.value)} placeholder="e.g. open now, cheap, good for a quiet date" /></label>
+        <button className="btn sm" disabled={busy}><Ico n="star" size={16} />{busy ? "Thinking..." : "Help me choose"}</button>
+      </form>
+      {err && <div className="alert">{err}</div>}
+      {pick && (
+        <div className="helpchoose-out" aria-live="polite">
+          <p style={{ margin: "14px 0 6px" }}><b>Fyndo's AI suggests <Link className="linkbtn" href={`/spot?id=${pick.id}`}>{pick.name}</Link></b></p>
+          <p className="small" style={{ margin: "0 0 10px" }}>{res.why}</p>
+          <ul className="helpchoose-notes">
+            {res.notes.filter((n) => byId[n.id] && (n.good || n.watch)).map((n) => (
+              <li key={n.id} className="small"><b>{byId[n.id].name}:</b> {n.good}{n.good && n.watch ? ". " : ""}{n.watch && <span className="muted">Check: {n.watch}</span>}</li>
+            ))}
+          </ul>
+          <p className="small muted" style={{ margin: 0 }}>A suggestion from the details above; the choice is yours.</p>
+        </div>
+      )}
+    </section>
   );
 }

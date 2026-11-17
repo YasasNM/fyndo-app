@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { db } from "@/lib/data";
-import { useSpots, useUser, goLogin } from "@/lib/hooks";
-import { VIBES, buildPlan } from "@/lib/planner";
+import { useSpots, useUser, useRatings, goLogin } from "@/lib/hooks";
+import { VIBES, buildPlan, shortlists } from "@/lib/planner";
+import { planAi } from "@/lib/api";
 import { downloadIcs, atDateTime } from "@/lib/ics";
 import { useSunsets } from "@/lib/sun";
 import { AREAS } from "@/lib/seed";
@@ -20,6 +21,7 @@ const TIMES = ["16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "1
 export default function PlanPage() {
   const { spots } = useSpots();
   const user = useUser();
+  const ratings = useRatings();
   const days = nextDays(7);
   const [step, setStep] = useState(0);
   const [f, setF] = useState({ vibe: "", budget: 5000, area: "", date: days[0].iso, start: "17:30", veg: false });
@@ -36,11 +38,38 @@ export default function PlanPage() {
   }, []); // eslint-disable-line
   const set = (k, v) => setF((x) => ({ ...x, [k]: v }));
 
-  const plan = step === 4 && spots ? buildPlan(spots, { ...f, skip }) : null;
+  const rulePlan = step === 4 && spots ? buildPlan(spots, { ...f, skip }) : null;
+  // AI fine-tuning: the rules' plan shows at once; a free AI then re-chooses among the same rule-approved
+  // places for each stop and explains why. If no AI answers, the rules' plan simply stays.
+  const [ai, setAi] = useState({ key: "", state: "idle", picks: {}, tip: "" });
+  const aiKey = JSON.stringify({ v: f.vibe, b: f.budget, a: f.area, d: f.date, s: f.start, veg: f.veg, n: f.note || "" });
+  useEffect(() => {
+    if (!rulePlan || ai.key === aiKey) return;
+    setAi({ key: aiKey, state: "busy", picks: {}, tip: "" });
+    // Stops the rules found no place for are left out; the AI tunes the rest (at least two).
+    const lists = shortlists(spots, { ...f, skip }, rulePlan, ratings).map((l, i) => ({ ...l, i })).filter((l) => l.candidates.length);
+    if (lists.length < 2) { setAi((x) => ({ ...x, state: "off" })); return; }
+    planAi({ vibe: rulePlan.vibeLabel, budget: f.budget, start: f.start, area: f.area, veg: f.veg, note: f.note || "",
+      stops: lists.map(({ label, candidates }) => ({ label, candidates })) })
+      .then((r) => setAi((x) => (x.key !== aiKey ? x : { ...x, state: "done", tip: r.tip || "",
+        picks: Object.fromEntries((r.picks || []).filter((p) => lists[p.stop]).map((p) => [lists[p.stop].i, { id: p.id, why: p.why }])) })))
+      .catch(() => setAi((x) => (x.key !== aiKey ? x : { ...x, state: "off" })));
+  }, [rulePlan && aiKey, spots]); // eslint-disable-line
+
+  // The plan shown: the rules' plan with the AI's choices swapped in.
+  const plan = rulePlan && (() => {
+    const stops = rulePlan.stops.map((s, i) => {
+      const p = ai.key === aiKey && ai.picks[i];
+      const spot = p && !(skip[i] || []).includes(p.id) && spots.find((x) => x.id === p.id);
+      return spot ? { ...s, spot, ai: p.why } : s;
+    });
+    return { ...rulePlan, stops, total: stops.reduce((a, s) => a + (s.spot ? avgPrice(s.spot) * 2 : 0), 0) };
+  })();
   const swap = (i) => {
     const cur = plan.stops[i].spot;
     if (!cur) return;
     setSkip((s) => ({ ...s, [i]: [...(s[i] || []), cur.id] }));
+    setAi((x) => { const picks = { ...x.picks }; delete picks[i]; return { ...x, picks }; });
   };
   const dateLabel = (days.find((d) => d.iso === f.date) || days[0]).label;
 
@@ -152,7 +181,11 @@ export default function PlanPage() {
           <button className={"opt" + (f.veg ? " on" : "")} onClick={() => set("veg", !f.veg)}>
             <span className="em"><Ico n="leaf" size={20} /></span>Vegetarian friendly places{f.veg ? " (on)" : ""}
           </button>
-          <p className="small muted">More options (no alcohol, wheelchair access, parking) are coming soon.</p>
+          <label className="field" style={{ marginTop: 6 }}><span>Anything we should know? (optional)</span>
+            <textarea className="input" rows={2} maxLength={200} value={f.note || ""} onChange={(e) => set("note", e.target.value)}
+              placeholder="e.g. she loves seafood, no spicy food, somewhere with parking" />
+            <span className="small muted fieldhint">Fyndo's AI uses this to choose between the places that fit your plan.</span>
+          </label>
           <Next />
         </>
       )}
@@ -165,17 +198,21 @@ export default function PlanPage() {
           {sunsets[f.date] && (
             <p className="small" style={{ marginTop: -4 }}><Ico n="sun" size={16} /> Sunset that day is at {niceTime(sunsets[f.date])}.{f.vibe === "outdoor" ? " Aim to reach your first stop 30 minutes before." : ""}</p>
           )}
+          <p className="small aistatus" aria-live="polite">
+            {ai.key === aiKey && ai.state === "busy" && <><span className="aidot" aria-hidden="true" />Fine-tuning your plan with AI...</>}
+            {ai.key === aiKey && ai.state === "done" && Object.keys(ai.picks).length > 0 && <><Ico n="star" size={15} />Tuned by AI for your budget{f.note ? " and wishes" : ""}. Every place still comes from Fyndo's list.</>}
+          </p>
           <div className="timeline">
             {plan.stops.map((s, i) => (
               <div key={i} className="stop">
-                <div className="small muted" style={{ marginBottom: 4 }}><b>{niceTime(s.time)}</b> {s.label}</div>
+                <div className="small muted" style={{ marginBottom: 4 }}><b>{niceTime(s.time)}</b> {s.label}{s.ai && <span className="aipick">AI pick</span>}</div>
                 {s.spot ? (
                   <div className="card">
                     <Thumb spot={s.spot} className="mini" />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <Link href={`/spot?id=${s.spot.id}`}><h3>{s.spot.name}</h3></Link>
                       <div className="small muted">{s.spot.area}, about {avgPrice(s.spot) ? lkr(avgPrice(s.spot) * 2) : "free"} for two</div>
-                      <div className="small why">{whyThis(s.spot, { moods: vibeMoods, budget: f.budget, area: f.area })}</div>
+                      <div className="small why">{s.ai || whyThis(s.spot, { moods: vibeMoods, budget: f.budget, area: f.area })}</div>
                       <div className="row" style={{ marginTop: 6, gap: 14 }}>
                         {s.alternatives > 0 && <button className="linkbtn" onClick={() => swap(i)}>Swap this stop</button>}
                         {s.spot.booking_enabled && (
@@ -198,6 +235,7 @@ export default function PlanPage() {
           })()}
           <div className="total" style={{ marginTop: 14 }}><span>Estimated total for two</span><span>{lkr(plan.total)}</span></div>
           {plan.total > f.budget && <p className="small muted">A bit over your budget. Swap a stop to bring it down.</p>}
+          {ai.key === aiKey && ai.tip && <p className="small aitip"><b>Tip:</b> {ai.tip}</p>}
           {msg && <div className={"alert" + (/^(Plan saved|Plan link)/.test(msg) ? " ok" : "")}>{msg}</div>}
           <div className="actionbar">
             <button className="btn" onClick={share}><Ico n="share" size={18} />Share plan</button>
@@ -207,7 +245,7 @@ export default function PlanPage() {
             <button className="linkbtn" onClick={copy}>Copy link</button>
             <button className="linkbtn" onClick={addToCalendar}>Add to calendar</button>
             <Link className="linkbtn" href="/split">Split the bill</Link>
-            <button className="linkbtn" onClick={() => { setStep(0); setSkip({}); setMsg(""); }}>Start over</button>
+            <button className="linkbtn" onClick={() => { setStep(0); setSkip({}); setMsg(""); setAi({ key: "", state: "idle", picks: {}, tip: "" }); }}>Start over</button>
           </div>
         </>
       )}
