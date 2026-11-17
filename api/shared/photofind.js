@@ -226,6 +226,32 @@ async function commonsNear(name, lat, lng) {
   return (await commonsInfo(titles)).map((c) => ({ ...c, score: 1.5 + matchScore(name, c.title) }));
 }
 
+// ---------- free AI vision check (Gemini) for photos taken from a website ----------
+// true: shows food, drinks, the inside or outside. false: logo, banner, menu, poster, stock art. null: no key or it failed.
+async function visionCheck(spotName, url) {
+  const key = process.env.GEMINI_API_KEY;
+  if (!key) return null;
+  try {
+    const img = await fetchSafe(url, { max: 3_500_000, accept: "image/*", timeout: 12000 });
+    const mime = (img.type.match(/image\/(jpeg|png|webp)/) || [])[0];
+    if (!mime) return null;
+    const prompt = `You check photos for a restaurant guide in Sri Lanka. This image is from the website of "${spotName}". ` +
+      'Reply with JSON only: {"kind": "food|drink|interior|exterior|menu|logo|people|text|stock|other", "ok": true or false}. ' +
+      "ok is true only for food, drinks, the inside or the outside of a place like this; false for logos, banners, menus, posters, portraits and stock art.";
+    const model = process.env.GEMINI_VISION_MODEL || "gemini-2.5-flash-lite";
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, signal: AbortSignal.timeout(20000),
+      body: JSON.stringify({ contents: [{ parts: [{ inline_data: { mime_type: mime, data: img.body.toString("base64") } }, { text: prompt }] }],
+        generationConfig: { temperature: 0, responseMimeType: "application/json" } }),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const text = (((data.candidates || [])[0] || {}).content || { parts: [] }).parts.map((p) => p.text || "").join("");
+    const j = JSON.parse((text.match(/\{[\s\S]*\}/) || ["{}"])[0]);
+    return typeof j.ok === "boolean" ? j.ok && ["food", "drink", "interior", "exterior"].includes(j.kind) : null;
+  } catch { return null; }
+}
+
 // Main entry: { name, lat, lng, website } -> { candidates, website, osm }
 async function findPhotos({ name, lat, lng, website }, { websiteLookup } = {}) {
   const hasPos = Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180;
@@ -252,11 +278,17 @@ async function findPhotos({ name, lat, lng, website }, { websiteLookup } = {}) {
   if (!website && websiteLookup) { website = (await websiteLookup().catch(() => "")) || ""; if (website) websiteFrom = "google"; }
   if (website) {
     if (!/^https?:\/\//i.test(website)) website = "https://" + website;
-    (await fromWebsite(website).catch((e) => { notes.push("Website: " + e.message); return []; })).forEach((c) => out.push(c));
+    const fromSite = await fromWebsite(website).catch((e) => { notes.push("Website: " + e.message); return []; });
+    // With a free AI key, website photos must pass a vision check (no logos, banners or stock art).
+    for (const c of fromSite) {
+      const ok = await visionCheck(name, c.url);
+      if (ok === false) { notes.push("AI dropped a website image that was not a photo of the place."); continue; }
+      out.push(ok === true ? { ...c, checked: "ai", score: c.score + 0.3 } : c);
+    }
   }
   const seen = new Set();
   const candidates = out.filter((c) => c.url && !seen.has(c.url) && seen.add(c.url)).sort((a, b) => b.score - a.score).slice(0, 6);
   return { candidates, website: website || "", websiteFrom, osm: osm ? { id: osm.id, name: osm.tags.name } : null, notes };
 }
 
-module.exports = { findPhotos, tokens, matchScore, sameName, coreName, imageSize, shareImages, privateIp, checkUrl };
+module.exports = { findPhotos, visionCheck, tokens, matchScore, sameName, coreName, imageSize, shareImages, privateIp, checkUrl };

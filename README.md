@@ -55,7 +55,7 @@ You'll do 6 parts. Take them in order. Each takes 5 to 15 minutes.
 1. **supabase.com** > New project. Name `fyndo`, region **Singapore**, strong password (save it).
 2. **SQL Editor** > New query > paste all of `supabase/schema.sql` > **Run**.
    (Already ran it before? Run it again. It safely adds the new Google column.)
-   **Then run `supabase/schema_v3.sql`, `supabase/schema_v4.sql` and `supabase/schema_v5.sql` the same way, in that order** (v4 adds free photo storage; v5 adds photo credits, place websites and restaurant owner claims).
+   **Then run `supabase/schema_v3.sql`, `supabase/schema_v4.sql`, `supabase/schema_v5.sql` and `supabase/schema_v6.sql` the same way, in that order** (v4 adds free photo storage; v5 adds photo credits, place websites and restaurant owner claims; v6 adds official links, visitor photos and the weekly photo job).
    It adds QR check-ins and rewards, verified reviews, owner replies, private feedback, reports, collections and group votes. Safe to run again. Paste the file's contents, not its name.
 3. **Real places:** run `supabase/seed_google.sql` the same way. It adds 177 real restaurants, cafés, dessert places and things to do in Colombo 3, 4, 5, 7, Dehiwala and Mount Lavinia, each linked to its Google listing, with Google's price level and usual hours. Skip `seed.sql` (made-up samples).
 4. **Accounts (email verification and password reset):**
@@ -169,6 +169,19 @@ OpenStreetMap (the place's photo, Wikimedia file or website), Wikimedia Commons 
 website (the picture it uses for link previews, or a large photo on its home page). Every photo keeps a credit ("From their website", "Wikimedia Commons").
 Many small places have no website or open photos, so expect some places to stay on example photos; owners can add their own once they claim the page.
 For one place: **Edit** it > **Find real photos**, then tick the ones you want. Photos never come from Google here, because Google's terms don't allow keeping its photos.
+
+### Weekly photo job (free, GitHub Actions)
+`tools/photo-pipeline/pipeline.py` runs every Sunday at 2 AM (Sri Lanka time) on GitHub's free servers and looks at up to 25 places with no photo:
+1. **Official links:** a free AI with web search (Gemini, or Groq as a backup) suggests the place's website, Facebook page and Instagram. Each link is checked before it is kept: the website must load and name the place; Facebook and Instagram links must be the place's own page (directories, delivery apps, review sites and groups are thrown away).
+2. **Photos from the place's own website**, read with [Scrapling](https://github.com/D4Vinci/Scrapling). It obeys `robots.txt`, says who it is (`FyndoBot`), and skips any site that blocks it. It never solves Cloudflare challenges or disguises itself, and never touches Google Maps, TripAdvisor, Facebook or Instagram pages.
+3. **AI photo check:** a free vision model keeps only real photos of the food, drinks, inside or outside, and drops logos, banners and stock art. Each kept photo is credited to the website.
+4. **Menus:** priced menu items found on the website go to **Admin > Tools > Menu suggestions**. Nothing changes until you press Apply.
+
+Set it up once: **Supabase > Project Settings > API keys** > copy the **secret (service_role)** key. Then on GitHub **Settings > Secrets and variables > Actions > New repository secret**, add `SUPABASE_SERVICE_ROLE_KEY`, plus `GEMINI_API_KEY` (and optionally `GROQ_API_KEY`). The service role key can change anything in your database: keep it only in GitHub secrets, never in code or Azure. To run it now: **Actions > Find place photos > Run workflow** (tick "Dry run" first to see what it would do).
+
+### Official links, embeds and visitor photos
+- Admins (Spot form) and owners (Business > Edit page) can add the website, Facebook page, Instagram account and up to 6 Instagram post links. The place page shows them, and the posts through Facebook's and Instagram's official embeds, which load only when tapped.
+- Logged-in visitors can **Add a photo** on any place page. Photos wait in **Admin > Tools > Visitor photos** until you approve them; approved photos are credited "Fyndo visitor", rejected ones are deleted. Run `supabase/schema_v6.sql` first.
 
 ### Restaurant owners claiming their page
 1. On any place without an owner, people see **"Own or run this place? Claim this page"** (also under **Me** and **Business**).

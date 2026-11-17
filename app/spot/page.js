@@ -19,6 +19,8 @@ import dynamic from "next/dynamic";
 import PhotoGallery from "@/components/PhotoGallery";
 import { coverFor } from "@/lib/coverPhotos";
 import { galleryPhotos } from "@/lib/photoInfo";
+import OfficialLinks from "@/components/OfficialLinks";
+import AddPhoto from "@/components/AddPhoto";
 const SpotMap = dynamic(() => import("@/components/SpotMap"), { ssr: false, loading: () => <div className="skel" style={{ height: 240, borderRadius: 16 }} /> });
 import { directionsUrl } from "@/lib/gmaps";
 
@@ -75,6 +77,7 @@ function SpotPage() {
         {embed && spot.photos && spot.photos.length > 0 && (
           <div className="card" style={{ overflow: "hidden", marginTop: 14 }}><PhotoGallery photos={galleryPhotos(spot)} placeName={spot.name} /></div>
         )}
+        <AddPhoto spot={spot} user={user} />
         {spot.google_place_id && <GooglePanel placeId={spot.google_place_id} onInfo={setGInfo} onFail={() => setGFail(true)} admin={Boolean(user && user.role === "admin")} />}
         {!spot.google_place_id && user && user.role === "admin" && (
           <div className="card pad small" style={{ marginTop: 14 }}>
@@ -135,6 +138,7 @@ function SpotPage() {
 
         <FeatureChips ids={spot.features} />
         <MenuPanel spot={spot} />
+        <OfficialLinks spot={spot} />
         <RewardsBox spot={spot} user={user} />
         {spot.lat != null && spot.lng != null && (
           <div style={{ marginTop: 18 }}>

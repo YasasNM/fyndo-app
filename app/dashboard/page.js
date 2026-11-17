@@ -8,6 +8,7 @@ import { MOODS } from "@/lib/seed";
 import { RewardsTab, ReviewsTab, FeaturePicker } from "@/components/OwnerExtras";
 import PhotoManager from "@/components/PhotoManager";
 import { CONFIG } from "@/lib/config";
+import { LinksFields } from "@/components/OfficialLinks";
 import { niceTime, nextDays, todayIso, bookingSlots, STATUS_LABEL, parseMenu } from "@/lib/utils";
 
 const STATUS_BADGE = { confirmed: "", requested: "warn", declined: "red", cancelled: "grey", arrived: "book", no_show: "red" };
@@ -226,6 +227,8 @@ function EditPage({ spot, onSaved }) {
     const patch = { about: f.about, open_time: f.open_time, close_time: f.close_time, video_url: f.video_url, phone: f.phone,
       whatsapp: f.whatsapp, price_min: f.price_min, price_max: f.price_max, moods: f.moods, features: f.features || [],
       menu: menu.filter((m) => m.item), menu_updated_at: todayIso() };
+    // Link columns arrive with schema_v6.sql; only send the ones this database has (or the owner filled in).
+    ["website", "facebook_url", "instagram_url", "instagram_posts"].forEach((k) => { if (f[k] !== undefined) patch[k] = f[k]; });
     try { await db.updateSpot(spot.id, patch); onSaved(patch); setMsg("Saved"); } catch (e) { setMsg(e.message); }
   };
   return (
@@ -245,6 +248,7 @@ function EditPage({ spot, onSaved }) {
         <div className="row" style={{ gap: 6 }}>{MOODS.map((m) => <button key={m} className={"chip" + (f.moods.includes(m) ? " on" : "")} onClick={() => toggleMood(m)}>{m}</button>)}</div>
       </div>
       <FeaturePicker value={f.features || []} onChange={(features) => setF({ ...f, features })} />
+      <LinksFields f={f} set={(patch) => setF((x) => ({ ...x, ...patch }))} />
       <PhotoManager spot={f} onChange={(photos) => { setF((x) => ({ ...x, photos })); onSaved({ photos }); }} />
       <div className="field"><span>Menu & prices</span>
         {menu.map((m, i) => (

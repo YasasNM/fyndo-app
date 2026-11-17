@@ -12,6 +12,8 @@ import AdminDiscover from "@/components/AdminDiscover";
 import PhotoManager from "@/components/PhotoManager";
 import AdminPhotos, { PhotoSuggest } from "@/components/AdminPhotos";
 import AdminClaims from "@/components/AdminClaims";
+import { AdminVisitorPhotos, AdminSuggestions } from "@/components/AdminReview";
+import { LinksFields } from "@/components/OfficialLinks";
 import { googleSearch } from "@/lib/api";
 
 const BLANK = {
@@ -133,6 +135,8 @@ export default function Admin() {
     ["photos", "star", "Find real photos", "Look up photos of places from open sources and their websites"],
     ["discover", "search", "Add places from Google", "Popular food spots in an area"],
     ["link", "link", "Link places to Google", "Match your places to Google Maps for live hours and ratings"],
+    ["visitor", "plus", "Visitor photos", "Photos visitors sent, waiting for your yes or no"],
+    ["menus", "receipt", "Menu suggestions", "Menus and prices the weekly job read from places' own websites"],
   ];
   if (tab === "tools") {
     const t = TOOLS.find((x) => x[0] === tool);
@@ -157,6 +161,8 @@ export default function Admin() {
             {tool === "photos" && <AdminPhotos spots={spots} onDone={load} />}
             {tool === "discover" && <AdminDiscover spots={spots} onDone={load} />}
             {tool === "link" && <GoogleLinker spots={spots} onDone={(m) => { setMsg(m); setTool(""); load(); }} />}
+            {tool === "visitor" && <AdminVisitorPhotos />}
+            {tool === "menus" && <AdminSuggestions />}
           </>
         )}
       </>
@@ -275,7 +281,7 @@ function SpotForm({ initial, isNew, onDone }) {
         </div>
         <p className="small muted" style={{ marginTop: -4 }}>Tip: "Find it on Google Maps" above fills the map position for you.</p>
         <FeaturePicker value={f.features || []} onChange={(features) => setF({ ...f, features })} />
-        <label className="field"><span>Website</span><input className="input" type="url" value={f.website || ""} onChange={set("website")} placeholder="https://..." /></label>
+        <LinksFields f={f} set={(patch) => setF((x) => ({ ...x, ...patch }))} />
         <PhotoSuggest spot={f} onAdd={(url, meta, website) => setF((x) => ({ ...x, photos: [...(x.photos || []), url].slice(0, 12),
           photo_info: { ...(x.photo_info || {}), [url]: meta }, website: x.website || website || "" }))} />
         <PhotoManager spot={isNew ? { ...f, id: "" } : f} onChange={(photos) => setF((x) => ({ ...x, photos }))} />
