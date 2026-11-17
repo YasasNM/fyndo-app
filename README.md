@@ -55,7 +55,7 @@ You'll do 6 parts. Take them in order. Each takes 5 to 15 minutes.
 1. **supabase.com** > New project. Name `fyndo`, region **Singapore**, strong password (save it).
 2. **SQL Editor** > New query > paste all of `supabase/schema.sql` > **Run**.
    (Already ran it before? Run it again. It safely adds the new Google column.)
-   **Then run `supabase/schema_v3.sql`, `supabase/schema_v4.sql`, `supabase/schema_v5.sql`, `supabase/schema_v6.sql`, `supabase/schema_v7.sql` and `supabase/schema_v8.sql` the same way, in that order** (v4 adds free photo storage; v5 adds photo credits, place websites and restaurant owner claims; v6 adds official links, visitor photos and the weekly photo job; v7 adds profiles, follows, likes and lists; v8 tightens security: private reviews, safe links, daily spam limits).
+   **Then run `supabase/schema_v3.sql`, `supabase/schema_v4.sql`, `supabase/schema_v5.sql`, `supabase/schema_v6.sql`, `supabase/schema_v7.sql`, `supabase/schema_v8.sql` and `supabase/schema_v9.sql` the same way, in that order** (v4 adds free photo storage; v5 adds photo credits, place websites and restaurant owner claims; v6 adds official links, visitor photos and the weekly photo job; v7 adds profiles, follows, likes and lists; v8 tightens security: private reviews, safe links, daily spam limits; v9 adds Today's deals, which owners set in the Business dashboard).
    It adds QR check-ins and rewards, verified reviews, owner replies, private feedback, reports, collections and group votes. Safe to run again. Paste the file's contents, not its name.
 3. **Real places:** run `supabase/seed_google.sql` the same way. It adds 177 real restaurants, cafés, dessert places and things to do in Colombo 3, 4, 5, 7, Dehiwala and Mount Lavinia, each linked to its Google listing, with Google's price level and usual hours. Skip `seed.sql` (made-up samples).
 4. **Accounts (email verification and password reset):**
@@ -241,7 +241,7 @@ Database keys for the website go in `.env.local` (copy `.env.example`).
 - Raw data exports (the `Res data/` folder) are never committed. They are in `.gitignore`.
 
 ### Security checklist (do these once)
-1. **Run `supabase/schema_v8.sql`** in the Supabase SQL Editor.
+1. **Run `supabase/schema_v8.sql`, then `supabase/schema_v9.sql`** in the Supabase SQL Editor.
 2. **Bot check (recommended):**
    - **dash.cloudflare.com > Turnstile > Add widget.** Add your site's domain and choose **Managed**.
    - **GitHub repo > Settings > Secrets and variables > Actions > New repository secret.** Name `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, value: the **site key**. Push any change so the site rebuilds.

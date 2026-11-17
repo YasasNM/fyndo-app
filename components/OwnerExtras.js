@@ -5,7 +5,9 @@ import QRCode from "qrcode";
 import { db } from "@/lib/data";
 import { REVIEW_TAGS, FEATURES } from "@/lib/features";
 import Stars from "@/components/Stars";
-import { lkr } from "@/lib/utils";
+import { lkr, todayIso } from "@/lib/utils";
+import { DAY_NAMES, dealSchedule } from "@/lib/deals";
+import { DealBanner } from "@/components/TodayDeals";
 
 // ---------- Rewards & QR tab ----------
 export function RewardsTab({ spot, onSaved }) {
@@ -191,6 +193,88 @@ export function FeaturePicker({ value = [], onChange }) {
         {FEATURES.map((f) => (
           <button type="button" key={f.id} className={"chip" + (value.includes(f.id) ? " on" : "")} onClick={() => toggle(f.id)}>{f.emoji} {f.label}</button>
         ))}
+      </div>
+    </div>
+  );
+}
+
+// ---------- Deals tab: one deal per place, shown on Home under "Today's deals" on the days and hours it runs ----------
+export function DealsTab({ spot, onSaved }) {
+  const d0 = spot.deal || {};
+  const [title, setTitle] = useState(d0.title || "");
+  const [detail, setDetail] = useState(d0.detail || "");
+  const [days, setDays] = useState(Array.isArray(d0.days) ? d0.days : []);
+  const [timed, setTimed] = useState(Boolean(d0.from && d0.to));
+  const [from, setFrom] = useState(d0.from || "17:00");
+  const [to, setTo] = useState(d0.to || "19:00");
+  const [until, setUntil] = useState(d0.until || "");
+  const [msg, setMsg] = useState("");
+  const [err, setErr] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    const d = spot.deal || {};
+    setTitle(d.title || ""); setDetail(d.detail || ""); setDays(Array.isArray(d.days) ? d.days : []);
+    setTimed(Boolean(d.from && d.to)); setFrom(d.from || "17:00"); setTo(d.to || "19:00"); setUntil(d.until || ""); setMsg(""); setErr("");
+  }, [spot.id]); // eslint-disable-line
+
+  const toggleDay = (i) => setDays(days.includes(i) ? days.filter((x) => x !== i) : [...days, i].sort());
+  const deal = { title: title.trim().slice(0, 60), detail: detail.trim().slice(0, 160), days: days.length === 7 ? [] : days,
+    ...(timed ? { from, to } : {}), ...(until ? { until } : {}) };
+  const store = async (value, done) => {
+    setBusy(true); setErr(""); setMsg("");
+    try { await db.updateSpot(spot.id, { deal: value }); onSaved({ deal: value }); setMsg(done); }
+    catch (e) { setErr(/deal/i.test(e.message) ? "Run supabase/schema_v9.sql in Supabase first, then try again." : e.message); }
+    setBusy(false);
+  };
+  const save = (e) => {
+    e.preventDefault();
+    if (title.trim().length < 3) return setErr("Give the deal a short title, like \"2 for 1 mocktails\".");
+    if (timed && from === to) return setErr("The start and end times are the same. Pick different times.");
+    store(deal, "Saved. It shows on Home on the days and hours you picked.");
+  };
+
+  return (
+    <div className="two" style={{ gap: 18 }}>
+      <form onSubmit={save} noValidate>
+        <h2 style={{ marginTop: 0 }}>Today&apos;s deal</h2>
+        <p className="small muted" style={{ marginTop: 0 }}>Your deal appears on the Fyndo home page under &quot;Today&apos;s deals&quot; while it runs, and on your place page. It is included in your owner plan.</p>
+        {err && <div className="alert" role="alert">{err}</div>}
+        {msg && <div className="alert ok" role="status">{msg}</div>}
+        <label className="field"><span>Deal title</span>
+          <input className="input" value={title} maxLength={60} onChange={(e) => setTitle(e.target.value)} placeholder="2 for 1 mocktails" />
+          <span className="fieldhint">{60 - title.length} characters left</span></label>
+        <label className="field"><span>Details (optional)</span>
+          <input className="input" value={detail} maxLength={160} onChange={(e) => setDetail(e.target.value)} placeholder="Order before 7 pm. Dine in only." /></label>
+        <div className="field"><span>Days</span>
+          <div className="chips" style={{ flexWrap: "wrap", overflow: "visible" }}>
+            <button type="button" className={"chip" + (!days.length ? " on" : "")} aria-pressed={!days.length} onClick={() => setDays([])}>Every day</button>
+            {DAY_NAMES.map((n, i) => <button type="button" key={n} className={"chip" + (days.includes(i) ? " on" : "")} aria-pressed={days.includes(i)} onClick={() => toggleDay(i)}>{n}</button>)}
+          </div></div>
+        <div className="field"><span>Hours</span>
+          <div className="seg" role="radiogroup" aria-label="Hours">
+            <button type="button" role="radio" aria-checked={!timed} className={!timed ? "on" : ""} onClick={() => setTimed(false)}>While we are open</button>
+            <button type="button" role="radio" aria-checked={timed} className={timed ? "on" : ""} onClick={() => setTimed(true)}>Set hours</button>
+          </div>
+          {timed && <div className="grid2" style={{ marginTop: 10 }}>
+            <label className="field" style={{ margin: 0 }}><span>From</span><input className="input" type="time" value={from} onChange={(e) => setFrom(e.target.value)} /></label>
+            <label className="field" style={{ margin: 0 }}><span>To</span><input className="input" type="time" value={to} onChange={(e) => setTo(e.target.value)} /></label>
+          </div>}</div>
+        <label className="field"><span>Ends on (optional)</span>
+          <input className="input" type="date" value={until} min={todayIso()} onChange={(e) => setUntil(e.target.value)} />
+          <span className="fieldhint">Leave empty to keep it running until you remove it.</span></label>
+        <div className="row">
+          <button className="btn" disabled={busy}>{busy ? "Saving..." : "Save deal"}</button>
+          {(spot.deal && spot.deal.title) && <button type="button" className="btn ghost" disabled={busy} onClick={() => store({}, "Deal removed.")}>Remove deal</button>}
+        </div>
+      </form>
+      <div>
+        <h2 style={{ marginTop: 0 }}>How it looks</h2>
+        {deal.title.length >= 3 ? <>
+          <DealBanner spot={{ ...spot, deal }} />
+          <p className="small muted">{dealSchedule(deal)}.</p>
+        </> : <p className="small muted">Type a title to see a preview.</p>}
+        <p className="small muted">Keep it true and simple: one clear offer, the hours it runs, and anything people must do (like asking for the Fyndo deal).</p>
       </div>
     </div>
   );

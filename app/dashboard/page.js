@@ -5,7 +5,7 @@ import Link from "next/link";
 import { db } from "@/lib/data";
 import { useUser, goLogin } from "@/lib/hooks";
 import { MOODS } from "@/lib/seed";
-import { RewardsTab, ReviewsTab, FeaturePicker } from "@/components/OwnerExtras";
+import { RewardsTab, ReviewsTab, FeaturePicker, DealsTab } from "@/components/OwnerExtras";
 import PhotoManager from "@/components/PhotoManager";
 import { CONFIG } from "@/lib/config";
 import { LinksFields } from "@/components/OfficialLinks";
@@ -55,11 +55,12 @@ export default function Dashboard() {
       <PlanNote spot={spot} admin={user.role === "admin"} />
       <Stats spotId={spot.id} />
       <div className="tabs-in">
-        {[["bookings", "Bookings"], ["rewards", "Rewards & QR"], ["reviews", "Reviews & tips"], ["settings", "Booking settings"], ["page", "Edit page & menu"]].map(([k, l]) => (
+        {[["bookings", "Bookings"], ["deals", "Deals"], ["rewards", "Rewards & QR"], ["reviews", "Reviews & tips"], ["settings", "Booking settings"], ["page", "Edit page & menu"]].map(([k, l]) => (
           <button key={k} className={tab === k ? "on" : ""} onClick={() => setTab(k)}>{l}</button>
         ))}
       </div>
       {tab === "bookings" && <Bookings spot={spot} />}
+      {tab === "deals" && <DealsTab spot={spot} onSaved={refresh} />}
       {tab === "rewards" && <RewardsTab spot={spot} onSaved={refresh} />}
       {tab === "reviews" && <ReviewsTab spot={spot} />}
       {tab === "settings" && <Settings spot={spot} onSaved={refresh} />}

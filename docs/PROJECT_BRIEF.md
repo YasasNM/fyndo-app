@@ -77,7 +77,7 @@ lib/            data layer (data.js chooses demo.js or live.js), planner, AI fal
                 config (owner fee etc.), photos and credits, weather, rates, sun times
 api/            Azure functions: ask, plan-ai, decide, place, photo, cover, places-search,
                 places-discover, photo-finder, health; shared/ (util: rate limits, admin check; google)
-supabase/       schema.sql, then schema_v3.sql … schema_v8.sql (run in order); seed_google.sql (177 real places)
+supabase/       schema.sql, then schema_v3.sql … schema_v9.sql (run in order); seed_google.sql (177 real places)
 tools/          photo-pipeline (weekly job)
 public/         icons, manifest, service worker, staticwebapp.config.json (routes + security headers),
                 img/ and video/ (openly licensed, credited on /credits)
@@ -97,6 +97,7 @@ PRODUCT.md      product context;  DESIGN.md  visual system;  README.md  full set
 **Visitors**
 - **Search and Ask Fyndo:** free AI that turns a sentence into filters and answers only from Fyndo's own places, plus moods, occasions and filters (area, budget, type, open now, can book).
 - **Views:** list and map.
+- **Today's deals:** a row on Home of the offers places are running today (on now first, then later today), and a deal card on the place page. Owners set one deal per place in the Business dashboard's Deals tab: title, details, days, hours and an end date. Needs `schema_v9.sql`.
 - **Planning:** Plan a date or night within a budget, AI-tuned but checked on the server; Compare, with AI "Help me choose"; group vote; bill split.
 - **Place pages:**
   - photos, gallery, video, menu and prices
@@ -180,7 +181,7 @@ PRODUCT.md      product context;  DESIGN.md  visual system;  README.md  full set
 ## 6. Open to-do list (owner actions, not code)
 
 **Security checklist (from the README)**
-- [ ] Run `supabase/schema_v8.sql` in the Supabase SQL Editor (v3–v7 already run).
+- [ ] Run `supabase/schema_v8.sql`, then `supabase/schema_v9.sql` (Today's deals), in the Supabase SQL Editor (v3–v7 already run). Until v9 runs, the deals row stays hidden and the Deals tab asks for it.
 - [ ] Rotate the Google Maps key and the Gmail app password; both were exposed in an earlier chat.
 - [ ] Turn on 2-step sign-in for Supabase, GitHub, Azure, Google Cloud and the Fyndo Gmail account.
 - [ ] Supabase Auth: minimum password length 8, secure email change and secure password change on, rate limits not raised.

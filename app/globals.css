@@ -258,14 +258,27 @@ select.input { appearance: none; -webkit-appearance: none; padding-right: 38px; 
 
 /* Home tools: the three that live only here, as calm grey tiles. */
 .suggest { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 36px 0 4px; }
-.suggest-tile { display: flex; align-items: center; gap: 14px; padding: 14px 16px; min-height: 76px;
-  border-radius: var(--r-card); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); color: var(--ink); line-height: 1.25;
-  transition: background-color 0.15s, transform 0.2s var(--ease); }
-.suggest-tile:hover { background: var(--surface-2); }
+/* Glass tiles: a real photo, softly darkened, behind a frosted pane that carries the gem icon and the words.
+   Light catches the top edge; on hover the photo drifts closer and the pane brightens. Same look in both themes. */
+.suggest-tile { position: relative; isolation: isolate; overflow: hidden; display: flex; align-items: flex-end; min-height: 132px; padding: 10px;
+  border-radius: 20px; color: #fff; background: #0b0f0d; line-height: 1.25;
+  box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 12px 32px -14px rgba(0,0,0,.45);
+  transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease); }
+.suggest-tile::after { content: ""; position: absolute; inset: 0; z-index: 2; border-radius: inherit; pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.14), inset 0 1px 0 rgba(255,255,255,.28); }
+.suggest-img { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; filter: saturate(1.05) brightness(.82);
+  transform: scale(1.06); transition: transform 1.2s var(--ease), filter 0.6s ease; }
+.suggest-tile::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,.35) 100%); }
+.suggest-tile:hover { box-shadow: 0 1px 2px rgba(0,0,0,.1), 0 18px 40px -14px rgba(0,0,0,.55); }
+.suggest-tile:hover .suggest-img { transform: scale(1.12); filter: saturate(1.15) brightness(.9); }
 .suggest-tile:active { transform: scale(0.98); }
-.suggest-tile > span:last-child { display: grid; gap: 2px; min-width: 0; }
-.suggest-tile b { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
-.suggest-sub { font-size: 13px; color: var(--muted); }
+.suggest-glass { position: relative; display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 12px; border-radius: 14px;
+  background: rgba(255,255,255,.14); -webkit-backdrop-filter: blur(16px) saturate(1.6); backdrop-filter: blur(16px) saturate(1.6);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.2), inset 0 1px 0 rgba(255,255,255,.35); transition: background-color 0.4s ease; }
+.suggest-tile:hover .suggest-glass { background: rgba(255,255,255,.2); }
+.suggest-glass > span:last-child { display: grid; gap: 1px; min-width: 0; }
+.suggest-tile b { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; text-shadow: 0 1px 8px rgba(0,0,0,.25); }
+.suggest-sub { font-size: 12.5px; color: rgba(255,255,255,.82); }
 /* Gem tiles: a white solid icon on a small square of the feature's gem colour, like iPhone Settings. */
 .gem-ink { --c: var(--tile-ink); --g: var(--gem-ink); } .gem-emerald { --c: var(--tile-emerald); --g: var(--gem-emerald); }
 .gem-sapphire { --c: var(--tile-sapphire); --g: var(--gem-sapphire); } .gem-ruby { --c: var(--tile-ruby); --g: var(--gem-ruby); }
@@ -572,15 +585,18 @@ a.rainbar { color: inherit; }
   .homehead .lede { order: 2; margin-bottom: 14px; font-size: 1rem; }
   .homehead .ask { order: 3; margin-top: 0; }
   .homehead .suggest { order: 4; }
-  .homehead .moodrow { order: 5; }
-  .homehead .opennear { order: 6; }
+  .homehead .deals { order: 5; }
+  .homehead .moodrow { order: 6; }
+  .homehead .opennear { order: 7; }
   .homehead .opennear h2 { margin-top: 28px; }
-  .homehead .hero-photo { order: 7; aspect-ratio: 16 / 10; margin: 28px 0 0; }
+  .homehead .hero-photo { order: 8; aspect-ratio: 16 / 10; margin: 28px 0 0; }
   .suggest { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 22px; }
-  .suggest-tile { flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 10px; min-height: 96px; padding: 12px; }
-  .suggest-tile b { font-size: 14px; }
+  .suggest-tile { min-height: 118px; padding: 6px; border-radius: 16px; }
+  .suggest-glass { flex-direction: column; align-items: flex-start; gap: 8px; padding: 8px 9px; border-radius: 11px; }
+  .suggest-tile b { font-size: 13.5px; }
   .suggest-sub { display: none; }
-  .suggest-tile .gem-tile { width: 36px; height: 36px; border-radius: 10px; }
+  .suggest-tile .gem-tile { width: 30px; height: 30px; border-radius: 9px; }
+  .deal { flex-basis: 78%; }
   .ask-in .input { font-size: 16.5px; padding-left: 40px; }
   .ask-in .btn:disabled { --face: var(--surface-3); --fg: var(--muted); }
 .ask-ic { left: 19px; }
@@ -897,3 +913,41 @@ a.rainbar { color: inherit; }
 /* Home headline: each word sits in its own line so it can rise in. */
 .hl .w { display: inline-block; overflow: hidden; vertical-align: bottom; padding-bottom: 0.08em; margin-bottom: -0.08em; }
 .hl .w > span { display: inline-block; }
+
+/* ---------- Today's deals ---------- */
+.deals { margin-top: 36px; }
+.deals-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.deals-head h2 { margin: 0; }
+.deals-row { display: flex; gap: 14px; overflow-x: auto; padding: 2px 2px 12px; scroll-snap-type: x mandatory; scrollbar-width: thin; }
+.deal { position: relative; isolation: isolate; overflow: hidden; flex: 0 0 300px; aspect-ratio: 4 / 3; border-radius: 20px; scroll-snap-align: start;
+  display: flex; align-items: flex-end; padding: 10px; color: #fff; background: var(--lacquer);
+  box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 14px 34px -16px rgba(0,0,0,.5); transition: box-shadow 0.35s var(--ease); }
+.deal::after { content: ""; position: absolute; inset: 0; z-index: 2; border-radius: inherit; pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.14), inset 0 1px 0 rgba(255,255,255,.28); }
+.deal-img { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; object-fit: cover; filter: brightness(.86); transform: scale(1.04); transition: transform 1.4s var(--ease); }
+.deal:hover .deal-img { transform: scale(1.1); }
+.deal-glass { display: grid; gap: 3px; width: 100%; padding: 11px 13px 12px; border-radius: 14px;
+  background: rgba(12, 16, 14, .38); -webkit-backdrop-filter: blur(18px) saturate(1.6); backdrop-filter: blur(18px) saturate(1.6);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.16), inset 0 1px 0 rgba(255,255,255,.3); }
+.deal-title { font-size: 17px; font-weight: 650; letter-spacing: -0.02em; line-height: 1.2; }
+.deal-place { font-size: 12.5px; color: rgba(255,255,255,.78); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.deal-example { position: absolute; z-index: 3; right: 10px; top: 10px; font-size: 11px; padding: 2px 8px; border-radius: var(--r-pill); background: rgba(0,0,0,.5); color: #fff; }
+.deal-when { display: inline-flex; align-items: center; gap: 6px; width: fit-content; font-size: 11.5px; font-weight: 600; letter-spacing: 0.01em;
+  padding: 3px 9px 3px 8px; border-radius: var(--r-pill); background: rgba(255,255,255,.16); color: #fff; }
+.deal-when.live { background: rgba(69, 207, 138, .22); color: #c9f5dc; }
+.deal-when.live i { width: 7px; height: 7px; border-radius: 50%; background: #45cf8a; box-shadow: 0 0 0 0 rgba(69,207,138,.6); }
+/* Place page: the deal as a quiet card above the actions */
+.dealbanner { display: flex; gap: 14px; align-items: flex-start; margin: 16px 0 4px; padding: 14px 16px; border-radius: var(--r-card);
+  background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
+.dealbanner-text { display: grid; gap: 3px; min-width: 0; }
+.dealbanner-text b { font-size: 16px; letter-spacing: -0.01em; }
+.dealbanner-text .small { color: var(--muted); }
+.dealbanner .deal-when { margin-top: 4px; background: var(--surface-2); color: var(--ink-2); }
+.dealbanner .deal-when.live { background: var(--green-soft); color: var(--green-text); }
+.dealbanner .deal-when.live i { background: var(--green); }
+@media (prefers-reduced-motion: no-preference) {
+  .deal-when.live i { animation: livePulse 2.2s ease-out infinite; }
+  .deals-row > .deal { animation: develop 1.1s var(--ease) both; }
+  .deals-row > .deal:nth-child(2) { animation-delay: 0.1s; } .deals-row > .deal:nth-child(3) { animation-delay: 0.2s; } .deals-row > .deal:nth-child(4) { animation-delay: 0.3s; }
+}
+@keyframes livePulse { 0% { box-shadow: 0 0 0 0 rgba(69,207,138,.6); } 70% { box-shadow: 0 0 0 7px rgba(69,207,138,0); } 100% { box-shadow: 0 0 0 0 rgba(69,207,138,0); } }

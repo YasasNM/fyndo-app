@@ -22,6 +22,7 @@ import { galleryPhotos } from "@/lib/photoInfo";
 import OfficialLinks from "@/components/OfficialLinks";
 import AddPhoto from "@/components/AddPhoto";
 import AddToList from "@/components/AddToList";
+import { DealBanner } from "@/components/TodayDeals";
 const SpotMap = dynamic(() => import("@/components/SpotMap"), { ssr: false, loading: () => <div className="skel" style={{ height: 240, borderRadius: 16 }} /> });
 import { directionsUrl } from "@/lib/gmaps";
 
@@ -117,6 +118,7 @@ function SpotPage() {
         <div className="row" style={{ gap: 6 }}>{spot.moods.map((m) => <span key={m} className="tag">{m}</span>)}</div>
         {spot.about && <p>{spot.about}</p>}
 
+        <DealBanner spot={spot} />
         <div className="actionbar">
           {spot.booking_enabled ? (
             <Link href={`/book?id=${spot.id}`} className="btn">{spot.booking_mode === "request" ? "Request a table" : "Book a table"}</Link>

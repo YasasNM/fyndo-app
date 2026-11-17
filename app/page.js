@@ -6,6 +6,7 @@ import SpotCard, { SkeletonGrid } from "@/components/SpotCard";
 import AskFyndo from "@/components/AskFyndo";
 import Tour from "@/components/Tour";
 import HeroSlides from "@/components/HeroSlides";
+import TodayDeals from "@/components/TodayDeals";
 import { db } from "@/lib/data";
 import { useSpots, useRatings, usePopular, useLocation, useCollections, goLogin, useUser, useSaves } from "@/lib/hooks";
 import { useWeather } from "@/lib/weather";
@@ -24,9 +25,9 @@ const BUDGETS = [
 ];
 // Tools that live only here (Plan, Friends, Saved and Profile are in the bottom bar).
 const SHORTCUTS = [
-  { href: "/watch", label: "Watch", sub: "Short videos of real places", ic: "film", gem: "ruby" },
-  { href: "/rewards", label: "Rewards", sub: "Points, stamps and badges", ic: "ticket", gem: "topaz" },
-  { href: "/split", label: "Split a bill", sub: "Who owes what, in seconds", ic: "receipt", gem: "sapphire" },
+  { href: "/watch", label: "Watch", sub: "Short videos of real places", ic: "film", gem: "ruby", img: "kottu-2" },
+  { href: "/rewards", label: "Rewards", sub: "Points, stamps and badges", ic: "ticket", gem: "topaz", img: "coffee-3" },
+  { href: "/split", label: "Split a bill", sub: "Who owes what, in seconds", ic: "receipt", gem: "sapphire", img: "restaurant-3" },
 ];
 const SORTS = [
   { id: "best", label: "Best match" },
@@ -164,11 +165,15 @@ export default function Home() {
         <nav className="suggest" aria-label="Shortcuts">
           {SHORTCUTS.map((s) => (
             <Link key={s.href} href={s.href} className={"suggest-tile gem-" + s.gem}>
-              <span className="gem-tile"><Ico n={s.ic} size={22} fill /></span>
-              <span><b>{s.label}</b><span className="suggest-sub">{s.sub}</span></span>
+              <img className="suggest-img" src={`/img/${s.img}-500.jpg`} alt="" aria-hidden="true" loading="lazy" decoding="async" />
+              <span className="suggest-glass">
+                <span className="gem-tile"><Ico n={s.ic} size={22} fill /></span>
+                <span><b>{s.label}</b><span className="suggest-sub">{s.sub}</span></span>
+              </span>
             </Link>
           ))}
         </nav>
+        <TodayDeals spots={spots} />
         <div className="moodrow">
           <h2 className="rowlabel">Pick a mood</h2>
           <div className="chips">
