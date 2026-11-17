@@ -83,10 +83,17 @@ function Reports({ spots }) {
       <div className="stack">
         {list.map((r) => (
           <div key={r.id} className="card pad" style={{ opacity: r.resolved ? 0.55 : 1 }}>
-            <div className="row between"><b>{r.kind === "review" ? "Review" : "Spot"} report</b><span className="small muted">{new Date(r.created_at).toLocaleDateString()}</span></div>
+            <div className="row between"><b>{{ review: "Review", spot: "Spot", user: "Profile", list: "List" }[r.kind] || "Report"} report</b><span className="small muted">{new Date(r.created_at).toLocaleDateString()}</span></div>
             <div className="small">“{r.reason}”</div>
             <div className="small muted">Target: {r.kind === "spot" ? name(r.target) : r.target}</div>
-            {!r.resolved && <button className="btn sm ghost" style={{ marginTop: 6 }} onClick={async () => { await db.resolveReport(r.id); load(); }}>Mark resolved</button>}
+            {!r.resolved && (
+              <div className="row" style={{ gap: 8, marginTop: 6 }}>
+                {r.kind === "user" && <button className="btn sm danger" onClick={async () => { if (window.confirm("Remove this person's profile photo and bio?")) { await db.adminClearProfile(r.target); await db.resolveReport(r.id); load(); } }}>Remove photo and bio</button>}
+                {r.kind === "list" && <Link className="btn sm ghost" href={`/list?id=${r.target}`}>Open list</Link>}
+                {r.kind === "list" && <button className="btn sm danger" onClick={async () => { if (window.confirm("Delete this list?")) { await db.deleteList(r.target); await db.resolveReport(r.id); load(); } }}>Delete list</button>}
+                <button className="btn sm ghost" onClick={async () => { await db.resolveReport(r.id); load(); }}>Mark resolved</button>
+              </div>
+            )}
           </div>
         ))}
         {list.length === 0 && <div className="empty">No reports.</div>}

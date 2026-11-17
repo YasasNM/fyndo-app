@@ -21,6 +21,7 @@ import { coverFor } from "@/lib/coverPhotos";
 import { galleryPhotos } from "@/lib/photoInfo";
 import OfficialLinks from "@/components/OfficialLinks";
 import AddPhoto from "@/components/AddPhoto";
+import AddToList from "@/components/AddToList";
 const SpotMap = dynamic(() => import("@/components/SpotMap"), { ssr: false, loading: () => <div className="skel" style={{ height: 240, borderRadius: 16 }} /> });
 import { directionsUrl } from "@/lib/gmaps";
 
@@ -134,6 +135,7 @@ function SpotPage() {
           {(spot.booking_enabled || spot.whatsapp || spot.phone) && <a className="linkbtn" href={directionsUrl(spot)} target="_blank" rel="noreferrer">Directions</a>}
           <button className="linkbtn" onClick={copyLink}>Copy link</button>
         </div>
+        <AddToList spot={spot} user={user} />
         {msg && <div className={"alert" + (msg === "Link copied." ? " ok" : "")}>{msg}</div>}
 
         <FeatureChips ids={spot.features} />
@@ -148,7 +150,7 @@ function SpotPage() {
             </div>
           </div>
         )}
-        <ReviewsPanel spotId={spot.id} user={user} onChange={(l) => l.length && setRating({ avg: l.reduce((a, r) => a + r.rating, 0) / l.length, count: l.length })} />
+        <ReviewsPanel spotId={spot.id} spot={spot} user={user} onChange={(l) => l.length && setRating({ avg: l.reduce((a, r) => a + r.rating, 0) / l.length, count: l.length })} />
         <FeedbackBox spotId={spot.id} user={user} />
         <p className="small muted" style={{ marginTop: 10 }}><Link className="linkbtn" href="/split">Split the bill with friends</Link></p>
         <p className="small muted" style={{ marginTop: 16 }}>

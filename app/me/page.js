@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { db, isLive } from "@/lib/data";
 import { useUser } from "@/lib/hooks";
+import Avatar from "@/components/Avatar";
 import { niceTime, STATUS_LABEL, toMin, todayIso } from "@/lib/utils";
 
 const STATUS_BADGE = { confirmed: "", requested: "warn", declined: "red", cancelled: "grey", arrived: "book", no_show: "red" };
@@ -107,6 +108,18 @@ export default function Me() {
       <h1>Hi, {user.name || user.email}</h1>
       <p className="muted" style={{ marginTop: 0 }}>{user.email}, {user.role === "user" ? "Member" : user.role === "owner" ? "Business owner" : "Admin"}</p>
 
+      <div className="card pad mecard">
+        <Avatar src={user.avatar_url} name={user.name || user.email} size={56} />
+        <div style={{ minWidth: 0, flex: 1 }}>
+          {user.username ? <><b>@{user.username}</b><div className="small muted">{user.is_private ? "Private profile" : "Your public profile, diary and lists"}</div></>
+            : <><b>Set up your public profile</b><div className="small muted">A username and photo let friends find you, follow you and see your lists.</div></>}
+        </div>
+        <div className="row" style={{ gap: 8 }}>
+          {user.username && <Link className="btn sm ghost" href={`/u?name=${user.username}`}>View</Link>}
+          <Link className="btn sm" href="/profile">{user.username ? "Edit" : "Set up"}</Link>
+        </div>
+      </div>
+
       {edit ? (
         <div className="card pad">
           <label className="field"><span>Name</span><input className="input" value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} /></label>
@@ -115,14 +128,15 @@ export default function Me() {
         </div>
       ) : (
         <div className="row">
-          <button className="btn sm ghost" onClick={() => setEdit(true)}>Edit profile</button>
+          <button className="btn sm ghost" onClick={() => setEdit(true)}>Account details</button>
           <button className="btn sm danger" onClick={async () => { await db.signOut(); window.location.href = "/"; }}>Log out</button>
         </div>
       )}
       {isLive && !edit && <ChangePassword />}
 
       <nav className="menu" aria-label="Your Fyndo">
-        <Link href="/rewards"><Ico n="ticket" size={20} /><span><b>Rewards</b><span className="small muted">Points, stamp cards and badges</span></span></Link>
+        <Link href="/rewards"><Ico n="ticket" size={20} /><span><b>Rewards</b><span className="small muted">Points, stamp cards and badges to share</span></span></Link>
+        <Link href="/feed"><Ico n="group" size={20} /><span><b>Friends</b><span className="small muted">Find people, follow them, see what they rate</span></span></Link>
         {(user.role === "owner" || user.role === "admin") && <Link href="/dashboard"><Ico n="store" size={20} /><span><b>Business dashboard</b><span className="small muted">Bookings, QR poster, reviews</span></span></Link>}
         {user.role === "user" && <Link href="/claim"><Ico n="store" size={20} /><span><b>Run a restaurant or café?</b><span className="small muted">Claim your place to manage its page</span></span></Link>}
         {user.role === "admin" && <Link href="/admin"><Ico n="shield" size={20} /><span><b>Admin</b><span className="small muted">Places, lists, reports, setup check</span></span></Link>}

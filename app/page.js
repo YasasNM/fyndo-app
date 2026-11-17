@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import SpotCard, { SkeletonGrid } from "@/components/SpotCard";
 import AskFyndo from "@/components/AskFyndo";
 import Tour from "@/components/Tour";
-import HeroVideo from "@/components/HeroVideo";
+import HeroSlides from "@/components/HeroSlides";
 import { db } from "@/lib/data";
 import { useSpots, useRatings, usePopular, useLocation, useCollections, goLogin, useUser, useSaves } from "@/lib/hooks";
 import { useWeather } from "@/lib/weather";
@@ -148,7 +148,7 @@ export default function Home() {
 
             <AskFyndo spots={spots} />
           </div>
-          <HeroVideo className="hero-photo" />
+          <HeroSlides className="hero-photo" />
         </section>
         <div className="moodrow">
           <h2 className="rowlabel">Pick a mood</h2>

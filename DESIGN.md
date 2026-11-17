@@ -2,8 +2,8 @@
 name: Fyndo
 description: Find the real spots in Sri Lanka: what a place looks like, what it costs, and the whole night planned in a minute.
 colors:
-  livery-red: "#b8202b"
-  livery-red-deep: "#9a1a23"
+  shell-green: "#11593a"
+  shell-green-deep: "#0b3f29"
   board-black: "#141414"
   route-yellow: "#ffd000"
   route-yellow-edge: "#a88800"
@@ -24,7 +24,7 @@ colors:
   chilli-soft: "#fbe9e5"
   chilli-edge: "#f1c3b9"
   chilli-text: "#8f2615"
-  header-link: "#ffe1e3"
+  header-link: "#d8eee3"
   blind-placeholder: "#d9b400"
   strip-text: "#d6d6cf"
   strip-text-bright: "#e2e2db"
@@ -33,7 +33,7 @@ colors:
   star-gold: "#e0a800"
   star-empty: "#cfcfc6"
   rating-text: "#5a4700"
-  link-on-dark: "#ff8a8f"
+  link-on-dark: "#7fd3a8"
   you-are-here: "#2563eb"
   google-grey: "#5f6368"
   dark-green-soft: "#14301f"
@@ -153,7 +153,7 @@ components:
     rounded: "{rounded.control}"
     height: "52px"
   header:
-    backgroundColor: "{colors.livery-red}"
+    backgroundColor: "{colors.shell-green}"
     textColor: "{colors.enamel-white}"
   card:
     backgroundColor: "{colors.enamel-white}"
@@ -167,27 +167,27 @@ components:
 
 **Creative North Star: "The Galle Road bus board"**
 
-Fyndo borrows the working signage of Colombo's buses: the red livery band, the yellow route board, the black destination blind. Every place reads like a stop on that board: its area on a yellow plate, its per-person price set as the route number. The world lends four things only, type, palette, density and one signature move; the layout, navigation and controls stay the ordinary ones people already know from apps.
+Fyndo borrows the working signage of Colombo's buses: the livery band (painted tea-estate green), the yellow route board, the black destination blind. Every place reads like a stop on that board: its area on a yellow plate, its per-person price set as the route number. The world lends four things only, type, palette, density and one signature move; the layout, navigation and controls stay the ordinary ones people already know from apps.
 
-The ground is a cool board-white, never cream. Red owns the shell and nothing else. Yellow on black is reserved for the things that orient you or act: area plates, the search blind, the selected plate and the one primary action. Hierarchy comes from scale, not from many sizes: huge condensed numerals for prices and route numbers, small plain labels for everything else.
+The ground is a cool board-white, never cream. Green owns the shell; red is kept for errors and "closed" only. Yellow on black is reserved for the things that orient you or act: area plates, the search blind, the selected plate and the one primary action. Hierarchy comes from scale, not from many sizes: huge condensed numerals for prices and route numbers, small plain labels for everything else.
 
 **Key Characteristics:**
-- Red livery band at the top on every screen; the active page is a yellow plate in it (desktop) or a red marker in the bottom bar (phone).
+- Green livery band at the top on every screen; the active page is a yellow plate in it (desktop) or a green marker in the bottom bar (phone).
 - Yellow area plates with a 2px board-black ring, carrying the open/closed mark in their first cell.
 - Prices as route-board numerals in Saira Condensed 800, with "LKR per person" beneath.
-- The planner drawn as a route: a red line with numbered yellow stop plates.
+- The planner drawn as a route: a green line with numbered yellow stop plates.
 - Atkinson Hyperlegible for all reading text: built for low vision, second-language readers and outdoor light.
 
 ## Colors
 
-A shell red, a route-board yellow on board black, and quiet neutrals; green and chilli only carry state.
+A tea-estate green shell, a route-board yellow on board black, and quiet neutrals; a brighter green and chilli only carry state.
 
 ### Primary
-- **Livery Red** (#b8202b): the header band, the active tab marker, a saved bookmark, the planner's route line. Never on content cards or text blocks.
+- **Shell Green** (#11593a): the header band, the active tab marker, a saved bookmark, the planner's route line, letter avatars. Never as a card fill or body text.
 - **Route Yellow** (#ffd000) on **Board Black** (#141414): area plates, the search blind's lettering, the selected chip or tab, and the primary button. Its edge (#a88800) is the button's pressed lip.
 
 ### Secondary
-- **Livery Red Deep** (#9a1a23): links and small icons on light grounds, the header's bottom rule.
+- **Shell Green Deep** (#0b3f29): links and small icons on light grounds, the header's bottom rule.
 - **Route Yellow Soft** (#fff3b0): hover on plates and the chosen option row.
 
 ### Neutral
@@ -202,10 +202,10 @@ A shell red, a route-board yellow on board black, and quiet neutrals; green and 
 - **Chilli** (#c8381f): closed, errors, destructive actions.
 
 ### Named Rules
-**The Shell Red Rule.** Red is the bus, not the cargo: it lives in the header band, the active nav marker and the route line, never as a card fill or a text colour for content.
+**The Shell Green Rule.** Green is the bus, not the cargo: it lives in the header band, the active nav marker and the route line, never as a card fill or a text colour for content. Red only ever means a problem or "closed".
 **The Plate Rule.** Yellow appears only where it orients or acts: an area plate, the search blind, a selected plate, the primary button. A screen with yellow decoration has lost its signage.
 
-Dark mode keeps the world: a near-black ground (#0f0f0e) with #1a1a18 surfaces, a deeper livery red (#a31c26), yellow plates unchanged, links in a light red (#ff8a8f) and yellow focus rings.
+Dark mode keeps the world: a near-black ground (#0f0f0e) with #1a1a18 surfaces, a deeper shell green (#0f4a31), yellow plates unchanged, links in a light green (#7fd3a8) and yellow focus rings.
 
 ## Typography
 
@@ -265,23 +265,23 @@ Small, firm corners like cut metal plates: 5px on area plates, 6px on chips and 
 - **Error:** chilli text under the field, never only a red border.
 
 ### Navigation
-- **Header:** the red livery band with the yellow pin wordmark; desktop links in Saira Condensed 18px, the current page a yellow plate.
-- **Bottom bar (phones):** white bar, icons over labels; the current page gets a red icon plate and red label.
+- **Header:** the green livery band with the yellow pin wordmark; desktop links in Saira Condensed 18px, the current page a yellow plate.
+- **Bottom bar (phones):** white bar with six tabs (Home, Plan, Friends, Saved, Rewards, Me), icons over labels; the current page gets a green icon plate and green label.
 - **Section tabs:** a board-black strip; the open tab is a yellow plate.
 
 ### Place card (signature)
 Photo first. The yellow area plate sits top-left and always holds the open (green) or closed (chilli) mark in its first cell; the save bookmark sits top-right. Below the photo: the place name and "category, open till 11 PM" on the left, the per-person price as a route numeral on the right. Marks (verified, hidden gem, bookable, video) follow in one small row; nothing is labelled twice.
 
 ### Destination blind (search)
-A board-black field with route-yellow lettering, 52px tall. On phones it spans the full width directly under the red band.
+A board-black field with route-yellow lettering, 52px tall. On phones it spans the full width directly under the green band.
 
 ### Route strip (planner)
-The planned night is a red 4px line with numbered yellow stop plates (30px, ring and Saira 800 numerals) beside each stop.
+The planned night is a green 4px line with numbered yellow stop plates (30px, ring and Saira 800 numerals) beside each stop.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** keep red to the shell: header band, active nav marker, route line, saved state.
+- **Do** keep green to the shell (header band, active nav marker, route line, saved state) and red to problems and "closed".
 - **Do** put area and price on every place surface as a plate and a route numeral.
 - **Do** keep the open/closed mark inside the area plate, in the same place on every card.
 - **Do** use Atkinson Hyperlegible for anything longer than a label.

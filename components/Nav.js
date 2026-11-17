@@ -9,10 +9,13 @@ import { useUser } from "@/lib/hooks";
 const LINKS = [
   { href: "/", label: "Home", ic: "home" },
   { href: "/plan", label: "Plan", ic: "route" },
+  { href: "/feed", label: "Friends", ic: "group" },
   { href: "/saved", label: "Saved", ic: "bookmark" },
   { href: "/rewards", label: "Rewards", ic: "ticket" },
   { href: "/me", label: "Me", ic: "user" },
 ];
+// The phone's bottom bar: Business and Admin live in the Me menu there, so the bar stays at six.
+const PHONE = ["/", "/plan", "/feed", "/saved", "/rewards", "/me"];
 
 export default function Nav() {
   const path = usePathname();
@@ -37,7 +40,7 @@ export default function Nav() {
         </div>
       </header>
       <nav className="tabs" aria-label="Main">
-        {links.map((l) => (
+        {links.filter((l) => PHONE.includes(l.href)).map((l) => (
           <Link key={l.href} href={l.href} className={on(l.href) ? "on" : ""} aria-current={on(l.href) ? "page" : undefined}>
             <span className="ic"><Ico n={l.ic} size={21} strokeWidth={on(l.href) ? 2.1 : 1.8} /></span>{l.label}
           </Link>

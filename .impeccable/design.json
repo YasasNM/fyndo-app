@@ -4,7 +4,7 @@
   "title": "Design System: Fyndo",
   "extensions": {
     "colorMeta": {
-      "livery-red": { "role": "primary", "displayName": "Livery Red", "tonalRamp": ["#3d0a0e", "#5e1016", "#7d141c", "#9a1a23", "#b8202b", "#d24a53", "#e98b91", "#f8d6d8"] },
+      "shell-green": { "role": "primary", "displayName": "Shell Green", "tonalRamp": ["#051a11", "#0a3322", "#0b3f29", "#11593a", "#2f7a57", "#5f9f80", "#a3cdb7", "#d8eee3"] },
       "route-yellow": { "role": "primary", "displayName": "Route Yellow", "tonalRamp": ["#3a3200", "#5e5000", "#866e00", "#a88800", "#ffd000", "#ffdc40", "#ffe988", "#fff3b0"] },
       "board-black": { "role": "neutral", "displayName": "Board Black", "tonalRamp": ["#000000", "#0f0f0e", "#141414", "#1a1a18", "#252522", "#2e2e2b", "#3a3a36", "#4a4a45"] },
       "board-white": { "role": "neutral", "displayName": "Board White", "tonalRamp": ["#5f5f58", "#85857d", "#a3a39a", "#b9b9b0", "#d8d8d0", "#e8e8e2", "#f2f2ee", "#ffffff"] },
@@ -84,30 +84,30 @@
       "name": "Header Band",
       "kind": "nav",
       "refersTo": "header",
-      "description": "The red livery band; the current page is a yellow plate.",
+      "description": "The green livery band; the current page is a yellow plate.",
       "html": "<header class=\"ds-band\"><b class=\"ds-brand\">Fyndo</b><nav><a class=\"on\">Home</a><a>Plan</a><a>Saved</a></nav></header>",
-      "css": ".ds-band { display: flex; align-items: center; gap: 16px; padding: 10px 16px 12px; background: #b8202b; border-bottom: 1px solid #9a1a23; color: #fff; } .ds-brand { font: 800 30px/1 'Saira Condensed', sans-serif; } .ds-band nav { margin-left: auto; display: flex; gap: 2px; } .ds-band a { padding: 8px 12px; border-radius: 6px; font: 700 18px 'Saira Condensed', sans-serif; color: #ffe1e3; cursor: pointer; } .ds-band a:hover { background: rgba(0,0,0,.16); color: #fff; } .ds-band a.on { background: #ffd000; color: #141414; }"
+      "css": ".ds-band { display: flex; align-items: center; gap: 16px; padding: 10px 16px 12px; background: #11593a; border-bottom: 1px solid #0b3f29; color: #fff; } .ds-brand { font: 800 30px/1 'Saira Condensed', sans-serif; } .ds-band nav { margin-left: auto; display: flex; gap: 2px; } .ds-band a { padding: 8px 12px; border-radius: 6px; font: 700 18px 'Saira Condensed', sans-serif; color: #d8eee3; cursor: pointer; } .ds-band a:hover { background: rgba(0,0,0,.16); color: #fff; } .ds-band a.on { background: #ffd000; color: #141414; }"
     }
   ],
   "narrative": {
     "northStar": "The Galle Road bus board",
-    "overview": "Fyndo borrows the working signage of Colombo's buses: the red livery band, the yellow route board, the black destination blind. Every place reads like a stop on that board: its area on a yellow plate, its per-person price set as the route number. The world lends four things only, type, palette, density and one signature move; the layout, navigation and controls stay the ordinary ones people already know from apps. The ground is a cool board-white, never cream. Red owns the shell and nothing else. Yellow on black is reserved for the things that orient you or act: area plates, the search blind, the selected plate and the one primary action. Hierarchy comes from scale, not from many sizes: huge condensed numerals for prices and route numbers, small plain labels for everything else.",
+    "overview": "Fyndo borrows the working signage of Colombo's buses: the livery band (painted tea-estate green), the yellow route board, the black destination blind. Every place reads like a stop on that board: its area on a yellow plate, its per-person price set as the route number. The world lends four things only, type, palette, density and one signature move; the layout, navigation and controls stay the ordinary ones people already know from apps. The ground is a cool board-white, never cream. Green owns the shell; red is kept for errors and \"closed\" only. Yellow on black is reserved for the things that orient you or act: area plates, the search blind, the selected plate and the one primary action. Hierarchy comes from scale, not from many sizes: huge condensed numerals for prices and route numbers, small plain labels for everything else.",
     "keyCharacteristics": [
-      "Red livery band at the top on every screen; the active page is a yellow plate in it (desktop) or a red marker in the bottom bar (phone).",
+      "Green livery band at the top on every screen; the active page is a yellow plate in it (desktop) or a green marker in the bottom bar (phone).",
       "Yellow area plates with a 2px board-black ring, carrying the open/closed mark in their first cell.",
       "Prices as route-board numerals in Saira Condensed 800, with \"LKR per person\" beneath.",
-      "The planner drawn as a route: a red line with numbered yellow stop plates.",
+      "The planner drawn as a route: a green line with numbered yellow stop plates.",
       "Atkinson Hyperlegible for all reading text: built for low vision, second-language readers and outdoor light."
     ],
     "rules": [
-      { "name": "The Shell Red Rule", "body": "Red is the bus, not the cargo: it lives in the header band, the active nav marker and the route line, never as a card fill or a text colour for content.", "section": "colors" },
+      { "name": "The Shell Green Rule", "body": "Green is the bus, not the cargo: it lives in the header band, the active nav marker and the route line, never as a card fill or a text colour for content. Red only ever means a problem or \"closed\".", "section": "colors" },
       { "name": "The Plate Rule", "body": "Yellow appears only where it orients or acts: an area plate, the search blind, a selected plate, the primary button. A screen with yellow decoration has lost its signage.", "section": "colors" },
       { "name": "The Scale Rule", "body": "Rank by scale contrast: a price or route number is huge, its label is small, and there is no in-between size competing with them.", "section": "typography" },
       { "name": "The Sentence Case Rule", "body": "Plates, buttons and heads are sentence case; no tracked capitals.", "section": "typography" },
       { "name": "The Painted Board Rule", "body": "Surfaces are flat like painted signage; anything that lifts does so because it floats over content or responds to a press.", "section": "elevation" }
     ],
     "dos": [
-      "Do keep red to the shell: header band, active nav marker, route line, saved state.",
+      "Do keep green to the shell (header band, active nav marker, route line, saved state) and red to problems and \"closed\".",
       "Do put area and price on every place surface as a plate and a route numeral.",
       "Do keep the open/closed mark inside the area plate, in the same place on every card.",
       "Do use Atkinson Hyperlegible for anything longer than a label."

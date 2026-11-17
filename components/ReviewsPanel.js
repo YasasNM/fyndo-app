@@ -5,6 +5,10 @@ import { db } from "@/lib/data";
 import { goLogin } from "@/lib/hooks";
 import { REVIEW_TAGS, VISIT_TYPES, visitLabel } from "@/lib/features";
 import Stars from "@/components/Stars";
+import Link from "next/link";
+import Avatar from "./Avatar";
+import ShareSheet from "./ShareSheet";
+import { reviewCard } from "@/lib/sharecard";
 
 function ago(iso) {
   const d = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
@@ -15,8 +19,18 @@ function ago(iso) {
 const tagLabel = (id) => (REVIEW_TAGS.find((t) => t.id === id) || { label: id }).label;
 
 // Fyndo's own reviews (separate from the live Google section).
-export default function ReviewsPanel({ spotId, user, onChange }) {
+export default function ReviewsPanel({ spotId, spot, user, onChange }) {
   const [list, setList] = useState(null);
+  const [liked, setLiked] = useState([]);
+  const reviewIds = list ? list.map((r) => r.id).join(",") : "";
+  useEffect(() => { if (user && reviewIds) db.myLikes(reviewIds.split(",")).then(setLiked).catch(() => {}); }, [user, reviewIds]);
+  const like = async (r) => {
+    if (!user) return goLogin();
+    const on = !liked.includes(r.id);
+    setLiked((l) => (on ? [...l, r.id] : l.filter((x) => x !== r.id)));
+    setList((l) => l.map((x) => (x.id === r.id ? { ...x, likes: Math.max(0, (x.likes || 0) + (on ? 1 : -1)) } : x)));
+    try { await db.toggleLike(r.id); } catch (e) { setMsg(e.message); load(); }
+  };
   const [rating, setRating] = useState(0);
   const [body, setBody] = useState("");
   const [tags, setTags] = useState([]);
@@ -137,7 +151,10 @@ export default function ReviewsPanel({ spotId, user, onChange }) {
         <div key={r.id} className="review">
           <div className="row between">
             <span className="row" style={{ gap: 8 }}>
-              <b>{r.author}</b><Stars value={r.rating} size={14} />
+              {r.username
+                ? <Link href={`/u?name=${r.username}`} className="row reviewer" style={{ gap: 8 }}><Avatar src={r.avatar_url} name={r.author} size={28} /><b>{r.author}</b><span className="small muted">@{r.username}</span></Link>
+                : <><Avatar name={r.author} size={28} /><b>{r.author}</b></>}
+              <Stars value={r.rating} size={14} />
               {r.visited && <span className="badge" title="This person checked in at this place">Visited</span>}
               {r.visit_type && <span className="tag">{visitLabel(r.visit_type)}</span>}
             </span>
@@ -151,6 +168,14 @@ export default function ReviewsPanel({ spotId, user, onChange }) {
             <div className="reply"><b className="small">Reply from the owner</b><div className="small">{r.owner_reply}</div></div>
           )}
           <div className="row" style={{ gap: 12, marginTop: 4 }}>
+            <button className={"likebtn" + (liked.includes(r.id) ? " on" : "")} aria-pressed={liked.includes(r.id)} onClick={() => like(r)}
+              aria-label={`${liked.includes(r.id) ? "Unlike" : "Like"} this review${r.likes ? `, ${r.likes} likes` : ""}`}>
+              <Ico n="heart" size={15} />{r.likes > 0 ? r.likes : ""}
+            </button>
+            {user && r.user_id === user.id && spot && (
+              <ShareSheet label="Share as story" className="linkbtn" title={`${spot.name} on Fyndo`} text={`My review of ${spot.name} on Fyndo`} url={`/spot?id=${spot.id}`}
+                make={() => reviewCard({ spot, rating: r.rating, body: r.body, username: user.username })} fileName={`fyndo-${spot.id}.png`} />
+            )}
             {user && (r.user_id === user.id || user.role === "admin") && (
               <button className="linkbtn" style={{ color: "var(--chili)" }} onClick={() => remove(r.id)}>Delete</button>
             )}

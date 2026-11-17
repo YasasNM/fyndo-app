@@ -55,7 +55,7 @@ You'll do 6 parts. Take them in order. Each takes 5 to 15 minutes.
 1. **supabase.com** > New project. Name `fyndo`, region **Singapore**, strong password (save it).
 2. **SQL Editor** > New query > paste all of `supabase/schema.sql` > **Run**.
    (Already ran it before? Run it again. It safely adds the new Google column.)
-   **Then run `supabase/schema_v3.sql`, `supabase/schema_v4.sql`, `supabase/schema_v5.sql` and `supabase/schema_v6.sql` the same way, in that order** (v4 adds free photo storage; v5 adds photo credits, place websites and restaurant owner claims; v6 adds official links, visitor photos and the weekly photo job).
+   **Then run `supabase/schema_v3.sql`, `supabase/schema_v4.sql`, `supabase/schema_v5.sql`, `supabase/schema_v6.sql` and `supabase/schema_v7.sql` the same way, in that order** (v4 adds free photo storage; v5 adds photo credits, place websites and restaurant owner claims; v6 adds official links, visitor photos and the weekly photo job; v7 adds profiles, follows, likes and lists).
    It adds QR check-ins and rewards, verified reviews, owner replies, private feedback, reports, collections and group votes. Safe to run again. Paste the file's contents, not its name.
 3. **Real places:** run `supabase/seed_google.sql` the same way. It adds 177 real restaurants, cafés, dessert places and things to do in Colombo 3, 4, 5, 7, Dehiwala and Mount Lavinia, each linked to its Google listing, with Google's price level and usual hours. Skip `seed.sql` (made-up samples).
 4. **Accounts (email verification and password reset):**
@@ -187,6 +187,15 @@ Set it up once: **Supabase > Project Settings > API keys** > copy the **secret (
 ### Official links, embeds and visitor photos
 - Admins (Spot form) and owners (Business > Edit page) can add the website, Facebook page, Instagram account and up to 6 Instagram post links. The place page shows them, and the posts through Facebook's and Instagram's official embeds, which load only when tapped.
 - Logged-in visitors can **Add a photo** on any place page. Photos wait in **Admin > Tools > Visitor photos** until you approve them; approved photos are credited "Fyndo visitor", rejected ones are deleted. Run `supabase/schema_v6.sql` first.
+
+### Social: profiles, friends, lists and story sharing (no chat)
+Run `supabase/schema_v7.sql` first. Like Letterboxd, but for places:
+- **Profiles:** **Me > Set up** picks a @username, photo, bio, city and **Top 4** places. Profiles are public by default; the **Private profile** switch hides the profile, diary and lists (reviews still show on place pages with the first name only). Email and phone are never shown.
+- **Diary:** every place you rate appears on your profile with your stars and words.
+- **Friends:** follow people (no messages). The **Friends** tab shows what they rate and the lists they make, and finds people by name or @username.
+- **Likes and lists:** heart other people's reviews; make lists like "Best kottu in Colombo 4" from your profile or with **Add to a list** on any place.
+- **Story sharing:** "Share as story" on your reviews, "Share" on earned badges, lists and profiles makes a 1080x1920 image on the phone and opens the share sheet (Instagram/Facebook/WhatsApp stories), or saves it.
+- **Moderation:** anyone can report a profile or list; **Admin > Reports** can remove a profile's photo and bio or delete a list.
 
 ### Restaurant owners claiming their page
 1. On any place without an owner, people see **"Own or run this place? Claim this page"** (also under **Me** and **Business**).

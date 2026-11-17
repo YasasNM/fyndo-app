@@ -6,6 +6,8 @@ import { db } from "@/lib/data";
 import { useUser } from "@/lib/hooks";
 import { TIERS, badgesOf, pointsOf, stampsFor, streakWeeks, tierOf } from "@/lib/rewards";
 import { lkr } from "@/lib/utils";
+import ShareSheet from "@/components/ShareSheet";
+import { badgeCard } from "@/lib/sharecard";
 
 const BADGE_ICON = { first: "star", ten: "compass", street: "flame", cafe: "cup", gem: "gem", date: "heart", regular: "home", area: "pin" };
 
@@ -64,6 +66,10 @@ export default function Rewards() {
           <div key={b.id} className={"card pad center badge-card" + (b.got ? "" : " locked")}>
             <div className="medal"><Ico n={BADGE_ICON[b.id] || "star"} size={24} /></div><b className="small">{b.label}</b>
             <div className="small muted">{b.got ? "Earned" : b.hint}</div>
+            {b.got && (
+              <ShareSheet label="Share" className="linkbtn" title={`${b.label}: a Fyndo badge`} text={`I earned the ${b.label} badge on Fyndo`}
+                url={user.username ? `/u?name=${user.username}` : "/rewards"} make={() => badgeCard({ badge: b, username: user.username, tier: tier.cur.label })} fileName={`fyndo-badge-${b.id}.png`} />
+            )}
           </div>
         ))}
       </div>
