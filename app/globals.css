@@ -610,7 +610,9 @@ a.rainbar { color: inherit; }
 .qtile-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
 .qtile.has-photo::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.82) 70%); }
 .qtile.has-photo, .qtile.has-photo span.s { color: #fff; }
-.planphoto { aspect-ratio: 16 / 7; margin: 16px 0 0; }
+.planphoto { aspect-ratio: 3 / 1; margin: 16px 0 0; }
+.planphoto img { object-position: 40% 55%; }
+@media (max-width: 760px) { .planphoto { aspect-ratio: 2.2 / 1; } }
 .authphoto { aspect-ratio: 16 / 7; margin: 16px 0 0; }
 /* Login banner: rooftop photo, Fyndo mark in the dark sky top-left. */
 .authart { position: relative; margin: 16px 0 0; aspect-ratio: 16 / 7; border-radius: var(--r-card); overflow: hidden; background: #0f1a26; box-shadow: 0 0 0 1px var(--line); }

@@ -11,7 +11,6 @@ import { downloadIcs, atDateTime } from "@/lib/ics";
 import { useSunsets } from "@/lib/sun";
 import { AREAS } from "@/lib/seed";
 import { Thumb } from "@/components/SpotCard";
-import Photo from "@/components/Photo";
 import { lkr, niceTime, nextDays, shareNow, avgPrice, whyThis } from "@/lib/utils";
 
 const RouteMap = dynamic(() => import("@/components/RouteMap"), { ssr: false, loading: () => <div className="skel" style={{ height: 260, borderRadius: 16, marginTop: 14 }} /> });
@@ -126,7 +125,7 @@ export default function PlanPage() {
 
       {step === 0 && (
         <>
-          <Photo slug="watalappan" className="planphoto" sizes="(max-width: 760px) 100vw, 560px" />
+          <figure className="photo planphoto"><img src="/img/plan-evening-1600.jpg" srcSet="/img/plan-evening-800.jpg 800w, /img/plan-evening-1600.jpg 1600w" sizes="(max-width: 760px) 100vw, 560px" alt="A couple walking hand in hand above the Colombo seafront at dusk, with a lit rooftop restaurant and city lights ahead" fetchPriority="high" /></figure>
           <h1>What's the vibe?</h1>
           {VIBES.map((v) => (
             <button key={v.id} className={"opt" + (f.vibe === v.id ? " on" : "")} onClick={() => set("vibe", v.id)}>
