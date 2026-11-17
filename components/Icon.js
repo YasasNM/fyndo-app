@@ -1,4 +1,7 @@
-// Fyndo icon set: simple 24px line icons, drawn for this app. Replaces emoji everywhere.
+import { PH, PH_FILL } from "./phosphor";
+
+// Fyndo icons: Phosphor (see phosphor.js) through <Ico>. The 24px line drawings below are only used as raw markup
+// for cover-tile patterns and map pins.
 // Strings below are fixed, trusted SVG markup (never user input).
 const ICONS = {
   home: '<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',
@@ -52,26 +55,23 @@ const ICONS = {
   leaf: '<path d="M5 19C5 10 10 5 20 4c0 10-5 15-14 15z"/><path d="M5 19l8-8"/>',
 };
 
-// Shapes that read well with a soft tinted fill under the line (the duotone style).
-const DUO = new Set(["home", "bookmark", "ticket", "user", "group", "receipt", "film", "heart", "star", "pin", "gem", "cup", "bowl",
-  "calendar", "store", "shield", "compass", "sun", "moon", "map", "flame", "cone", "lock", "chat", "phone", "diary", "leaf", "qr", "flag"]);
-
-// <Ico n="pin" /> draws one icon. Decorative by default; pass `label` to make it readable by screen readers.
-// `duo` adds a soft fill in the same colour beneath the fine line, for medallions and active tabs.
-export function Ico({ n, size = 20, label, className = "", strokeWidth = 1.6, style, duo = false }) {
-  const shape = ICONS[n] || ICONS.pin;
-  const html = duo && DUO.has(n) ? `<g class="ico-duo" fill="currentColor" stroke="none">${shape}</g>${shape}` : shape;
+// <Ico n="pin" /> draws one Phosphor icon (regular weight). Decorative by default; pass `label` to make it
+// readable by screen readers. `fill` (or the older `duo`) draws the solid weight: active tabs and gem tiles.
+// strokeWidth is accepted for older callers and ignored: Phosphor shapes carry their own weight.
+export function Ico({ n, size = 20, label, className = "", style, fill = false, duo = false }) {
+  const solid = fill || duo;
+  const html = (solid ? PH_FILL[n] : PH[n]) || PH[n] || PH.pin;
   return (
     <svg
       className={"ico " + className}
-      width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round"
+      width={size} height={size} viewBox="0 0 256 256" fill="currentColor"
       role={label ? "img" : undefined} aria-label={label} aria-hidden={label ? undefined : true} style={style}
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );
 }
 
+// The older line drawings stay for the two places that inline raw SVG: cover-tile patterns and map pins.
 export const ICON_MARKUP = ICONS;
 
 // Place category -> icon used on cover tiles

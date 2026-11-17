@@ -10,11 +10,11 @@ import { useUser } from "@/lib/hooks";
 // Each feature has one home: these five in the bars, Watch / Rewards / Split as tiles on Home,
 // account settings and bookings behind "Settings" on your profile.
 const LINKS = [
-  { href: "/", label: "Home", ic: "home" },
-  { href: "/plan", label: "Plan", ic: "route" },
-  { href: "/feed", label: "Friends", ic: "group" },
-  { href: "/saved", label: "Saved", ic: "bookmark" },
-  { href: "/me", label: "Profile", ic: "user", profile: true },
+  { href: "/", label: "Home", ic: "home", gem: "ink" },
+  { href: "/plan", label: "Plan", ic: "route", gem: "emerald" },
+  { href: "/feed", label: "Friends", ic: "group", gem: "sapphire" },
+  { href: "/saved", label: "Saved", ic: "bookmark", gem: "ruby" },
+  { href: "/me", label: "Profile", ic: "user", gem: "amethyst", profile: true },
 ];
 // The phone's bottom bar: Business and Admin live in Settings there, so the bar stays at five.
 const PHONE = ["/", "/plan", "/feed", "/saved", "/me"];
@@ -23,8 +23,8 @@ export default function Nav() {
   const path = usePathname();
   const user = useUser();
   const links = [...LINKS];
-  if (user && (user.role === "owner" || user.role === "admin")) links.splice(4, 0, { href: "/dashboard", label: "Business", ic: "store" });
-  if (user && user.role === "admin") links.splice(5, 0, { href: "/admin", label: "Admin", ic: "shield" });
+  if (user && (user.role === "owner" || user.role === "admin")) links.splice(4, 0, { href: "/dashboard", label: "Business", ic: "store", gem: "topaz" });
+  if (user && user.role === "admin") links.splice(5, 0, { href: "/admin", label: "Admin", ic: "shield", gem: "moonstone" });
   // Profile opens your public profile once you have a username; before that (or logged out) it opens /me.
   const profileHref = user && user.username ? `/u?name=${encodeURIComponent(user.username)}` : "/me";
   const on = (h) => (h === "/" ? path === "/" : h === "/me" ? ["/me", "/profile", "/u"].some((p) => path.startsWith(p)) : path.startsWith(h));
@@ -47,8 +47,8 @@ export default function Nav() {
       </header>
       <nav className="tabs" aria-label="Main">
         {links.filter((l) => PHONE.includes(l.href)).map((l) => (
-          <Link key={l.href} href={hrefOf(l)} className={on(l.href) ? "on" : ""} aria-current={on(l.href) ? "page" : undefined}>
-            <span className="ic"><Ico n={l.ic} size={22} strokeWidth={on(l.href) ? 1.8 : 1.5} duo={on(l.href)} /></span>{l.label}
+          <Link key={l.href} href={hrefOf(l)} className={"gem-" + l.gem + (on(l.href) ? " on" : "")} aria-current={on(l.href) ? "page" : undefined}>
+            <span className="ic"><Ico key={on(l.href) ? "on" : "off"} n={l.ic} size={24} fill={on(l.href)} /></span>{l.label}
           </Link>
         ))}
       </nav>

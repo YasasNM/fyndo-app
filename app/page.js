@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import SpotCard, { SkeletonGrid } from "@/components/SpotCard";
@@ -24,9 +24,9 @@ const BUDGETS = [
 ];
 // Tools that live only here (Plan, Friends, Saved and Profile are in the bottom bar).
 const SHORTCUTS = [
-  { href: "/watch", label: "Watch", sub: "Short videos of real places", ic: "film" },
-  { href: "/rewards", label: "Rewards", sub: "Points, stamps and badges", ic: "ticket" },
-  { href: "/split", label: "Split a bill", sub: "Who owes what, in seconds", ic: "receipt" },
+  { href: "/watch", label: "Watch", sub: "Short videos of real places", ic: "film", gem: "ruby" },
+  { href: "/rewards", label: "Rewards", sub: "Points, stamps and badges", ic: "ticket", gem: "topaz" },
+  { href: "/split", label: "Split a bill", sub: "Who owes what, in seconds", ic: "receipt", gem: "sapphire" },
 ];
 const SORTS = [
   { id: "best", label: "Best match" },
@@ -154,7 +154,7 @@ export default function Home() {
       <div className="homehead">
         <section className="hero">
           <div className="hero-text">
-            <h1>Where to tonight?</h1>
+            <h1 className="hl" aria-label="Where to tonight?">{["Where", "to", "tonight?"].map((w, i) => <Fragment key={w}>{i > 0 && " "}<span className="w" aria-hidden="true"><span style={{ "--n": i }}>{w}</span></span></Fragment>)}</h1>
             <p className="lede">Real photos, real prices per person, and the whole night planned in a minute.</p>
 
             <AskFyndo spots={spots} />
@@ -163,8 +163,8 @@ export default function Home() {
         </section>
         <nav className="suggest" aria-label="Shortcuts">
           {SHORTCUTS.map((s) => (
-            <Link key={s.href} href={s.href} className="suggest-tile">
-              <span className="suggest-ic"><Ico n={s.ic} size={21} strokeWidth={1.5} duo /></span>
+            <Link key={s.href} href={s.href} className={"suggest-tile gem-" + s.gem}>
+              <span className="gem-tile"><Ico n={s.ic} size={22} fill /></span>
               <span><b>{s.label}</b><span className="suggest-sub">{s.sub}</span></span>
             </Link>
           ))}

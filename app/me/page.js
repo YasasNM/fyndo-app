@@ -153,10 +153,10 @@ export default function Me() {
       {isLive && !edit && <ChangePassword />}
 
       <nav className="menu" aria-label="Your Fyndo">
-        {(user.role === "owner" || user.role === "admin") && <Link href="/dashboard"><Ico n="store" size={20} strokeWidth={1.5} duo /><span><b>Business dashboard</b><span className="small muted">Bookings, QR poster, reviews</span></span></Link>}
-        {user.role === "user" && <Link href="/claim"><Ico n="store" size={20} strokeWidth={1.5} duo /><span><b>Run a restaurant or café?</b><span className="small muted">Claim your place to manage its page</span></span></Link>}
-        {user.role === "admin" && <Link href="/admin"><Ico n="shield" size={20} strokeWidth={1.5} duo /><span><b>Admin</b><span className="small muted">Places, lists, reports, setup check</span></span></Link>}
-        <Link href="/?tour=1"><Ico n="compass" size={20} strokeWidth={1.5} duo /><span><b>Take the quick tour again</b><span className="small muted">Three short steps on the home page</span></span></Link>
+        {(user.role === "owner" || user.role === "admin") && <Link href="/dashboard"><span className="gem-tile gem-topaz"><Ico n="store" size={20} fill /></span><span><b>Business dashboard</b><span className="small muted">Bookings, QR poster, reviews</span></span></Link>}
+        {user.role === "user" && <Link href="/claim"><span className="gem-tile gem-topaz"><Ico n="store" size={20} fill /></span><span><b>Run a restaurant or café?</b><span className="small muted">Claim your place to manage its page</span></span></Link>}
+        {user.role === "admin" && <Link href="/admin"><span className="gem-tile gem-moonstone"><Ico n="shield" size={20} fill /></span><span><b>Admin</b><span className="small muted">Places, lists, reports, setup check</span></span></Link>}
+        <Link href="/?tour=1"><span className="gem-tile gem-emerald"><Ico n="compass" size={20} fill /></span><span><b>Take the quick tour again</b><span className="small muted">Three short steps on the home page</span></span></Link>
       </nav>
 
       <h2>Upcoming bookings</h2>

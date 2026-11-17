@@ -85,7 +85,7 @@ PRODUCT.md      product context;  DESIGN.md  visual system;  README.md  full set
 ```
 
 ### Design
-- **Visual theme:** "Emerald night" (November 2026): an Uber- and Letterboxd-inspired luxury look in Ceylon emerald. Deep emerald `#0f3b2c` actions (pale jade `#9fdcc0` in dark mode), emerald links and selection, gold only for ratings, fine-line duotone icons on emerald medallions, photo posters, purposeful animations (theme switch circle, one-time home intro, poster stagger). Light, dark, or follow the phone. One font: **Geist**. Tokens at the top of `app/globals.css`; full rules in `DESIGN.md`.
+- **Visual theme:** "Black lacquer" (November 2026): an Uber- and Letterboxd-inspired luxury look. Black and white, a black-to-emerald lacquer gradient on main buttons, the active page and planned stops, Phosphor icons with a gem colour per feature (emerald, sapphire, ruby, topaz, amethyst, moonstone) shown as small tiles, gold only for ratings, and premium motion (headline words rise, photos develop, button sheen, theme circle). Light, dark, or follow the phone. One font: **Geist**. Tokens at the top of `app/globals.css`; full rules in `DESIGN.md`.
 - **Imagery:** calm photo hero with real, credited photography and no AI-generated imagery.
 - **Accessibility:** 44px touch targets, strong contrast in light and dark mode, and reduced motion respected.
 - **Reference:** full tokens are in `DESIGN.md`.

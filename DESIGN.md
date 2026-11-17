@@ -3,34 +3,29 @@ name: Fyndo
 description: Find the real spots in Sri Lanka: what a place looks like, what it costs, and the whole night planned in a minute.
 colors:
   bg: "#ffffff"
-  surface: "#ffffff"
-  surface-2: "#f1f4f2"
-  surface-3: "#e4eae6"
-  ink: "#0b1a14"
-  ink-2: "#33433c"
-  muted: "#5c6b64"
-  line: "#e6ebe8"
-  line-strong: "#cdd6d1"
-  primary: "#0f3b2c"
-  on-primary: "#ffffff"
+  surface-2: "#f2f3f2"
+  surface-3: "#e6e8e7"
+  ink: "#0a0a0a"
+  muted: "#626864"
+  line: "#e6e8e7"
+  lacquer-from: "#060807"
+  lacquer-mid: "#0a1712"
+  lacquer-to: "#0f3b2c"
   accent: "#0d6e4f"
-  accent-soft: "#e5f3ec"
   star: "#a67c1a"
-  green: "#0e8048"
-  red: "#c9372b"
-  dark-bg: "#0f1513"
-  dark-surface: "#161e1b"
-  dark-surface-2: "#1e2823"
-  dark-surface-3: "#28342e"
-  dark-ink: "#eef4f0"
-  dark-muted: "#8fa198"
-  dark-line: "#222d28"
-  dark-primary: "#9fdcc0"
-  dark-on-primary: "#06281c"
+  gem-emerald: "#0f7a57"
+  gem-sapphire: "#2350c8"
+  gem-ruby: "#b4233f"
+  gem-topaz: "#b8790b"
+  gem-amethyst: "#6a3fb5"
+  gem-moonstone: "#4f6f88"
+  dark-bg: "#090b0a"
+  dark-surface: "#101312"
+  dark-surface-2: "#161a18"
+  dark-ink: "#eef1ef"
+  dark-muted: "#8d9893"
   dark-accent: "#6fd6a8"
   dark-star: "#e3b94d"
-  dark-green: "#4fd08f"
-  dark-red: "#ff7a6e"
 typography:
   display:
     fontFamily: "Geist, system-ui, sans-serif"
@@ -108,28 +103,22 @@ components:
 
 ## Overview
 
-**Creative North Star: "Emerald night"**
+**Creative North Star: "Black lacquer"**
 
-Luxury through restraint, at the craft level of Uber and Letterboxd (the owner's standing reference; never their logos, colours or names), set in Ceylon emerald. Deep emerald is the one solid action; in dark mode it becomes pale jade on a forest-black ground. A brighter emerald marks what is yours or chosen: links, saves, focus, the hover ring on a poster. Gold is kept only for ratings. Places are shown like a poster wall. Many features, each with one home: Home, Plan, Friends, Saved and Profile in the bars; Watch, Rewards and Split a bill as Home tiles; account, bookings and appearance behind Settings on your profile.
+Luxury through restraint, at the craft level of Uber and Letterboxd (the owner's standing reference; never their logos, colours or names). Black and white do the work. A black-to-emerald lacquer gradient (`135deg, #060807 → #0a1712 → #0f3b2c`, a hairline of light on top) marks the main action, the page you are on, planned stops and the few dark panels. Each feature has its own colour from Sri Lanka's gemstones, used on icons only. Gold is kept for ratings.
 
 **Key characteristics:**
-- Big, tight headings ("Where to tonight?") and one large pill search field on home.
-- Solid emerald pill for the one main action; grey-green pills for everything else.
-- Fine-line duotone icons (1.5px line over a 20% fill of the same colour) on soft emerald medallions with a hairline ring.
-- Place posters at 4:5, rounded 10px, with an emerald ring on hover or focus.
-- Segmented controls: a soft track where the open tab lifts. The active bottom tab sits in a jade pill.
-- The planned night is a trip: a thin line with numbered emerald stops.
+- Icons are Phosphor (MIT), embedded in `components/phosphor.js`: regular weight in grey for everyday UI, solid weight for active and tiled icons.
+- Gem tiles: a white solid icon on a small rounded square of the feature's gem colour, like iPhone Settings (home tools, settings list).
+- Gem map: Home ink, Plan emerald, Friends sapphire, Saved ruby (also Watch), Profile amethyst, Rewards and Business topaz, Split a bill sapphire, Admin and Check in moonstone.
+- The active tab fills in its gem colour with a small dot beneath; other tabs stay grey.
+- Saved places turn ruby. Selected chips, days and time slots are solid black (white in dark mode).
 
 ## Colors
 
-**Restrained strategy, one hue.** Neutrals carry a breath of green; emerald does action and selection; gold only rates; green and red carry state.
-
-- **Light:** white ground, `#f1f4f2` fills, green-black ink `#0b1a14`, deep emerald `#0f3b2c` actions, emerald `#0d6e4f` links and selection, gold `#a67c1a` stars.
-- **Dark:** forest night `#0f1513`, `#161e1b` cards, `#1e2823` fills, `#eef4f0` ink, pale jade `#9fdcc0` actions with `#06281c` text, `#6fd6a8` links, gold `#e3b94d` stars.
-- **Panels** (plan banner, rewards tier, compare tray) use `--panel`: deep emerald in light, raised forest in dark.
-- All pairs checked for contrast: body text at least 4.5:1, icons and controls at least 3:1, in both themes.
-
-**The one-hue rule.** Emerald never decorates. If it is on screen, it is an action, something you chose, a link or focus.
+- **Light:** white ground, `#f2f3f2` fills, `#0a0a0a` ink, `#626864` secondary text, emerald `#0d6e4f` links.
+- **Dark:** near-black `#090b0a`, `#101312` cards, `#161a18` fills, `#eef1ef` ink. The lacquer gets a thin emerald edge so it reads on black. Gem icons use lighter tones in dark mode; tiles keep the deep tones.
+- Contrast is checked for text (4.5:1) and controls (3:1) in both themes.
 
 ## Themes
 
@@ -151,9 +140,10 @@ A 1120px column with 16px gutters. Home: question, search and example chips on t
 
 ## Elevation & motion
 
-Flat by default; depth comes from tone. Shadows only where something floats or lifts. Motion is eased out (`cubic-bezier(0.16, 1, 0.3, 1)`) and every animation explains something:
-- **Theme switch:** the new theme grows as a circle out of the tapped button (View Transitions; instant where unsupported).
-- **Home, first visit of a session:** the heading rises out of its line, the photo opens like a curtain, the tools follow. Returning home is instant.
-- **Posters** land as a row with a short stagger over the first eight.
-- **Pages** fade in on navigation (opacity only, so fixed trays keep their place). Presses scale to 0.97, the active tab pill grows in, the save button pops.
-- Reduced motion turns all movement off.
+Flat by default; depth comes from tone. Motion is slow, eased (`cubic-bezier(0.16, 1, 0.3, 1)`, springs for small confirmations) and always tied to something you did or something arriving:
+- **Theme switch:** the new theme grows as a circle out of the tapped button (View Transitions).
+- **Home, first visit of a session:** each word of the headline rises through its own line and comes into focus; the photo opens like a curtain; the tools follow.
+- **Place photos develop** from soft and grey to sharp full colour, one after another.
+- **Main buttons** catch a band of light (sheen) on hover.
+- **Tabs** spring their icon in and a dot appears beneath; **saving** turns the bookmark ruby with a ring that opens and fades.
+- **Pages** fade in on navigation. Reduced motion turns all movement off.

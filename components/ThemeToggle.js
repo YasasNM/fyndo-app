@@ -48,7 +48,7 @@ export default function ThemeToggle() {
   const next = theme === "dark" ? "light" : "dark";
   return (
     <button type="button" className="themebtn" onClick={(e) => switchTheme(next, e.currentTarget)} aria-label={`Switch to ${next} mode`} title={`Switch to ${next} mode`}>
-      <Ico key={theme} className="themeic" n={theme === "dark" ? "sun" : "moon"} size={19} strokeWidth={1.6} duo />
+      <Ico key={theme} className="themeic" n={theme === "dark" ? "sun" : "moon"} size={19} fill />
     </button>
   );
 }
