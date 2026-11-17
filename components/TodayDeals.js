@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Ico } from "./Icon";
 import { coverFor } from "@/lib/coverPhotos";
-import { todaysDeals, dealToday } from "@/lib/deals";
+import { todaysDeals, dealToday, dealTomorrow } from "@/lib/deals";
 
 // Re-check every minute so "on now" and "from 5 pm" stay true while the page is open.
 function useNow() {
@@ -25,11 +25,12 @@ export default function TodayDeals({ spots }) {
   const list = todaysDeals(spots, now).slice(0, 10);
   if (!list.length) return null;
   const liveCount = list.filter((x) => x.when.state === "live").length;
+  const tomorrow = list[0].when.state === "tomorrow";
   return (
     <section className="deals" aria-labelledby="deals-h">
       <div className="deals-head">
-        <h2 id="deals-h">Today's deals</h2>
-        <span className="small muted">{liveCount ? `${liveCount} on now` : "Starting later today"}</span>
+        <h2 id="deals-h">{tomorrow ? "Deals tomorrow" : "Today's deals"}</h2>
+        <span className="small muted">{tomorrow ? "Today's deals have ended" : liveCount ? `${liveCount} on now` : "Starting later today"}</span>
       </div>
       <div className="deals-row">
         {list.map(({ spot, when }) => {
@@ -56,7 +57,7 @@ export function DealBanner({ spot }) {
   const now = useNow();
   const d = spot && spot.deal;
   if (!now || !d || !d.title) return null;
-  const when = dealToday(spot, now);
+  const when = dealToday(spot, now) || dealTomorrow(spot, now);
   return (
     <div className="dealbanner">
       <span className="gem-tile gem-ruby"><Ico n="ticket" size={20} fill /></span>
