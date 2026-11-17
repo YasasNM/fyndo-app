@@ -116,7 +116,28 @@ grant select on public.user_lists to anon, authenticated;
 grant insert, update, delete on public.user_lists to authenticated;
 
 -- ---------- reviews: show the reviewer's @username and photo (public profiles only) ----------
-create or replace view public.reviews_public as
+-- Columns schema_v3.sql adds; repeated here (safe) in case an older v3 was run.
+alter table public.reviews add column if not exists tags text[] not null default '{}';
+alter table public.reviews add column if not exists would_return boolean;
+alter table public.reviews add column if not exists visit_type text;
+alter table public.reviews add column if not exists owner_reply text;
+alter table public.reviews add column if not exists owner_reply_at timestamptz;
+-- Check-ins come from schema_v3.sql; created here (empty, private) only if it was never run.
+create table if not exists public.checkins (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  spot_id text not null references public.spots(id) on delete cascade,
+  day date not null default ((now() at time zone 'Asia/Colombo')::date),
+  points int not null default 10,
+  note text not null default '' check (char_length(note) <= 300),
+  spent int check (spent is null or spent between 0 and 1000000),
+  created_at timestamptz default now(),
+  unique (user_id, spot_id, day)
+);
+alter table public.checkins enable row level security;
+-- Rebuilt from scratch: an older version of this view may have different columns.
+drop view if exists public.reviews_public;
+create view public.reviews_public as
   select r.id, r.spot_id, r.user_id, r.author, r.rating, r.body, r.tags, r.would_return,
          r.owner_reply, r.owner_reply_at, r.created_at,
          exists (select 1 from public.checkins c where c.user_id = r.user_id and c.spot_id = r.spot_id) as visited,
@@ -148,6 +169,17 @@ $$;
 grant execute on function public.friends_feed(int) to authenticated;
 
 -- ---------- reports can now point at a profile or a list ----------
+-- (created here only if schema_v3.sql was never run; its policies come from v3)
+create table if not exists public.reports (
+  id uuid primary key default gen_random_uuid(),
+  kind text not null,
+  target text not null,
+  reason text not null check (char_length(reason) between 3 and 500),
+  reporter uuid references public.profiles(id) on delete set null,
+  resolved boolean not null default false,
+  created_at timestamptz default now()
+);
+alter table public.reports enable row level security;
 alter table public.reports drop constraint if exists reports_kind_check;
 alter table public.reports add constraint reports_kind_check check (kind in ('review', 'spot', 'user', 'list'));
 
