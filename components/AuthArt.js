@@ -1,5 +1,5 @@
 // Login and sign-up banner: a candlelit rooftop table over the Colombo coast at blue hour,
-// with the Fyndo mark in the dark sky. The photo is AI-generated, so it is labelled as such.
+// with the Fyndo mark in the dark sky.
 export default function AuthArt() {
   return (
     <figure className="authart">
@@ -21,7 +21,6 @@ export default function AuthArt() {
           <small>The night, planned.</small>
         </span>
       </div>
-      <figcaption className="authart-note">AI-generated image</figcaption>
     </figure>
   );
 }

@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import SpotCard, { SkeletonGrid } from "@/components/SpotCard";
@@ -62,6 +62,11 @@ export default function Home() {
   const [picked, setPicked] = useState([]);
   const [busy, setBusy] = useState(false);
 
+  // The hero's entrance plays once per visit; after that, returning home is instant.
+  useEffect(() => {
+    const t = setTimeout(() => { document.documentElement.dataset.intro = "seen"; try { sessionStorage.setItem("fyndo-intro", "1"); } catch {} }, 1600);
+    return () => clearTimeout(t);
+  }, []);
   const chooseSort = (v) => { setSort(v); if (v === "near" && !loc.pos) loc.ask(); };
   const dist = (s) => (loc.pos && s.lat != null && s.lng != null ? km(loc.pos, { lat: s.lat, lng: s.lng }) : null);
   const occ = OCCASIONS.find((o) => o.id === occasion);
@@ -159,7 +164,7 @@ export default function Home() {
         <nav className="suggest" aria-label="Shortcuts">
           {SHORTCUTS.map((s) => (
             <Link key={s.href} href={s.href} className="suggest-tile">
-              <span className="suggest-ic"><Ico n={s.ic} size={22} strokeWidth={1.7} /></span>
+              <span className="suggest-ic"><Ico n={s.ic} size={21} strokeWidth={1.5} duo /></span>
               <span><b>{s.label}</b><span className="suggest-sub">{s.sub}</span></span>
             </Link>
           ))}

@@ -27,7 +27,7 @@ export default function SpotMap({ spots, me, height = 420, single = false }) {
       spots.filter((s) => s.lat != null && s.lng != null).forEach((s) => {
         const icon = L.divIcon({
           className: "fy-pin", iconSize: [34, 34], iconAnchor: [17, 32], popupAnchor: [0, -28],
-          html: `<div style="background:#111111"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(45deg)">${ICON_MARKUP[CAT_ICON[s.category] || "pin"]}</svg></div>`,
+          html: `<div style="background:#0f3b2c"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(45deg)">${ICON_MARKUP[CAT_ICON[s.category] || "pin"]}</svg></div>`,
         });
         const m = L.marker([s.lat, s.lng], { icon, title: s.name, alt: s.name }).addTo(layerRef.current);
         if (!single) {

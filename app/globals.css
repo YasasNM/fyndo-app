@@ -1,51 +1,54 @@
 /* =====================================================================
-   Fyndo design system: "Night ledger"
-   Monochrome and quiet, like a well-made ride or film-diary app: black and white do the work,
-   one Ceylon-sapphire accent marks what is yours or chosen (ratings, saves, links, focus).
-   Places are shown as photo posters. Light and dark themes share every rule; only tokens change.
-   Type: Geist, one family, weight and size carry the hierarchy.
+   Fyndo design system: "Emerald night"
+   Quiet and precise, like a well-made ride or film-diary app, set in Ceylon emerald:
+   deep emerald is the one solid action (pale jade in dark mode), a brighter emerald marks
+   what is yours or chosen (links, saves, focus), gold is kept for ratings.
+   Icons are fine-line duotone on soft emerald medallions. Places are photo posters.
+   Light and dark share every rule; only tokens change. Type: Geist.
    ===================================================================== */
 :root {
   color-scheme: light;
   --bg: #ffffff;
   --surface: #ffffff;
-  --surface-2: #f3f3f3;     /* quiet fills: inputs, chips, tiles */
-  --surface-3: #e8e8e8;     /* pressed fills, tracks */
-  --ink: #000000;
-  --ink-2: #3a3a3a;
-  --muted: #6b6b6b;
-  --line: #ebebeb;
-  --line-strong: #d2d2d2;
-  --primary: #000000;       /* the one solid action */
+  --surface-2: #f1f4f2;     /* quiet fills: inputs, chips, tiles (a breath of green) */
+  --surface-3: #e4eae6;     /* pressed fills, tracks */
+  --ink: #0b1a14;           /* green-black text */
+  --ink-2: #33433c;
+  --muted: #5c6b64;
+  --line: #e6ebe8;
+  --line-strong: #cdd6d1;
+  --primary: #0f3b2c;       /* deep emerald: the one solid action */
   --on-primary: #ffffff;
-  --primary-hover: #2b2b2b;
-  --panel: #000000;         /* night panels: plan banner, tier, compare tray */
+  --primary-hover: #16503c;
+  --panel: #0f3b2c;         /* emerald panels: plan banner, tier, compare tray */
   --on-panel: #ffffff;
-  --on-panel-2: #b8b8b8;
-  --accent: #2747d6;        /* Ceylon sapphire */
-  --accent-soft: #edf0fd;
+  --on-panel-2: #b7d3c6;
+  --accent: #0d6e4f;        /* emerald: links, saves, focus, selection */
+  --accent-soft: #e5f3ec;
   --on-accent: #ffffff;
-  --green: #0b7a43;
-  --green-soft: #e8f5ee;
+  --green: #0e8048;
+  --green-soft: #e6f5ec;
   --green-text: #0a5f35;
   --on-green: #ffffff;
   --red: #c9372b;
   --red-soft: #fdecea;
   --red-text: #9c2219;
-  --star: var(--accent);
-  --star-empty: #d2d2d2;
-  --poster-edge: rgba(0, 0, 0, 0.08);
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06), 0 2px 10px rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.06);
+  --star: #a67c1a;          /* gold, only for ratings */
+  --star-empty: #cdd6d1;
+  --medal: #e5f3ec;         /* icon medallions */
+  --medal-ring: rgba(13, 110, 79, 0.18);
+  --poster-edge: rgba(11, 26, 20, 0.08);
+  --shadow-sm: 0 1px 2px rgba(11, 26, 20, 0.06), 0 2px 10px rgba(11, 26, 20, 0.05);
+  --shadow-lg: 0 16px 48px rgba(11, 26, 20, 0.18), 0 2px 8px rgba(11, 26, 20, 0.06);
   --focus: var(--accent);
 
   /* role names older components still use */
   --paper: var(--bg); --card: var(--surface); --cream: var(--surface-2); --head: var(--ink);
-  --board: var(--panel); --shell: var(--ink); --shell-deep: var(--ink);
+  --board: var(--panel); --shell: var(--primary); --shell-deep: var(--primary);
   --plate: var(--accent); --plate-edge: var(--accent); --plate-soft: var(--accent-soft);
   --teal: var(--panel); --teal-2: var(--accent);
   --sun: var(--accent); --sun-edge: var(--accent); --sun-soft: var(--accent-soft);
-  --mango: var(--ink); --mango-dark: var(--accent); --bar: var(--bg); --chili: var(--red);
+  --mango: var(--primary); --mango-dark: var(--accent); --bar: var(--bg); --chili: var(--red);
 
   --r-sm: 8px; --r-ctl: 12px; --r-card: 16px; --r-poster: 10px; --r-pill: 999px;
   --font: "Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -53,31 +56,33 @@
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Dark: slate night, not pure black, so photos glow and text stays soft on the eyes. */
+/* Dark: forest night, green-black rather than pure black, so photos glow and text stays soft. */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #14181c; --surface: #1b2026; --surface-2: #232a31; --surface-3: #2e3740;
-  --ink: #f2f4f6; --ink-2: #c8d0d8; --muted: #93a0ad; --line: #262e36; --line-strong: #3b4651;
-  --primary: #ffffff; --on-primary: #000000; --primary-hover: #dfe3e7;
-  --panel: #232a31; --on-panel: #f2f4f6; --on-panel-2: #a9b4bf;
-  --accent: #8fa8ff; --accent-soft: #1d2647; --on-accent: #0a0f22;
-  --green: #45cf8a; --green-soft: #12301f; --green-text: #86e2b1; --on-green: #06150d;
+  --bg: #0f1513; --surface: #161e1b; --surface-2: #1e2823; --surface-3: #28342e;
+  --ink: #eef4f0; --ink-2: #c3d0c9; --muted: #8fa198; --line: #222d28; --line-strong: #36443d;
+  --primary: #9fdcc0; --on-primary: #06281c; --primary-hover: #b6e7d0;
+  --panel: #1c2a24; --on-panel: #eef4f0; --on-panel-2: #a9bbb2;
+  --accent: #6fd6a8; --accent-soft: #173327; --on-accent: #06281c;
+  --green: #4fd08f; --green-soft: #12301f; --green-text: #86e2b1; --on-green: #06150d;
   --red: #ff7a6e; --red-soft: #3a1a17; --red-text: #ffb4ab;
-  --star-empty: #3b4651; --poster-edge: rgba(255, 255, 255, 0.08);
+  --star: #e3b94d; --star-empty: #36443d; --poster-edge: rgba(255, 255, 255, 0.07);
+  --medal: #173327; --medal-ring: rgba(111, 214, 168, 0.28);
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 10px rgba(0, 0, 0, 0.25);
   --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --bg: #14181c; --surface: #1b2026; --surface-2: #232a31; --surface-3: #2e3740;
-    --ink: #f2f4f6; --ink-2: #c8d0d8; --muted: #93a0ad; --line: #262e36; --line-strong: #3b4651;
-    --primary: #ffffff; --on-primary: #000000; --primary-hover: #dfe3e7;
-    --panel: #232a31; --on-panel: #f2f4f6; --on-panel-2: #a9b4bf;
-    --accent: #8fa8ff; --accent-soft: #1d2647; --on-accent: #0a0f22;
-    --green: #45cf8a; --green-soft: #12301f; --green-text: #86e2b1; --on-green: #06150d;
+    --bg: #0f1513; --surface: #161e1b; --surface-2: #1e2823; --surface-3: #28342e;
+    --ink: #eef4f0; --ink-2: #c3d0c9; --muted: #8fa198; --line: #222d28; --line-strong: #36443d;
+    --primary: #9fdcc0; --on-primary: #06281c; --primary-hover: #b6e7d0;
+    --panel: #1c2a24; --on-panel: #eef4f0; --on-panel-2: #a9bbb2;
+    --accent: #6fd6a8; --accent-soft: #173327; --on-accent: #06281c;
+    --green: #4fd08f; --green-soft: #12301f; --green-text: #86e2b1; --on-green: #06150d;
     --red: #ff7a6e; --red-soft: #3a1a17; --red-text: #ffb4ab;
-    --star-empty: #3b4651; --poster-edge: rgba(255, 255, 255, 0.08);
+    --star: #e3b94d; --star-empty: #36443d; --poster-edge: rgba(255, 255, 255, 0.07);
+    --medal: #173327; --medal-ring: rgba(111, 214, 168, 0.28);
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 10px rgba(0, 0, 0, 0.25);
     --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.3);
   }
@@ -133,8 +138,13 @@ table, .stat b, .pcard-price, .kv, .total { font-variant-numeric: tabular-nums; 
   backdrop-filter: saturate(1.4) blur(14px); -webkit-backdrop-filter: saturate(1.4) blur(14px);
   display: none; padding: 6px 4px calc(6px + env(safe-area-inset-bottom)); }
 .tabs a { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px; font-size: 11px; color: var(--muted); padding: 2px 0; font-weight: 500; min-height: 48px; }
-.tabs a .ic { display: grid; place-items: center; width: 44px; height: 30px; transition: color 0.15s, transform 0.2s var(--ease); }
+.tabs a .ic { position: relative; isolation: isolate; display: grid; place-items: center; width: 52px; height: 30px; transition: color 0.2s, transform 0.2s var(--ease); }
+/* Active tab: a soft emerald pill grows in behind a duotone icon. */
+.tabs a .ic::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: var(--r-pill); background: var(--accent-soft);
+  box-shadow: inset 0 0 0 1px var(--medal-ring); opacity: 0; transform: scaleX(0.45); transition: transform 0.38s var(--ease), opacity 0.2s ease; }
+.tabs a.on .ic::before { opacity: 1; transform: none; }
 .tabs a.on { color: var(--ink); font-weight: 600; }
+.tabs a.on .ic { color: var(--accent); }
 .tabs a:active .ic { transform: scale(0.9); }
 @media (max-width: 760px) {
   .tabs { display: flex; }
@@ -244,8 +254,9 @@ select.input { appearance: none; -webkit-appearance: none; padding-right: 38px; 
 .suggest-tile > span:last-child { display: grid; gap: 2px; min-width: 0; }
 .suggest-tile b { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
 .suggest-sub { font-size: 13px; color: var(--muted); }
-.suggest-ic { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--surface); }
-:root[data-theme="dark"] .suggest-ic { background: var(--surface-3); }
+.suggest-ic { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--medal); color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--medal-ring); transition: transform 0.4s var(--ease); }
+.suggest-tile:hover .suggest-ic { transform: rotate(-8deg) scale(1.06); }
 
 /* legacy quick tiles (kept for any page that still uses them) */
 .quick { display: grid; grid-template-columns: 1.5fr 1fr; gap: 12px; margin: 18px 0 6px; }
@@ -348,7 +359,7 @@ select.input { appearance: none; -webkit-appearance: none; padding-right: 38px; 
 .alert { display: flex; gap: 8px; padding: 12px 16px; border-radius: var(--r-ctl); background: var(--red-soft); color: var(--red-text); font-size: 14.5px; margin: 10px 0; }
 .alert.ok { background: var(--green-soft); color: var(--green-text); }
 .empty { text-align: center; padding: 48px 16px; color: var(--muted); }
-.empty .big { display: grid; place-items: center; width: 64px; height: 64px; margin: 0 auto 14px; border-radius: 50%; background: var(--surface-2); color: var(--ink); font-size: 0; }
+.empty .big { display: grid; place-items: center; width: 64px; height: 64px; margin: 0 auto 14px; border-radius: 50%; background: var(--medal); color: var(--accent); box-shadow: inset 0 0 0 1px var(--medal-ring); font-size: 0; }
 .empty .big svg { width: 28px; height: 28px; }
 .loading { padding: 40px; text-align: center; color: var(--muted); }
 table.simple { width: 100%; border-collapse: collapse; font-size: 14.5px; }
@@ -489,7 +500,7 @@ h2.rowlabel { font-size: 0.95rem; margin: 22px 0 8px; font-weight: 600; letter-s
 .lb-l { left: 0; } .lb-r { right: 0; }
 .lb-foot { text-align: center; }
 .lb-foot .linkbtn { color: #e6e6e6; }
-.route-pin div { width: 30px; height: 30px; border-radius: 50%; background: #111; color: #fff; border: 2.5px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,.4);
+.route-pin div { width: 30px; height: 30px; border-radius: 50%; background: #0f3b2c; color: #fff; border: 2.5px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,.4);
   display: grid; place-items: center; font-weight: 700; font-size: 13px; }
 
 /* ---------- Me menu, walkthrough ---------- */
@@ -503,7 +514,7 @@ a.rainbar { color: inherit; }
 .menu .menu-btn { display: flex; align-items: center; gap: 14px; padding: 14px 18px; min-height: 60px; width: 100%; border: 0; background: none; text-align: left; cursor: pointer; color: inherit; }
 .menu .menu-btn > span { display: grid; }
 .menu a > span { display: grid; }
-.menu .ico { color: var(--ink); }
+.menu .ico { box-sizing: border-box; width: 40px; height: 40px; padding: 10px; border-radius: 50%; background: var(--medal); color: var(--accent); box-shadow: inset 0 0 0 1px var(--medal-ring); }
 .appearance { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin: 14px 0; }
 .tour { position: fixed; z-index: 60; left: 50%; transform: translateX(-50%); bottom: 86px; width: min(420px, calc(100% - 24px));
   background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 20px; padding: 16px 18px; box-shadow: var(--shadow-lg); }
@@ -808,3 +819,50 @@ a.rainbar { color: inherit; }
 /* Heading inside empty and not-found states: a real page heading, sized like a short message. */
 .empty-title { font-size: 1.3rem; line-height: 1.25; font-weight: 600; letter-spacing: -0.02em; color: var(--ink); margin: 0 auto 14px; max-width: 30ch; text-wrap: balance; }
 .loading .empty-title { font: inherit; color: inherit; margin: 0; letter-spacing: 0; }
+
+/* =====================================================================
+   Icons and motion
+   Fine-line duotone icons; motion that explains: the theme grows from the tapped button,
+   the home hero arrives once per visit, posters land as a row, pages fade between.
+   ===================================================================== */
+.ico .ico-duo { opacity: 0.2; }
+.tabs a.on .ico .ico-duo { opacity: 0.28; }
+.themebtn .ico { color: var(--accent); }
+
+/* Theme switch: the new theme grows out of the tapped button as a circle (View Transitions). */
+::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+:root.theme-vt, :root.theme-vt * { transition: none !important; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .themeic { animation: iconTurn 0.5s var(--ease); }
+
+  /* Pages fade in on navigation (opacity only, so fixed trays and sheets keep their place). */
+  .page-enter { animation: pageIn 0.26s ease-out both; }
+
+  /* Home hero, first visit of the session: the heading rises out of its line, the photo opens like a curtain. */
+  :root:not([data-intro="seen"]) .hero-text h1 { animation: lineRise 0.8s var(--ease) both; }
+  :root:not([data-intro="seen"]) .hero-text .lede { animation: softIn 0.6s ease-out 0.18s both; }
+  :root:not([data-intro="seen"]) .hero-text .ask { animation: softIn 0.6s ease-out 0.3s both; }
+  :root:not([data-intro="seen"]) .hero-photo { animation: curtain 1.1s var(--ease) 0.1s both; }
+  :root:not([data-intro="seen"]) .suggest-tile { animation: softIn 0.5s ease-out both; }
+  :root:not([data-intro="seen"]) .suggest-tile:nth-child(1) { animation-delay: 0.42s; }
+  :root:not([data-intro="seen"]) .suggest-tile:nth-child(2) { animation-delay: 0.5s; }
+  :root:not([data-intro="seen"]) .suggest-tile:nth-child(3) { animation-delay: 0.58s; }
+
+  /* Posters land as a row: a short stagger over the first eight, the rest arrive together. */
+  .hscroll > .pcard, .grid > .pcard { animation: posterIn 0.55s var(--ease) both; animation-delay: 0.32s; }
+  .hscroll > .pcard:nth-child(1), .grid > .pcard:nth-child(1) { animation-delay: 0s; }
+  .hscroll > .pcard:nth-child(2), .grid > .pcard:nth-child(2) { animation-delay: 0.04s; }
+  .hscroll > .pcard:nth-child(3), .grid > .pcard:nth-child(3) { animation-delay: 0.08s; }
+  .hscroll > .pcard:nth-child(4), .grid > .pcard:nth-child(4) { animation-delay: 0.12s; }
+  .hscroll > .pcard:nth-child(5), .grid > .pcard:nth-child(5) { animation-delay: 0.16s; }
+  .hscroll > .pcard:nth-child(6), .grid > .pcard:nth-child(6) { animation-delay: 0.2s; }
+  .hscroll > .pcard:nth-child(7), .grid > .pcard:nth-child(7) { animation-delay: 0.24s; }
+  .hscroll > .pcard:nth-child(8), .grid > .pcard:nth-child(8) { animation-delay: 0.28s; }
+}
+@keyframes pageIn { from { opacity: 0; } }
+@keyframes softIn { from { opacity: 0; transform: translateY(6px); } }
+@keyframes lineRise { from { opacity: 0; transform: translateY(0.45em); clip-path: inset(0 0 100% 0); } to { opacity: 1; transform: none; clip-path: inset(0 0 -0.2em 0); } }
+@keyframes curtain { from { clip-path: inset(0 0 0 100% round 22px); } to { clip-path: inset(0 0 0 0 round 22px); } }
+@keyframes posterIn { from { opacity: 0; transform: translateY(12px) scale(0.985); } }
+@keyframes iconTurn { from { opacity: 0; transform: rotate(-90deg) scale(0.6); } }

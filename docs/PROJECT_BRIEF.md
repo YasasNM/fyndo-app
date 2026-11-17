@@ -85,7 +85,7 @@ PRODUCT.md      product context;  DESIGN.md  visual system;  README.md  full set
 ```
 
 ### Design
-- **Visual theme:** "Night ledger" (November 2026): a monochrome, Uber- and Letterboxd-inspired look. Black and white do the work, one Ceylon-sapphire accent (`#2747d6` light, `#8fa8ff` dark) marks ratings, saves, links and focus. Places show as photo posters. Light, dark, or follow the phone (header button and Me > Appearance). One font: **Geist**. Tokens live at the top of `app/globals.css`; full rules in `DESIGN.md`.
+- **Visual theme:** "Emerald night" (November 2026): an Uber- and Letterboxd-inspired luxury look in Ceylon emerald. Deep emerald `#0f3b2c` actions (pale jade `#9fdcc0` in dark mode), emerald links and selection, gold only for ratings, fine-line duotone icons on emerald medallions, photo posters, purposeful animations (theme switch circle, one-time home intro, poster stagger). Light, dark, or follow the phone. One font: **Geist**. Tokens at the top of `app/globals.css`; full rules in `DESIGN.md`.
 - **Imagery:** calm photo hero with real, credited photography and no AI-generated imagery.
 - **Accessibility:** 44px touch targets, strong contrast in light and dark mode, and reduced motion respected.
 - **Reference:** full tokens are in `DESIGN.md`.

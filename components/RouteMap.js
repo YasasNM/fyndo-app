@@ -25,7 +25,7 @@ export default function RouteMap({ stops, height = 280 }) {
       const map = mapRef.current;
       layerRef.current.clearLayers();
       const pts = stops.map((s) => [s.lat, s.lng]);
-      L.polyline(pts, { color: "#2747d6", weight: 3, opacity: 0.85, dashArray: "6 8" }).addTo(layerRef.current);
+      L.polyline(pts, { color: "#0d6e4f", weight: 3, opacity: 0.85, dashArray: "6 8" }).addTo(layerRef.current);
       stops.forEach((s, i) => {
         const icon = L.divIcon({ className: "route-pin", iconSize: [30, 30], iconAnchor: [15, 15], html: `<div>${i + 1}</div>` });
         L.marker([s.lat, s.lng], { icon, title: `${i + 1}. ${s.name}`, alt: `${i + 1}. ${s.name}` }).addTo(layerRef.current);

@@ -48,7 +48,7 @@ export default function Nav() {
       <nav className="tabs" aria-label="Main">
         {links.filter((l) => PHONE.includes(l.href)).map((l) => (
           <Link key={l.href} href={hrefOf(l)} className={on(l.href) ? "on" : ""} aria-current={on(l.href) ? "page" : undefined}>
-            <span className="ic"><Ico n={l.ic} size={22} strokeWidth={on(l.href) ? 2.2 : 1.7} /></span>{l.label}
+            <span className="ic"><Ico n={l.ic} size={22} strokeWidth={on(l.href) ? 1.8 : 1.5} duo={on(l.href)} /></span>{l.label}
           </Link>
         ))}
       </nav>

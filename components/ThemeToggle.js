@@ -24,13 +24,31 @@ function useTheme() {
   return state;
 }
 
+// Switch theme with the new colours growing out of the tapped button as a circle.
+// Falls back to an instant switch where View Transitions are missing or motion is reduced.
+export function switchTheme(pref, from) {
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!document.startViewTransition || reduce || !from) return setThemePref(pref);
+  const r = from.getBoundingClientRect();
+  const x = r.left + r.width / 2, y = r.top + r.height / 2;
+  const end = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
+  const root = document.documentElement;
+  root.classList.add("theme-vt");
+  const t = document.startViewTransition(() => setThemePref(pref));
+  t.ready.then(() => root.animate(
+    { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${end}px at ${x}px ${y}px)`] },
+    { duration: 620, easing: "cubic-bezier(0.16, 1, 0.3, 1)", pseudoElement: "::view-transition-new(root)" },
+  )).catch(() => {});
+  t.finished.finally(() => root.classList.remove("theme-vt"));
+}
+
 // Header button: one tap flips between light and dark.
 export default function ThemeToggle() {
   const { theme } = useTheme();
   const next = theme === "dark" ? "light" : "dark";
   return (
-    <button type="button" className="themebtn" onClick={() => setThemePref(next)} aria-label={`Switch to ${next} mode`} title={`Switch to ${next} mode`}>
-      <Ico n={theme === "dark" ? "sun" : "moon"} size={19} strokeWidth={1.9} />
+    <button type="button" className="themebtn" onClick={(e) => switchTheme(next, e.currentTarget)} aria-label={`Switch to ${next} mode`} title={`Switch to ${next} mode`}>
+      <Ico key={theme} className="themeic" n={theme === "dark" ? "sun" : "moon"} size={19} strokeWidth={1.6} duo />
     </button>
   );
 }
@@ -47,7 +65,7 @@ export function AppearancePicker() {
       </div>
       <div className="seg" role="radiogroup" aria-label="Appearance">
         {opts.map(([id, label]) => (
-          <button key={id} type="button" role="radio" aria-checked={pref === id} className={pref === id ? "on" : ""} onClick={() => setThemePref(id)}>{label}</button>
+          <button key={id} type="button" role="radio" aria-checked={pref === id} className={pref === id ? "on" : ""} onClick={(e) => switchTheme(id, e.currentTarget)}>{label}</button>
         ))}
       </div>
     </div>
