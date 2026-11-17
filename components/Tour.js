@@ -7,7 +7,7 @@ import { Ico } from "./Icon";
 const STEPS = [
   { sel: ".ask", title: "Say what you feel like", body: "Type it the way you would tell a friend. Fyndo turns it into real places and a plan." },
   { sel: ".moodrow", title: "Or tap a mood", body: "One tap filters every place in Colombo. Tap it again to clear." },
-  { sel: ".suggest-plan", title: "Let Fyndo plan the night", body: "Pick a vibe and a budget. You get stops, times, a route and the cost for two." },
+  { sel: ".toplinks a[href='/plan'], .tabs a[href='/plan']", title: "Let Fyndo plan the night", body: "Pick a vibe and a budget. You get stops, times, a route and the cost for two." },
 ];
 const KEY = "fyndo_tour_v1";
 
@@ -26,7 +26,8 @@ export default function Tour() {
 
   useEffect(() => {
     if (step < 0) return;
-    const el = document.querySelector(STEPS[step].sel);
+    // First match that is actually on screen (the top bar on desktop, the bottom bar on phones).
+    const el = [...document.querySelectorAll(STEPS[step].sel)].find((x) => x.offsetParent !== null || getComputedStyle(x).position === "fixed");
     if (!el) return;
     el.classList.add("tour-hi");
     el.scrollIntoView({ block: "center", behavior: "smooth" });

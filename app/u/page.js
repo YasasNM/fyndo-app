@@ -71,7 +71,7 @@ function Profile() {
         <span><b>{p.following}</b> following</span>
       </div>
       <div className="row" style={{ gap: 8, marginTop: 12 }}>
-        {mine ? <Link className="btn sm ghost" href="/profile">Edit profile</Link>
+        {mine ? <><Link className="btn sm ghost" href="/profile">Edit profile</Link><Link className="btn sm ghost" href="/me"><Ico n="sliders" size={16} />Settings</Link></>
           : <button className={"btn sm" + (following ? " ghost" : "")} onClick={toggleFollow} aria-pressed={following}>{following ? "Following" : "Follow"}</button>}
         {!p.is_private && <ShareSheet label="Share profile" title={`@${p.username} on Fyndo`} text={`Follow @${p.username} on Fyndo`} url={`/u?name=${p.username}`}
           make={() => profileCard({ profile: p, favorites: favs })} fileName={`fyndo-${p.username}.png`} />}

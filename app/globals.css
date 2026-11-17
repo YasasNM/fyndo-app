@@ -234,15 +234,18 @@ select.input { appearance: none; -webkit-appearance: none; padding-right: 38px; 
 .hero-photo { aspect-ratio: 4 / 4.2; border-radius: 22px; }
 .hero-photo img { object-position: 50% 80%; }
 
-/* Shortcuts: every feature one tap away, grey tiles in a calm row. */
-.suggest { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; margin: 36px 0 4px; }
-.suggest-tile { display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 18px; padding: 14px 14px 13px; min-height: 96px;
-  border-radius: var(--r-card); background: var(--surface-2); color: var(--ink); font-size: 14.5px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.2;
+/* Home tools: the three that live only here, as calm grey tiles. */
+.suggest { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 36px 0 4px; }
+.suggest-tile { display: flex; align-items: center; gap: 14px; padding: 14px 16px; min-height: 76px;
+  border-radius: var(--r-card); background: var(--surface-2); color: var(--ink); line-height: 1.25;
   transition: background-color 0.15s, transform 0.2s var(--ease); }
 .suggest-tile:hover { background: var(--surface-3); }
-.suggest-tile:active { transform: scale(0.97); }
-.suggest-plan { background: var(--primary); color: var(--on-primary); }
-.suggest-plan:hover { background: var(--primary-hover); }
+.suggest-tile:active { transform: scale(0.98); }
+.suggest-tile > span:last-child { display: grid; gap: 2px; min-width: 0; }
+.suggest-tile b { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+.suggest-sub { font-size: 13px; color: var(--muted); }
+.suggest-ic { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--surface); }
+:root[data-theme="dark"] .suggest-ic { background: var(--surface-3); }
 
 /* legacy quick tiles (kept for any page that still uses them) */
 .quick { display: grid; grid-template-columns: 1.5fr 1fr; gap: 12px; margin: 18px 0 6px; }
@@ -546,7 +549,10 @@ a.rainbar { color: inherit; }
   .homehead .opennear h2 { margin-top: 28px; }
   .homehead .hero-photo { order: 7; aspect-ratio: 16 / 10; margin: 28px 0 0; }
   .suggest { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 22px; }
-  .suggest-tile { min-height: 84px; padding: 12px; font-size: 13.5px; gap: 12px; }
+  .suggest-tile { flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 10px; min-height: 96px; padding: 12px; }
+  .suggest-tile b { font-size: 14px; }
+  .suggest-sub { display: none; }
+  .suggest-ic { width: 38px; height: 38px; }
   .ask-in .input { font-size: 16.5px; padding-left: 40px; }
   .ask-in .btn:disabled { --face: var(--surface-3); --fg: var(--muted); }
 .ask-ic { left: 19px; }
@@ -562,6 +568,19 @@ a.rainbar { color: inherit; }
 .qtile.has-photo, .qtile.has-photo span.s { color: #fff; }
 .planphoto { aspect-ratio: 16 / 7; margin: 16px 0 0; }
 .authphoto { aspect-ratio: 16 / 7; margin: 16px 0 0; }
+/* Login banner: rooftop photo, Fyndo mark in the dark sky top-left. */
+.authart { position: relative; margin: 16px 0 0; aspect-ratio: 16 / 7; border-radius: var(--r-card); overflow: hidden; background: #0f1a26; box-shadow: 0 0 0 1px var(--line); }
+.authart img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 62% 60%; }
+.authart::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(105deg, rgba(8, 14, 22, 0.55) 0%, rgba(8, 14, 22, 0) 45%); }
+.authart-brand { position: absolute; z-index: 1; left: 18px; top: 16px; display: flex; align-items: center; gap: 10px; color: #fff; }
+.authart-brand span { display: grid; line-height: 1.1; }
+.authart-brand b { font-size: 24px; font-weight: 700; letter-spacing: -0.03em; }
+.authart-brand small { font-size: 12.5px; color: rgba(255, 255, 255, 0.72); margin-top: 2px; }
+.authart-note { position: absolute; z-index: 1; right: 10px; bottom: 10px; font-size: 11px; padding: 2px 8px; border-radius: var(--r-pill); background: rgba(0, 0, 0, 0.5); color: rgba(255, 255, 255, 0.85); backdrop-filter: blur(6px); }
+@media (max-width: 760px) { .authart { aspect-ratio: 16 / 9; } .authart img { object-position: 72% 60%; } }
+@media (prefers-reduced-motion: no-preference) { .authart img { animation: authIn 1.2s var(--ease) both; } }
+@keyframes authIn { from { opacity: 0; transform: scale(1.04); } to { opacity: 1; transform: none; } }
+
 .pwrap { position: relative; display: block; }
 .pwrap .input { padding-right: 68px; }
 .pwtoggle { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); border: 0; background: none; color: var(--accent); font-weight: 500; cursor: pointer; padding: 8px; min-height: 36px; }

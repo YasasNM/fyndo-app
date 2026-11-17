@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { db, isLive } from "@/lib/data";
 import { Ico } from "@/components/Icon";
-import Photo from "@/components/Photo";
+import AuthArt from "@/components/AuthArt";
 import Link from "next/link";
 import Captcha, { CAPTCHA_KEY } from "@/components/Captcha";
 
@@ -68,7 +68,7 @@ export default function Login() {
 
   return (
     <div className="narrow" style={{ maxWidth: 440 }}>
-      <Photo slug="rice-curry" className="authphoto" />
+      <AuthArt />
       <h1>{title}</h1>
 
       {mode === "check-signup" && (

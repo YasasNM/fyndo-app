@@ -115,7 +115,7 @@ export default function Me() {
 
   return (
     <div className="narrow">
-      <h1>Hi, {user.name || user.email}</h1>
+      <h1>Your account</h1>
       <p className="muted" style={{ marginTop: 0 }}>{user.email}, {user.role === "user" ? "Member" : user.role === "owner" ? "Business owner" : "Admin"}</p>
 
       <div className="card pad mecard">
@@ -153,8 +153,6 @@ export default function Me() {
       {isLive && !edit && <ChangePassword />}
 
       <nav className="menu" aria-label="Your Fyndo">
-        <Link href="/rewards"><Ico n="ticket" size={20} /><span><b>Rewards</b><span className="small muted">Points, stamp cards and badges to share</span></span></Link>
-        <Link href="/feed"><Ico n="group" size={20} /><span><b>Friends</b><span className="small muted">Find people, follow them, see what they rate</span></span></Link>
         {(user.role === "owner" || user.role === "admin") && <Link href="/dashboard"><Ico n="store" size={20} /><span><b>Business dashboard</b><span className="small muted">Bookings, QR poster, reviews</span></span></Link>}
         {user.role === "user" && <Link href="/claim"><Ico n="store" size={20} /><span><b>Run a restaurant or café?</b><span className="small muted">Claim your place to manage its page</span></span></Link>}
         {user.role === "admin" && <Link href="/admin"><Ico n="shield" size={20} /><span><b>Admin</b><span className="small muted">Places, lists, reports, setup check</span></span></Link>}

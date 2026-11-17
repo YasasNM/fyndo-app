@@ -22,14 +22,11 @@ const BUDGETS = [
   { id: "2500", label: "Under LKR 2,500 pp" },
   { id: "5000", label: "Under LKR 5,000 pp" },
 ];
-// Every feature one tap from home.
+// Tools that live only here (Plan, Friends, Saved and Profile are in the bottom bar).
 const SHORTCUTS = [
-  { href: "/plan", label: "Plan a night", ic: "route" },
-  { href: "/watch", label: "Watch", ic: "film" },
-  { href: "/feed", label: "Friends", ic: "group" },
-  { href: "/split", label: "Split a bill", ic: "receipt" },
-  { href: "/rewards", label: "Rewards", ic: "ticket" },
-  { href: "/saved", label: "Saved", ic: "bookmark" },
+  { href: "/watch", label: "Watch", sub: "Short videos of real places", ic: "film" },
+  { href: "/rewards", label: "Rewards", sub: "Points, stamps and badges", ic: "ticket" },
+  { href: "/split", label: "Split a bill", sub: "Who owes what, in seconds", ic: "receipt" },
 ];
 const SORTS = [
   { id: "best", label: "Best match" },
@@ -161,9 +158,9 @@ export default function Home() {
         </section>
         <nav className="suggest" aria-label="Shortcuts">
           {SHORTCUTS.map((s) => (
-            <Link key={s.href} href={s.href} className={"suggest-tile" + (s.href === "/plan" ? " suggest-plan" : "")}>
-              <Ico n={s.ic} size={24} strokeWidth={1.7} />
-              <span>{s.label}</span>
+            <Link key={s.href} href={s.href} className="suggest-tile">
+              <span className="suggest-ic"><Ico n={s.ic} size={22} strokeWidth={1.7} /></span>
+              <span><b>{s.label}</b><span className="suggest-sub">{s.sub}</span></span>
             </Link>
           ))}
         </nav>
