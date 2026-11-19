@@ -11,7 +11,7 @@ import { downloadIcs, atDateTime } from "@/lib/ics";
 import { useSunsets } from "@/lib/sun";
 import { AREAS } from "@/lib/seed";
 import { Thumb } from "@/components/SpotCard";
-import { lkr, niceTime, nextDays, shareNow, avgPrice, whyThis } from "@/lib/utils";
+import { lkr, niceTime, nextDays, shareNow, avgPrice, whyThis, areaOptions } from "@/lib/utils";
 
 const RouteMap = dynamic(() => import("@/components/RouteMap"), { ssr: false, loading: () => <div className="skel" style={{ height: 260, borderRadius: 16, marginTop: 14 }} /> });
 const VIBE_ICON = { romantic: "heart", fun: "group", outdoor: "sun", chill: "cup" };
@@ -153,7 +153,7 @@ export default function PlanPage() {
           <label className="field"><span>Area</span>
             <select className="input" value={f.area} onChange={(e) => set("area", e.target.value)}>
               <option value="">Anywhere in Colombo</option>
-              {AREAS.map((a) => <option key={a}>{a}</option>)}
+              {areaOptions(AREAS, spots).map((a) => <option key={a}>{a}</option>)}
             </select>
           </label>
           <div className="field"><span>Day</span>

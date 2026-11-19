@@ -91,7 +91,7 @@ export default function SpotCard({ spot, rating, distanceKm, why, pick, save, in
   const km = distanceKm != null ? `${distanceKm < 10 ? distanceKm.toFixed(1) : Math.round(distanceKm)} km` : "";
   return (
     <article className="pcard">
-      <Link href={`/spot?id=${spot.id}`} className="pcard-link" aria-label={`${spot.name}, ${spot.area}, ${open ? "open now" : "closed"}, ${priceLabel(spot)}`}>
+      <Link href={`/spot?id=${spot.id}`} className="pcard-link" aria-label={`${spot.name}, ${spot.area}, ${open === null ? "Hours not added yet" : open ? "open now" : "closed"}, ${priceLabel(spot)}`}>
         <CardMedia spot={spot} />
         <div className="pcard-body">
           <div className="pcard-namecol">
@@ -99,7 +99,7 @@ export default function SpotCard({ spot, rating, distanceKm, why, pick, save, in
             <div className="pcard-sub">{spot.area}, {spot.category}{km && `, ${km}`}</div>
           </div>
           <div className="pcard-main">
-            <span className={open ? "open-now" : "closed-now"}>{open ? `Open till ${niceTime(spot.close_time)}` : "Closed now"}</span>
+            <span className={open === null ? "muted" : open ? "open-now" : "closed-now"}>{open === null ? "Hours not added yet" : open ? `Open till ${niceTime(spot.close_time)}` : "Closed now"}</span>
             {price.big ? (
               <span className="pcard-price"><b>{price.big === "Free" ? "Free" : `LKR ${price.big}`}</b>{price.unit && <span> pp</span>}</span>
             ) : <span className="pcard-price none"><span>No prices yet</span></span>}

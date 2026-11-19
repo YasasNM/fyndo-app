@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useSpots, useRatings } from "@/lib/hooks";
 import { Thumb } from "@/components/SpotCard";
 import { featureOf } from "@/lib/features";
-import { avgPrice, isOpenAt, niceTime, priceLabel } from "@/lib/utils";
+import { avgPrice, priceKnown, isOpenAt, niceTime, priceLabel } from "@/lib/utils";
 
 export default function CompareWrapper() {
   return <Suspense fallback={<div className="loading">Loading...</div>}><Compare /></Suspense>;
@@ -24,13 +24,13 @@ function Compare() {
 
   const now = new Date();
   const t = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
-  const cheapest = Math.min(...picked.map(avgPrice));
+  const cheapest = Math.min(...picked.filter(priceKnown).map(avgPrice));
   const best = Math.max(...picked.map((s) => (ratings[s.id] ? ratings[s.id].avg : 0)));
   const rows = [
-    ["Price", (s) => <span style={avgPrice(s) === cheapest ? { color: "var(--green)", fontWeight: 700 } : {}}>{priceLabel(s)}{avgPrice(s) === cheapest ? " (lowest)" : ""}</span>],
+    ["Price", (s) => <span style={priceKnown(s) && avgPrice(s) === cheapest ? { color: "var(--green)", fontWeight: 700 } : {}}>{priceLabel(s)}{priceKnown(s) && avgPrice(s) === cheapest ? " (lowest)" : ""}</span>],
     ["Fyndo rating", (s) => { const r = ratings[s.id]; return r ? <span style={r.avg === best ? { color: "var(--green)", fontWeight: 700 } : {}}>{r.avg.toFixed(1)} of 5 ({r.count} review{r.count > 1 ? "s" : ""}){r.visited ? `, ${r.visited} visited` : ""}</span> : <span className="muted">No reviews yet</span>; }],
-    ["Open now", (s) => (isOpenAt(s, t) ? <span className="open-now">Yes</span> : <span className="closed-now">Closed</span>)],
-    ["Hours", (s) => `${niceTime(s.open_time)} to ${niceTime(s.close_time)}`],
+    ["Open now", (s) => { const open = isOpenAt(s, t); return open === null ? <span className="muted">Hours not added yet</span> : open ? <span className="open-now">Yes</span> : <span className="closed-now">Closed</span>; }],
+    ["Hours", (s) => isOpenAt(s, t) === null ? "Hours not added yet" : `${niceTime(s.open_time)} to ${niceTime(s.close_time)}`],
     ["Area", (s) => s.area],
     ["Type", (s) => s.category],
     ["Vibe", (s) => (s.moods || []).slice(0, 4).join(", ") || "-"],

@@ -1,0 +1,805 @@
+[
+  {
+    "id": "osm-node-619128108",
+    "name": "Meat Locker",
+    "reason": "source_needs_review"
+  },
+  {
+    "id": "osm-node-621951612",
+    "name": "Shanmugas",
+    "reason": "possible_duplicate",
+    "existing_id": "shanmugas"
+  },
+  {
+    "id": "osm-node-1135499165",
+    "name": "Paradise Road Gallery Cafe",
+    "reason": "possible_duplicate",
+    "existing_id": "paradise-road-gallery-cafe"
+  },
+  {
+    "id": "osm-node-1434108415",
+    "name": "Steam Boat",
+    "reason": "possible_duplicate",
+    "existing_id": "steam-boat"
+  },
+  {
+    "id": "osm-node-1530580885",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-2041541733",
+    "name": "Sri Vihar",
+    "reason": "possible_duplicate",
+    "existing_id": "sri-vihar"
+  },
+  {
+    "id": "osm-node-2049615732",
+    "name": "Carnival Ice Cream",
+    "reason": "possible_duplicate",
+    "existing_id": "carnival-ice-cream"
+  },
+  {
+    "id": "osm-node-2049615737",
+    "name": "Amaravathi",
+    "reason": "possible_duplicate",
+    "existing_id": "amaravathi"
+  },
+  {
+    "id": "osm-node-2425250057",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-3354700753",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-3354700755",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-3401467544",
+    "name": "Barracuda Sea Food & Grill",
+    "reason": "possible_duplicate",
+    "existing_id": "barracuda-sea-food-and-grill"
+  },
+  {
+    "id": "osm-node-3401467545",
+    "name": "The Coast Ocean Cuisine",
+    "reason": "source_needs_review"
+  },
+  {
+    "id": "osm-node-3401467550",
+    "name": "Babi's Tent",
+    "reason": "possible_duplicate",
+    "existing_id": "babi-s-tent"
+  },
+  {
+    "id": "osm-node-3747912141",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-3751139490",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-3842187166",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-3936125166",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-4066195771",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-4082953995",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-4082960042",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-4082983193",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-4082996328",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-4082999692",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-4167631817",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-4235822151",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-4457426483",
+    "name": "Arabian Knights",
+    "reason": "possible_duplicate",
+    "existing_id": "arabian-knights"
+  },
+  {
+    "id": "osm-node-4457451959",
+    "name": "Arthur's Pizza",
+    "reason": "possible_duplicate",
+    "existing_id": "arthur-s-pizza"
+  },
+  {
+    "id": "osm-node-4509906904",
+    "name": "Park Street Mews",
+    "reason": "possible_duplicate",
+    "existing_id": "park-street-mews"
+  },
+  {
+    "id": "osm-node-4509906905",
+    "name": "Aqua Pizza",
+    "reason": "possible_duplicate",
+    "existing_id": "aqua-pizza"
+  },
+  {
+    "id": "osm-node-4513209960",
+    "name": "Dao Krua Thai",
+    "reason": "possible_duplicate",
+    "existing_id": "dao-krua-thai"
+  },
+  {
+    "id": "osm-node-4513253440",
+    "name": "ZEN Japanese Restaurant",
+    "reason": "possible_duplicate",
+    "existing_id": "zen-japanese-restaurant"
+  },
+  {
+    "id": "osm-node-4620035909",
+    "name": "Shop",
+    "reason": "generic_name"
+  },
+  {
+    "id": "osm-node-4652090040",
+    "name": "Giovanni's",
+    "reason": "possible_duplicate",
+    "existing_id": "giovanni-s"
+  },
+  {
+    "id": "osm-node-4653891141",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-4964250396",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-5042484024",
+    "name": "Peking Palace",
+    "reason": "possible_duplicate",
+    "existing_id": "osm-node-4555033276"
+  },
+  {
+    "id": "osm-node-5076532123",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-5199910175",
+    "name": "Nara Thai",
+    "reason": "possible_duplicate",
+    "existing_id": "nara-thai"
+  },
+  {
+    "id": "osm-node-5289258122",
+    "name": "Royal Burger",
+    "reason": "possible_duplicate",
+    "existing_id": "royal-burger"
+  },
+  {
+    "id": "osm-node-5343028491",
+    "name": "Chinese Dragon cafe",
+    "reason": "possible_duplicate",
+    "existing_id": "chinese-dragon-cafe-bambalapitiya"
+  },
+  {
+    "id": "osm-node-5565782272",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-5652866621",
+    "name": "Chana's",
+    "reason": "possible_duplicate",
+    "existing_id": "chana-s"
+  },
+  {
+    "id": "osm-node-5653338423",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-5653546122",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-5816701528",
+    "name": "Ratnagiri Hotel",
+    "reason": "source_needs_review"
+  },
+  {
+    "id": "osm-node-5963861957",
+    "name": "Fayaz Arabic Shawarma",
+    "reason": "possible_duplicate",
+    "existing_id": "fayaz-arabic-shawarma"
+  },
+  {
+    "id": "osm-node-5974224889",
+    "name": "FREGO Steak House",
+    "reason": "possible_duplicate",
+    "existing_id": "frego-steak-house"
+  },
+  {
+    "id": "osm-node-6157160117",
+    "name": "Dindigul Thalappakatti Restaurant",
+    "reason": "possible_duplicate",
+    "existing_id": "dindigul-thalappakatti-restaurant"
+  },
+  {
+    "id": "osm-node-6166073982",
+    "name": "Han Gook Gwan",
+    "reason": "possible_duplicate",
+    "existing_id": "han-gook-gwan"
+  },
+  {
+    "id": "osm-node-6166073983",
+    "name": "Luck Star",
+    "reason": "possible_duplicate",
+    "existing_id": "luck-star"
+  },
+  {
+    "id": "osm-node-6297198085",
+    "name": "Hotel new Amirthaa",
+    "reason": "possible_duplicate",
+    "existing_id": "hotel-new-amirthaa"
+  },
+  {
+    "id": "osm-node-6308020702",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-6328374351",
+    "name": "Fat Wok",
+    "reason": "source_needs_review"
+  },
+  {
+    "id": "osm-node-6351566695",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-6351566697",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-6351566713",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-6351566724",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-6351568701",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-6351639196",
+    "name": "Shaxian",
+    "reason": "possible_duplicate",
+    "existing_id": "shaxian"
+  },
+  {
+    "id": "osm-node-6351673785",
+    "name": "Sakura",
+    "reason": "possible_duplicate",
+    "existing_id": "sakura"
+  },
+  {
+    "id": "osm-node-6360491085",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-6372217845",
+    "name": "Thalis",
+    "reason": "possible_duplicate",
+    "existing_id": "thalis"
+  },
+  {
+    "id": "osm-node-6380250651",
+    "name": "Food",
+    "reason": "generic_name"
+  },
+  {
+    "id": "osm-node-6390214568",
+    "name": "The Catch",
+    "reason": "source_needs_review"
+  },
+  {
+    "id": "osm-node-6467718686",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-6482017085",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-6497634094",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-6517440201",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-6547960521",
+    "name": "Dolce Italia",
+    "reason": "possible_duplicate",
+    "existing_id": "dolce-italia"
+  },
+  {
+    "id": "osm-node-6632922949",
+    "name": "Box-O-Noodless",
+    "reason": "possible_duplicate",
+    "existing_id": "osm-node-6631008091"
+  },
+  {
+    "id": "osm-node-6715729585",
+    "name": "Black Pepper",
+    "reason": "possible_duplicate",
+    "existing_id": "osm-node-6338988886"
+  },
+  {
+    "id": "osm-node-6726849181",
+    "name": "Sakura",
+    "reason": "possible_duplicate",
+    "existing_id": "sakura"
+  },
+  {
+    "id": "osm-node-6774608486",
+    "name": "Tasty Caterer",
+    "reason": "source_needs_review"
+  },
+  {
+    "id": "osm-node-6812287456",
+    "name": "The Barnesbury",
+    "reason": "possible_duplicate",
+    "existing_id": "the-barnesbury"
+  },
+  {
+    "id": "osm-node-7040315015",
+    "name": "Tintagel Colombo",
+    "reason": "possible_duplicate",
+    "existing_id": "tintagel-colombo"
+  },
+  {
+    "id": "osm-node-7133159645",
+    "name": "Shelton Sea Food Restaurant",
+    "reason": "possible_duplicate",
+    "existing_id": "catamaran-seafood-restaurant"
+  },
+  {
+    "id": "osm-node-7133250596",
+    "name": "Catamaran Seafood Restaurant",
+    "reason": "possible_duplicate",
+    "existing_id": "catamaran-seafood-restaurant"
+  },
+  {
+    "id": "osm-node-7168916344",
+    "name": "Sri Lankan Palate",
+    "reason": "possible_duplicate",
+    "existing_id": "sri-lankan-palate"
+  },
+  {
+    "id": "osm-node-7296062660",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-7353220885",
+    "name": "Barbecue Station",
+    "reason": "possible_duplicate",
+    "existing_id": "osm-node-7319582585"
+  },
+  {
+    "id": "osm-node-7881713003",
+    "name": "Sushi Kai Bar",
+    "reason": "possible_duplicate",
+    "existing_id": "osm-node-5192793593"
+  },
+  {
+    "id": "osm-node-8588640388",
+    "name": "Grand bolgoda",
+    "reason": "conflicting_district_address"
+  },
+  {
+    "id": "osm-node-8594231615",
+    "name": "Gihans beach Resort",
+    "reason": "possible_duplicate",
+    "existing_id": "gihans-beach-resort"
+  },
+  {
+    "id": "osm-node-8610148577",
+    "name": "PappaRich",
+    "reason": "possible_duplicate",
+    "existing_id": "papparich"
+  },
+  {
+    "id": "osm-node-8638308039",
+    "name": "Pearl Grand Hotel",
+    "reason": "possible_duplicate",
+    "existing_id": "osm-node-8594230152"
+  },
+  {
+    "id": "osm-node-8645640819",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-8650470528",
+    "name": "Caravan Fresh",
+    "reason": "possible_duplicate",
+    "existing_id": "caravan-fresh-colombo-4"
+  },
+  {
+    "id": "osm-node-8662691655",
+    "name": "Kandoori",
+    "reason": "possible_duplicate",
+    "existing_id": "kandoori"
+  },
+  {
+    "id": "osm-node-8763572776",
+    "name": "Char Siu",
+    "reason": "possible_duplicate",
+    "existing_id": "char-siu"
+  },
+  {
+    "id": "osm-node-9533731417",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-9702980402",
+    "name": "Street Burger",
+    "reason": "possible_duplicate",
+    "existing_id": "street-burger"
+  },
+  {
+    "id": "osm-node-9733862248",
+    "name": "Rishi Foods",
+    "reason": "possible_duplicate",
+    "existing_id": "rishi-foods"
+  },
+  {
+    "id": "osm-node-9758819951",
+    "name": "Popeyes",
+    "reason": "possible_duplicate",
+    "existing_id": "popeyes"
+  },
+  {
+    "id": "osm-node-9973791871",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-10175779584",
+    "name": "The Manhattan Fish Market",
+    "reason": "possible_duplicate",
+    "existing_id": "the-manhattan-fish-market"
+  },
+  {
+    "id": "osm-node-10189053347",
+    "name": "Burley’s - Burgers & Beyond",
+    "reason": "possible_duplicate",
+    "existing_id": "burley-s-burgers-and-beyond"
+  },
+  {
+    "id": "osm-node-10262669909",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-10313090558",
+    "name": "Royal Code",
+    "reason": "possible_duplicate",
+    "existing_id": "royal-code"
+  },
+  {
+    "id": "osm-node-10770136999",
+    "name": "Ricorn Hotel & Bakery",
+    "reason": "possible_duplicate",
+    "existing_id": "ricorn-hotel-and-bakery-wellawatta"
+  },
+  {
+    "id": "osm-node-10831444912",
+    "name": "KFC",
+    "reason": "possible_duplicate",
+    "existing_id": "osm-node-4009314229"
+  },
+  {
+    "id": "osm-node-11232745338",
+    "name": "Pizza Hut",
+    "reason": "possible_duplicate",
+    "existing_id": "osm-node-10989303291"
+  },
+  {
+    "id": "osm-node-11247876539",
+    "name": "Pearl Beach Paradise",
+    "reason": "possible_duplicate",
+    "existing_id": "pearl-beach-paradise"
+  },
+  {
+    "id": "osm-node-11409364642",
+    "name": "HQ by W15",
+    "reason": "possible_duplicate",
+    "existing_id": "hq-by-w15"
+  },
+  {
+    "id": "osm-node-11662243332",
+    "name": "Big Plate",
+    "reason": "possible_duplicate",
+    "existing_id": "big-plate"
+  },
+  {
+    "id": "osm-node-11775146449",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-11777951994",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-11842860080",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-11842920970",
+    "name": "AL-BARAKA",
+    "reason": "possible_duplicate",
+    "existing_id": "osm-node-11842861784"
+  },
+  {
+    "id": "osm-node-11862652382",
+    "name": "Vaishnavi Vihar",
+    "reason": "possible_duplicate",
+    "existing_id": "osm-node-11842977983"
+  },
+  {
+    "id": "osm-node-12002014246",
+    "name": "KFC",
+    "reason": "possible_duplicate",
+    "existing_id": "osm-node-11842950270"
+  },
+  {
+    "id": "osm-node-12127462497",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-12260616795",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-12343040478",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-12388308625",
+    "name": "Big Taste",
+    "reason": "possible_duplicate",
+    "existing_id": "big-taste"
+  },
+  {
+    "id": "osm-node-12480820316",
+    "name": "Aqua Pizza",
+    "reason": "possible_duplicate",
+    "existing_id": "aqua-pizza"
+  },
+  {
+    "id": "osm-node-12480841389",
+    "name": "Wildish",
+    "reason": "possible_duplicate",
+    "existing_id": "wildish"
+  },
+  {
+    "id": "osm-node-12531941873",
+    "name": "Shoulders by Harpos",
+    "reason": "possible_duplicate",
+    "existing_id": "shoulders-by-harpos"
+  },
+  {
+    "id": "osm-node-12591878787",
+    "name": "The ‘Stache",
+    "reason": "possible_duplicate",
+    "existing_id": "the-stache"
+  },
+  {
+    "id": "osm-node-12591913834",
+    "name": "Vito's Woodfired Pizza",
+    "reason": "possible_duplicate",
+    "existing_id": "vito-wood-fired-pizza"
+  },
+  {
+    "id": "osm-node-12645155657",
+    "name": "Culture Colombo",
+    "reason": "possible_duplicate",
+    "existing_id": "culture-colombo"
+  },
+  {
+    "id": "osm-node-12669250301",
+    "name": "Soul Beach Colombo",
+    "reason": "possible_duplicate",
+    "existing_id": "soul-beach-colombo"
+  },
+  {
+    "id": "osm-node-12880896376",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-13015125102",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-13015132301",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-13306520104",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-node-13507090277",
+    "name": "Smash Burger",
+    "reason": "possible_duplicate",
+    "existing_id": "smash-burger"
+  },
+  {
+    "id": "osm-node-13893371467",
+    "name": "Abid's Restaurant",
+    "reason": "possible_duplicate",
+    "existing_id": "abid-s-restaurant-sri-lanka"
+  },
+  {
+    "id": "osm-way-233596648",
+    "name": "Upali's by Nawaloka",
+    "reason": "possible_duplicate",
+    "existing_id": "upali-s-by-nawaloka"
+  },
+  {
+    "id": "osm-way-288445379",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-way-327567097",
+    "name": "Hotel De Plaza",
+    "reason": "possible_duplicate",
+    "existing_id": "hotel-de-plaza"
+  },
+  {
+    "id": "osm-way-327731983",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-way-467373533",
+    "name": "Restaurant",
+    "reason": "generic_name"
+  },
+  {
+    "id": "osm-way-536833912",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-way-583173156",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-way-810443214",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-way-810443236",
+    "name": "Deck",
+    "reason": "possible_duplicate",
+    "existing_id": "deck"
+  },
+  {
+    "id": "osm-way-1023545715",
+    "name": "Elite Indian Restaurant",
+    "reason": "possible_duplicate",
+    "existing_id": "elite-indian-restaurant"
+  },
+  {
+    "id": "osm-way-1030776967",
+    "name": "Sulthan Palace",
+    "reason": "possible_duplicate",
+    "existing_id": "sulthan-palace"
+  },
+  {
+    "id": "osm-way-1061977648",
+    "name": "Como Colombo",
+    "reason": "possible_duplicate",
+    "existing_id": "como-colombo"
+  },
+  {
+    "id": "osm-way-1177165341",
+    "name": "miyurasa hotel",
+    "reason": "possible_duplicate",
+    "existing_id": "osm-node-12879950397"
+  },
+  {
+    "id": "osm-way-1200848259",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-way-1245766506",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-way-1466879265",
+    "name": "",
+    "reason": "unnamed"
+  },
+  {
+    "id": "osm-way-1542884279",
+    "name": "",
+    "reason": "unnamed"
+  }
+]

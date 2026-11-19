@@ -103,10 +103,10 @@ function SpotPage() {
           return (
             <div className="spotboard">
               <div className="spotboard-left">
-                <span className="pcard-area static"><i className={"pcard-state " + (open ? "open" : "closed")} aria-hidden="true" />{spot.area}</span>
+                <span className="pcard-area static">{open !== null && <i className={"pcard-state " + (open ? "open" : "closed")} aria-hidden="true" />}{spot.area}</span>
                 <div className="small" style={{ marginTop: 8 }}>
-                  <b>{spot.category}</b>, {open ? "open now" : "closed now"}
-                  <div className="muted"><Ico n="clock" size={14} /> {niceTime(spot.open_time)} to {niceTime(spot.close_time)}</div>
+                  <b>{spot.category}</b>{open !== null && `, ${open ? "open now" : "closed now"}`}
+                  <div className="muted"><Ico n="clock" size={14} /> {open === null ? "Hours not added yet" : `${niceTime(spot.open_time)} to ${niceTime(spot.close_time)}`}</div>
                 </div>
               </div>
               <div className="pcard-price spotprice" aria-label={priceLabel(spot)}>
@@ -117,6 +117,12 @@ function SpotPage() {
         })()}
         <div className="row" style={{ gap: 6 }}>{spot.moods.map((m) => <span key={m} className="tag">{m}</span>)}</div>
         {spot.about && <p>{spot.about}</p>}
+        {String(spot.id).startsWith("osm-") && (
+          <p className="small muted">
+            Place data © <a className="linkbtn" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap contributors</a>, available under the{" "}
+            <a className="linkbtn" href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noreferrer">ODbL</a>. Hours and prices may not be added yet.
+          </p>
+        )}
 
         <DealBanner spot={spot} />
         <div className="actionbar">

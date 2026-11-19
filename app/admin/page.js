@@ -5,7 +5,7 @@ import Link from "next/link";
 import { db } from "@/lib/data";
 import { useUser, goLogin } from "@/lib/hooks";
 import { AREAS, CATEGORIES, MOODS } from "@/lib/seed";
-import { slug, todayIso, parseMenu, menuToText } from "@/lib/utils";
+import { slug, todayIso, parseMenu, menuToText, areaOptions } from "@/lib/utils";
 import { FeaturePicker } from "@/components/OwnerExtras";
 import { SetupCheck, GoogleLinker } from "@/components/AdminGoogle";
 import AdminDiscover from "@/components/AdminDiscover";
@@ -117,7 +117,7 @@ export default function Admin() {
   if (user.role !== "admin") return <div className="empty"><div className="big"><Ico n="lock" size={30} /></div><h1 className="empty-title">Admins only</h1></div>;
   if (!spots) return <div className="loading">Loading spots...</div>;
 
-  if (editing) return <SpotForm initial={editing} isNew={!editing.id} onDone={(m) => { setEditing(null); setMsg(m || ""); load(); }} />;
+  if (editing) return <SpotForm initial={editing} areas={areaOptions(AREAS, [...spots, editing])} isNew={!editing.id} onDone={(m) => { setEditing(null); setMsg(m || ""); load(); }} />;
 
   const shown = spots.filter((s) => (s.name + s.area + s.category).toLowerCase().includes(q.toLowerCase()));
   const del = async (s) => {
@@ -218,7 +218,7 @@ export default function Admin() {
   );
 }
 
-function SpotForm({ initial, isNew, onDone }) {
+function SpotForm({ initial, areas, isNew, onDone }) {
   const [f, setF] = useState({ ...initial, lat: initial.lat ?? "", lng: initial.lng ?? "" });
   const [err, setErr] = useState("");
   const [gq, setGq] = useState("");
@@ -275,7 +275,7 @@ function SpotForm({ initial, isNew, onDone }) {
         </div>
         <label className="field"><span>Name</span><input className="input" value={f.name} onChange={set("name")} /></label>
         <div className="grid2">
-          <label className="field"><span>Area</span><select className="input" value={f.area} onChange={set("area")}>{AREAS.map((a) => <option key={a}>{a}</option>)}</select></label>
+          <label className="field"><span>Area</span><select className="input" value={f.area} onChange={set("area")}>{areas.map((a) => <option key={a}>{a}</option>)}</select></label>
           <label className="field"><span>Type</span><select className="input" value={f.category} onChange={set("category")}>{CATEGORIES.map((a) => <option key={a}>{a}</option>)}</select></label>
           <label className="field"><span>Price from (LKR pp)</span><input className="input" type="number" value={f.price_min} onChange={set("price_min", true)} /></label>
           <label className="field"><span>Price to (LKR pp)</span><input className="input" type="number" value={f.price_max} onChange={set("price_max", true)} /></label>

@@ -12,7 +12,7 @@ import { useSpots, useRatings, usePopular, useLocation, useCollections, goLogin,
 import { useWeather } from "@/lib/weather";
 import { MOODS, CATEGORIES, AREAS } from "@/lib/seed";
 import { FEATURES, OCCASIONS } from "@/lib/features";
-import { avgPrice, isOpenAt, km, whyThis } from "@/lib/utils";
+import { avgPrice, priceKnown, isOpenAt, km, whyThis, areaOptions } from "@/lib/utils";
 import { Ico } from "@/components/Icon";
 
 const SpotMap = dynamic(() => import("@/components/SpotMap"), { ssr: false, loading: () => <div className="skel" style={{ height: 420, borderRadius: 16 }} /> });
@@ -89,7 +89,7 @@ export default function Home() {
       if (indoor && (s.moods.includes("Outdoor") || s.category === "Activity") && !f.includes("ac")) return false;
       if (cat && s.category !== cat) return false;
       if (area && s.area !== area) return false;
-      if (budget && avgPrice(s) > Number(budget)) return false;
+      if (budget && (!priceKnown(s) || avgPrice(s) > Number(budget))) return false;
       if (openNow && !isOpenAt(s, t)) return false;
       if (bookable && !s.booking_enabled) return false;
       if (words) {
@@ -102,8 +102,8 @@ export default function Home() {
     const by = {
       rating: (a, b) => r(b) - r(a) || (ratings[b.id]?.count || 0) - (ratings[a.id]?.count || 0),
       near: (a, b) => (dist(a) ?? 1e9) - (dist(b) ?? 1e9),
-      cheap: (a, b) => avgPrice(a) - avgPrice(b),
-      pricey: (a, b) => avgPrice(b) - avgPrice(a),
+      cheap: (a, b) => Number(priceKnown(b)) - Number(priceKnown(a)) || (priceKnown(a) ? avgPrice(a) - avgPrice(b) : 0),
+      pricey: (a, b) => Number(priceKnown(b)) - Number(priceKnown(a)) || (priceKnown(a) ? avgPrice(b) - avgPrice(a) : 0),
       az: (a, b) => a.name.localeCompare(b.name),
     }[sort];
     return by ? [...list].sort(by) : list;
@@ -143,7 +143,7 @@ export default function Home() {
   const openList = (spots || []).filter((s) => isOpenAt(s, nowT)).slice(0, 8);
   const toMins = (t) => { const [h, m] = String(t || "00:00").split(":").map(Number); return h * 60 + m; };
   // Fewer than four open: top the row up with the places that open soonest, so it is never a lone card.
-  const soonList = openList.length >= 4 ? [] : (spots || []).filter((s) => !openList.includes(s)).sort((a, b) => {
+  const soonList = openList.length >= 4 ? [] : (spots || []).filter((s) => isOpenAt(s, nowT) === false).sort((a, b) => {
     const n = toMins(nowT), d = (s) => (toMins(s.open_time) - n + 1440) % 1440;
     return d(a) - d(b);
   }).slice(0, (openList.length ? 4 : 8) - openList.length);
@@ -228,7 +228,7 @@ export default function Home() {
           <div className="grid2" style={{ marginTop: 10 }}>
             <select className="input" value={area} onChange={(e) => setArea(e.target.value)} aria-label="Area">
               <option value="">All areas</option>
-              {AREAS.map((a) => <option key={a}>{a}</option>)}
+              {areaOptions(AREAS, spots).map((a) => <option key={a}>{a}</option>)}
             </select>
             <select className="input" value={budget} onChange={(e) => setBudget(e.target.value)} aria-label="Budget">
               {BUDGETS.map((b) => <option key={b.id} value={b.id}>{b.label}</option>)}
