@@ -40,6 +40,8 @@ export function CardMedia({ spot, children }) {
 // The per-person price as a route-board number: "600–1,000" over "LKR per person".
 export function priceParts(s) {
   const n = (x) => Number(x || 0).toLocaleString("en-US");
+  const label = priceLabel(s);
+  if (!s.price_max && label.startsWith("Reported ")) return { big: "", unit: label, reported: true };
   if (!s.price_max) return s.category === "Activity" ? { big: "Free", unit: "" } : { big: "", unit: "Prices not added yet" };
   return { big: s.price_min === s.price_max || !s.price_min ? n(s.price_max) : `${n(s.price_min)}–${n(s.price_max)}`, unit: "LKR per person" };
 }
@@ -61,7 +63,7 @@ export default function SpotCard({ spot, rating, distanceKm, why, pick, save, in
           </div>
           <div className="pcard-main">
             <span className={open === null ? "muted" : open ? "open-now" : "closed-now"}>{open === null ? "Hours not added yet" : open ? `Open till ${niceTime(spot.close_time)}` : "Closed now"}</span>
-            {price.big ? (
+            {price.reported ? <span className="pcard-price reported"><span>{price.unit}</span></span> : price.big ? (
               <span className="pcard-price"><b>{price.big === "Free" ? "Free" : `LKR ${price.big}`}</b>{price.unit && <span> pp</span>}</span>
             ) : <span className="pcard-price none"><span>No prices yet</span></span>}
           </div>

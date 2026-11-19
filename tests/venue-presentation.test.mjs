@@ -1,8 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { loadUtilsSource } from './load-utils.mjs';
 import { readFile } from 'node:fs/promises';
 import { renderFrontend } from './render-frontend.mjs';
-const src = await readFile(new URL('../lib/utils.js', import.meta.url), 'utf8');
+const src = await loadUtilsSource();
 const utils = await import(`data:text/javascript;base64,${Buffer.from(src).toString('base64')}`);
 export const spot = { id: 'osm-node-123', name: '668', category: 'Restaurant', area: 'Colombo District (locality unknown)', moods: [], photos: [], price_max: 0, open_time: null, close_time: null };
 

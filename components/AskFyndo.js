@@ -47,7 +47,7 @@ export default function AskFyndo({ spots }) {
             <b>{res.f.reply}</b>
             <button className="linkbtn" onClick={() => { setRes(null); setQ(""); }}>Clear</button>
           </div>
-          {!res.f.ai && <div className="small muted">Quick match (AI is off right now).</div>}
+          {!res.f.ai && <div className="small muted">Local keyword match.</div>}
           {res.plan && (
             <>
               <div className="small muted" style={{ margin: "4px 0 8px" }}>

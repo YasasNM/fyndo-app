@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { loadUtilsSource } from './load-utils.mjs';
 import { readFile } from 'node:fs/promises';
 import { renderFrontend } from './render-frontend.mjs';
 const entries = JSON.parse(await readFile(new URL('../lib/descriptionReviews.json', import.meta.url), 'utf8'));
@@ -40,7 +41,7 @@ test('owner-edited About is preserved and is not falsely attributed to an older 
 });
 
 test('detail renders clean About with review source only on exact reviewed IDs and keeps legal credit', async () => {
-  const utilsSource = await readFile(new URL('../lib/utils.js', import.meta.url), 'utf8');
+  const utilsSource = await loadUtilsSource();
   const utils = await import(`data:text/javascript;base64,${Buffer.from(utilsSource).toString('base64')}`);
   const actual = await descriptions();
   for (const s of [base, ...entries.map(e => ({ ...base, id: e.id, name: e.name }))]) {

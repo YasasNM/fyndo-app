@@ -1,8 +1,9 @@
 // Network-free visual fixture: real card JSX and production CSS, no app data calls.
 import { createServer } from 'node:http';
+import { loadUtilsSource } from './load-utils.mjs';
 import { readFile } from 'node:fs/promises';
 import { renderFrontend } from './render-frontend.mjs';
-const source = await readFile(new URL('../lib/utils.js', import.meta.url), 'utf8');
+const source = await loadUtilsSource();
 const utils = await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
 const css = await readFile(new URL('../app/globals.css', import.meta.url), 'utf8');
 const spot = { id: 'fixture', name: 'Neighborhood Kitchen', category: 'Restaurant', area: 'Colombo District', moods: [], photos: [], price_max: 0, open_time: null, close_time: null };

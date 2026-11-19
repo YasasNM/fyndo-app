@@ -1,11 +1,16 @@
 // Exercise the real JSX with only browser/data and unrelated child components stubbed.
 import { createRequire } from "node:module";
 import { readFile } from "node:fs/promises";
+import { loadPriceModules } from './load-utils.mjs';
+const { publicPrices } = await loadPriceModules();
 const gmapsSource = await readFile(new URL('../lib/gmaps.js', import.meta.url), 'utf8');
 const gmaps = await import(`data:text/javascript;base64,${Buffer.from(gmapsSource).toString('base64')}`);
 const reviews = await readFile(new URL('../lib/descriptionReviews.json', import.meta.url), 'utf8');
 const descriptionSource = (await readFile(new URL('../lib/placeDescriptions.js', import.meta.url), 'utf8')).replace(/import reviews from "\.\/descriptionReviews.json";/, `const reviews = ${reviews};`);
 const descriptions = await import(`data:text/javascript;base64,${Buffer.from(descriptionSource).toString('base64')}`);
+const publicRegistry = await readFile(new URL('../lib/publicDetails.json', import.meta.url), 'utf8');
+const publicSource = (await readFile(new URL('../lib/publicDetails.js', import.meta.url), 'utf8')).replace(/import registry from "\.\/publicDetails.json";/, `const registry = ${publicRegistry};`);
+const publicDetails = await import(`data:text/javascript;base64,${Buffer.from(publicSource).toString('base64')}`);
 const require = createRequire(import.meta.url);
 const React = require("react");
 const { renderToStaticMarkup } = require("react-dom/server");
@@ -50,6 +55,8 @@ export async function renderFrontend(file, { utils, spots = [], state = {}, spot
     "@/lib/config": { CONFIG: { whatsapp: "" } },
     "@/lib/gmaps": gmaps,
     "@/lib/placeDescriptions": descriptions,
+    "@/lib/publicDetails": publicDetails,
+    "@/lib/publicPrices": publicPrices,
   };
   Object.assign(modules, overrides);
   for (const dependency of realModules) {

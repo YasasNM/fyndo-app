@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { db, isLive } from "@/lib/data";
+import { safeAuthNext } from "@/lib/authRouting";
 import { Ico } from "@/components/Icon";
 import AuthArt from "@/components/AuthArt";
 import Link from "next/link";
@@ -29,8 +30,7 @@ export default function Login() {
 
   const go = () => {
     const next = new URLSearchParams(window.location.search).get("next");
-    // Only paths on this site: "//other.site" or "/\other.site" would leave Fyndo.
-    window.location.href = next && /^\/(?![\/\\])/.test(next) ? next : "/";
+    window.location.href = safeAuthNext(next);
   };
   const switchTo = (m) => { setMode(m); setErr(null); setNote(""); };
   const pwOk = (p) => p.length >= 8 && /[a-z]/i.test(p) && /\d/.test(p);

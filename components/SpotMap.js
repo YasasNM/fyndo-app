@@ -13,6 +13,7 @@ export default function SpotMap({ spots, me, height = 420, single = false }) {
 
   useEffect(() => {
     let dead = false;
+    let resizeTimer;
     (async () => {
       const L = (await import("leaflet")).default;
       if (dead || !el.current) return;
@@ -48,12 +49,21 @@ export default function SpotMap({ spots, me, height = 420, single = false }) {
       }
       if (pts.length === 1) map.setView(pts[0], 16);
       else if (pts.length > 1) map.fitBounds(pts, { padding: [30, 30], maxZoom: 16 });
-      setTimeout(() => map.invalidateSize(), 50);
+      resizeTimer = setTimeout(() => map.invalidateSize(), 50);
     })();
-    return () => { dead = true; };
+    return () => { dead = true; clearTimeout(resizeTimer); };
   }, [spots, me, single]);
 
-  useEffect(() => () => { if (mapRef.current) { mapRef.current.remove(); mapRef.current = null; } }, []);
+  useEffect(() => () => {
+    const map = mapRef.current;
+    if (!map) return;
+    // Leaflet 1.9.4 remove()/stop() leave the 250ms zoom fallback alive.
+    // Finish while the pane exists so its later callback is an idle no-op.
+    if (map._animatingZoom) map._onZoomTransitionEnd();
+    map.remove();
+    mapRef.current = null;
+    layerRef.current = null;
+  }, []);
 
   return <div ref={el} className="spotmap" style={{ height }} role="region" aria-label={single ? "Map of this place" : "Map of places"} />;
 }

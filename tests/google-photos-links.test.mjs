@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { loadUtilsSource } from './load-utils.mjs';
 import { readFile } from 'node:fs/promises';
 const source = await readFile(new URL('../lib/gmaps.js', import.meta.url), 'utf8');
 const gmaps = await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
@@ -27,7 +28,7 @@ test('668 regression uses the venue query that succeeds in Maps, not the failing
   assert.doesNotMatch(url.searchParams.get('query'), /6\.9139566|79\.8649163|locality unknown/);
 });
 
-const utilsSource = await readFile(new URL('../lib/utils.js', import.meta.url), 'utf8');
+const utilsSource = await loadUtilsSource();
 const utils = await import(`data:text/javascript;base64,${Buffer.from(utilsSource).toString('base64')}`);
 const { renderFrontend } = await import('./render-frontend.mjs');
 const spot = { id: 'osm-node-123', name: 'Imported restaurant', area: 'Colombo 3', category: 'Restaurant', lat: 6.9, lng: 79.85, moods: [], photos: [], price_min: 0, price_max: 0, open_time: null, close_time: null };

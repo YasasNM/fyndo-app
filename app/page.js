@@ -1,11 +1,10 @@
 "use client";
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import SpotCard, { SkeletonGrid } from "@/components/SpotCard";
 import AskFyndo from "@/components/AskFyndo";
 import Tour from "@/components/Tour";
-import HeroSlides from "@/components/HeroSlides";
 import TodayDeals from "@/components/TodayDeals";
 import { db } from "@/lib/data";
 import { useSpots, useRatings, usePopular, useLocation, useCollections, goLogin, useUser, useSaves } from "@/lib/hooks";
@@ -25,9 +24,9 @@ const BUDGETS = [
 ];
 // Tools that live only here (Plan, Friends, Saved and Profile are in the bottom bar).
 const SHORTCUTS = [
-  { href: "/watch", label: "Watch", sub: "Short videos of real places", ic: "film", gem: "ruby", img: "tile-watch", pos: "62% 42%" },
-  { href: "/rewards", label: "Rewards", sub: "Points, stamps and badges", ic: "ticket", gem: "topaz", img: "tile-rewards", pos: "60% 40%" },
-  { href: "/split", label: "Split a bill", sub: "Who owes what, in seconds", ic: "receipt", gem: "sapphire", img: "tile-split", pos: "50% 30%" },
+  { href: "/watch", label: "Watch" },
+  { href: "/rewards", label: "Rewards" },
+  { href: "/split", label: "Split a bill" },
 ];
 const SORTS = [
   { id: "best", label: "Best match" },
@@ -62,12 +61,8 @@ export default function Home() {
   const [view, setView] = useState("list");
   const [picked, setPicked] = useState([]);
   const [busy, setBusy] = useState(false);
+  const [tourReplayRequest, setTourReplayRequest] = useState(0);
 
-  // The hero's entrance plays once per visit; after that, returning home is instant.
-  useEffect(() => {
-    const t = setTimeout(() => { document.documentElement.dataset.intro = "seen"; try { sessionStorage.setItem("fyndo-intro", "1"); } catch {} }, 1600);
-    return () => clearTimeout(t);
-  }, []);
   const chooseSort = (v) => { setSort(v); if (v === "near" && !loc.pos) loc.ask(); };
   const dist = (s) => (loc.pos && s.lat != null && s.lng != null ? km(loc.pos, { lat: s.lat, lng: s.lng }) : null);
   const occ = OCCASIONS.find((o) => o.id === occasion);
@@ -151,104 +146,63 @@ export default function Home() {
 
   return (
     <>
-      {/* On phones this block re-orders: question and search first, then shortcuts, moods and what's open, then the photos (see .homehead in globals.css). */}
-      <div className="homehead">
-        <section className="hero">
-          <div className="hero-text">
-            <h1 className="hl" aria-label="Where to tonight?">{["Where", "to", "tonight?"].map((w, i) => <Fragment key={w}>{i > 0 && " "}<span className="w" aria-hidden="true"><span style={{ "--n": i }}>{w}</span></span></Fragment>)}</h1>
-            <p className="lede">Real photos, real prices per person, and the whole night planned in a minute.</p>
-
-            <AskFyndo spots={spots} />
-          </div>
-          <HeroSlides className="hero-photo" />
-        </section>
-        <nav className="suggest" aria-label="Shortcuts">
-          {SHORTCUTS.map((s) => (
-            <Link key={s.href} href={s.href} className={"suggest-tile gem-" + s.gem}>
-              <img className="suggest-img" src={`/img/${s.img}-500.jpg`} srcSet={`/img/${s.img}-500.jpg 500w, /img/${s.img}-1000.jpg 1000w`}
-                sizes="(max-width: 760px) 34vw, 380px" style={{ objectPosition: s.pos }} alt="" aria-hidden="true" loading="lazy" decoding="async" />
-              <span className="suggest-glass">
-                <span className="gem-tile"><Ico n={s.ic} size={22} fill /></span>
-                <span><b>{s.label}</b><span className="suggest-sub">{s.sub}</span></span>
-              </span>
-            </Link>
-          ))}
-        </nav>
-        <TodayDeals spots={spots} />
-        <div className="moodrow">
-          <h2 className="rowlabel">Pick a mood</h2>
-          <div className="chips">
-            {MOODS.map((m) => (
-              <button key={m} className={"chip" + (mood === m ? " on" : "")} aria-pressed={mood === m} onClick={() => setMood(mood === m ? "" : m)}>{m}</button>
-            ))}
-          </div>
+      <section className="directory-head" aria-labelledby="directory-title">
+        <h1 id="directory-title">Restaurants and more in Colombo</h1>
+        <p>Find a place by name, dish or neighbourhood. Check prices, hours and photos before you go.</p>
+      </section>
+      <section className="directory-controls" aria-label="Browse places">
+        <label className="directory-search">
+          <span className="sr-only">Search by name or dish</span>
+          <Ico n="search" size={20} />
+          <input className="input" type="search" aria-label="Search by name or dish" placeholder="Search names, dishes or areas" value={q} onChange={(e) => setQ(e.target.value)} />
+        </label>
+        <div className="directory-selects">
+          <label>Area<select className="input" value={area} onChange={(e) => setArea(e.target.value)} aria-label="Area">
+            <option value="">All areas</option>{areaOptions(AREAS, spots).map((a) => <option key={a}>{a}</option>)}
+          </select></label>
+          <label>Type<select className="input" value={cat} onChange={(e) => setCat(e.target.value)} aria-label="Type">
+            <option value="">All types</option>{CATEGORIES.map((c) => <option key={c}>{c}</option>)}
+          </select></label>
+          <label>Budget per person<select className="input" value={budget} onChange={(e) => setBudget(e.target.value)} aria-label="Budget">
+            {BUDGETS.map((b) => <option key={b.id} value={b.id}>{b.label}</option>)}
+          </select></label>
+          <label>Sort by<select className="input" value={sort} onChange={(e) => chooseSort(e.target.value)} aria-label="Sort by">
+            {SORTS.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
+          </select></label>
         </div>
-        {spots && !filtering && view === "list" && nearList.length > 0 && (
-          <section className="opennear" aria-labelledby="opennear-h">
-            <h2 id="opennear-h">{openList.length ? "Open near you" : "Opening soonest"}</h2>
-            {!openList.length && <p className="small muted" style={{ margin: "-6px 0 8px" }}>Nothing is open right now. These open first.</p>}
-            {openList.length > 0 && soonList.length > 0 && <p className="small muted" style={{ margin: "-6px 0 8px" }}>{openList.length} open now, then the ones opening soonest.</p>}
-            <div className="hscroll">{nearList.map(card)}</div>
-          </section>
+        <div className="filters directory-toggles">
+          <button className={"chip" + (openNow ? " on" : "")} aria-pressed={openNow} onClick={() => setOpenNow(!openNow)}>Open now</button>
+          <button className={"chip" + (showNeeds ? " on" : "")} aria-expanded={showNeeds} aria-controls="more-filters" onClick={() => setShowNeeds(!showNeeds)}>More filters{activeFilters ? ` (${activeFilters})` : ""}</button>
+          {filtering && <button className="linkbtn" onClick={clear}>Clear all</button>}
+          <span className="seg" style={{ marginLeft: "auto" }}>
+            <button className={view === "list" ? "on" : ""} aria-pressed={view === "list"} onClick={() => setView("list")}><Ico n="list" size={16} />List</button>
+            <button className={view === "map" ? "on" : ""} aria-pressed={view === "map"} onClick={() => { setView("map"); if (!loc.pos && loc.status === "") loc.ask(); }}><Ico n="map" size={16} />Map</button>
+          </span>
+        </div>
+        {showNeeds && (
+          <div className="fpanel" id="more-filters">
+            <div className="moodrow"><h2 className="rowlabel">Mood</h2><div className="chips">
+              {MOODS.map((m) => <button key={m} className={"chip" + (mood === m ? " on" : "")} aria-pressed={mood === m} onClick={() => setMood(mood === m ? "" : m)}>{m}</button>)}
+            </div></div>
+            <h2 className="rowlabel">Occasion</h2><div className="chips">
+              {OCCASIONS.map((o) => <button key={o.id} className={"chip" + (occasion === o.id ? " on" : "")} aria-pressed={occasion === o.id} onClick={() => setOccasion(occasion === o.id ? "" : o.id)}>{o.label}</button>)}
+            </div>
+            <h2 className="rowlabel">Facilities</h2><div className="chips">
+              {FEATURES.map((f) => <button key={f.id} className={"chip" + (needs.includes(f.id) ? " on" : "")} aria-pressed={needs.includes(f.id)} onClick={() => toggleNeed(f.id)}>{f.label}</button>)}
+              <button className={"chip" + (bookable ? " on" : "")} aria-pressed={bookable} onClick={() => setBookable(!bookable)}>Can book</button>
+              <button className={"chip" + (indoor ? " on" : "")} aria-pressed={indoor} onClick={() => setIndoor(!indoor)}>Indoor only</button>
+            </div>
+          </div>
         )}
+      </section>
+      {rainy && <div className="card pad rainbar">
+        <span>{weather.raining ? "It is raining in Colombo." : `Rain likely soon (${weather.chance}%).`}</span>
+        <button className={"chip" + (indoor ? " on" : "")} onClick={() => setIndoor(!indoor)} aria-pressed={indoor}>{indoor ? "Indoor only" : "Show indoor"}</button>
+      </div>}
+      <div className="directory-results" aria-live="polite">
+        <h2>{spots ? `${filtered.length} ${filtered.length === 1 ? "spot" : "spots"} found` : "Loading places…"}</h2>
+        {spots && <span className="small muted">{filtering ? "Matching your filters" : "All places"}</span>}
       </div>
-
-      {rainy && (
-        <div className="card pad rainbar">
-          <span className="row" style={{ gap: 8 }}><Ico n="rain" size={20} />{weather.raining ? "It is raining in Colombo." : `Rain likely soon (${weather.chance}%).`} Want cozy indoor picks?</span>
-          <button className={"chip" + (indoor ? " on" : "")} onClick={() => setIndoor(!indoor)} aria-pressed={indoor}>{indoor ? "Indoor only" : "Show indoor"}</button>
-        </div>
-      )}
-
-      <h2 className="rowlabel">What are you celebrating?</h2>
-      <div className="chips">
-        {OCCASIONS.map((o) => (
-          <button key={o.id} className={"chip" + (occasion === o.id ? " on" : "")} aria-pressed={occasion === o.id} onClick={() => setOccasion(occasion === o.id ? "" : o.id)}>{o.label}</button>
-        ))}
-      </div>
-
-      <div className="filters">
-        <button className={"chip" + (showNeeds || activeFilters ? " on" : "")} aria-expanded={showNeeds} onClick={() => setShowNeeds(!showNeeds)}>
-          <Ico n="sliders" size={16} />Filters{activeFilters ? ` (${activeFilters})` : ""}
-        </button>
-        <button className={"chip" + (openNow ? " on" : "")} aria-pressed={openNow} onClick={() => setOpenNow(!openNow)}>Open now</button>
-        <button className={"chip" + (bookable ? " on" : "")} aria-pressed={bookable} onClick={() => setBookable(!bookable)}>Can book</button>
-        {filtering && <button className="linkbtn" onClick={clear}>Clear all</button>}
-        <span className="seg" style={{ marginLeft: "auto" }}>
-          <button className={view === "list" ? "on" : ""} aria-pressed={view === "list"} onClick={() => setView("list")}><Ico n="list" size={16} />List</button>
-          <button className={view === "map" ? "on" : ""} aria-pressed={view === "map"} onClick={() => { setView("map"); if (!loc.pos && loc.status === "") loc.ask(); }}><Ico n="map" size={16} />Map</button>
-        </span>
-      </div>
-      {showNeeds && (
-        <div className="card pad fpanel">
-          <div className="search">
-            <span className="ic"><Ico n="search" size={18} /></span>
-            <input className="input" type="search" aria-label="Search by name or dish" placeholder="Search by name or dish: kottu, rooftop, tea" value={q} onChange={(e) => setQ(e.target.value)} />
-          </div>
-          <div className="grid2" style={{ marginTop: 10 }}>
-            <select className="input" value={area} onChange={(e) => setArea(e.target.value)} aria-label="Area">
-              <option value="">All areas</option>
-              {areaOptions(AREAS, spots).map((a) => <option key={a}>{a}</option>)}
-            </select>
-            <select className="input" value={budget} onChange={(e) => setBudget(e.target.value)} aria-label="Budget">
-              {BUDGETS.map((b) => <option key={b.id} value={b.id}>{b.label}</option>)}
-            </select>
-            <select className="input" value={cat} onChange={(e) => setCat(e.target.value)} aria-label="Type">
-              <option value="">All types</option>
-              {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
-            </select>
-            <select className="input" value={sort} onChange={(e) => chooseSort(e.target.value)} aria-label="Sort by">
-              {SORTS.map((s) => <option key={s.id} value={s.id}>{s.id === "best" ? "Sort: best match" : s.label}</option>)}
-            </select>
-          </div>
-          <div className="small" style={{ fontWeight: 650, margin: "12px 0 6px" }}>Facilities</div>
-          <div className="chips" style={{ flexWrap: "wrap", overflow: "visible" }}>
-            {FEATURES.map((f) => (
-              <button key={f.id} className={"chip" + (needs.includes(f.id) ? " on" : "")} aria-pressed={needs.includes(f.id)} onClick={() => toggleNeed(f.id)}>{f.label}</button>
-            ))}
-          </div>
-        </div>
-      )}
       {sort === "near" && loc.status === "asking" && <p className="small muted">Finding your location...</p>}
       {sort === "near" && loc.status === "denied" && (
         <div className="alert">Location is off. Allow location in your browser to sort by distance.</div>
@@ -264,9 +218,42 @@ export default function Home() {
         </div>
       )}
 
+        <details className="directory-disclosure directory-ask"><summary>Describe what you’re looking for</summary>
+          <p className="small muted">Have a budget, occasion or a few stops in mind? Ask in your own words.</p>
+          <AskFyndo spots={spots} />
+        </details>
+
       {error && <div className="alert">Could not load places: {error}</div>}
       {!spots && !error && <SkeletonGrid />}
 
+      {spots && view === "list" && (
+        filtered.length ? <div className="grid">{filtered.map(card)}</div>
+          : (
+            <div className="empty">
+              <div className="big"><Ico n="search" size={30} /></div>
+              {spots.length === 0 ? "No places added yet." : "No spots match. Try fewer filters."}
+              {filtering && spots.length > 0 && <><br /><br /><button className="btn sm" onClick={clear}>Clear filters</button></>}
+            </div>
+          )
+      )}
+
+      <section className="directory-extras" aria-label="More from Fyndo">
+        <nav className="utility-links" aria-label="Tools">
+          <span className="small muted">More from Fyndo</span>
+          {SHORTCUTS.map((s) => <Link key={s.href} href={s.href}>{s.label}</Link>)}
+          <Link href="/plan">Plan an outing</Link>
+          <button type="button" className="linkbtn" onClick={() => setTourReplayRequest((request) => request + 1)}>Help</button>
+        </nav>
+        <TodayDeals spots={spots} />
+        {spots && !filtering && view === "list" && nearList.length > 0 && (
+          <section className="opennear" aria-label="Opening hours suggestions">
+            <details className="directory-disclosure"><summary>{openList.length ? "Open now and opening soon" : "Opening soonest"}</summary>
+              {!openList.length && <p className="small muted">No places with added hours are open right now.</p>}
+              <div className="hscroll">{nearList.map(card)}</div>
+            </details>
+          </section>
+        )}
+        <details className="directory-disclosure"><summary>Collections and local favourites</summary>
       {spots && !filtering && view === "list" && (
         <>
           {popular.length > 0 && (<><h2>Trending this week</h2><div className="hscroll">{popular.map(card)}</div></>)}
@@ -282,20 +269,11 @@ export default function Home() {
             <SpotCard key={s.id} spot={s} rating={ratings[s.id]} distanceKm={dist(s)} why={whyFor(s)} inGems
               pick={{ on: picked.includes(s.id), toggle: togglePick }} save={{ on: saves.ids.includes(s.id), toggle: saves.toggle }} />
           ))}</div></>)}
-          <h2>All spots</h2>
+
         </>
       )}
-      {spots && view === "list" && filtering && <h2>{filtered.length} {filtered.length === 1 ? "spot" : "spots"} found</h2>}
-      {spots && view === "list" && (
-        filtered.length ? <div className="grid">{filtered.map(card)}</div>
-          : (
-            <div className="empty">
-              <div className="big"><Ico n="search" size={30} /></div>
-              {spots.length === 0 ? "No places added yet." : "No spots match. Try fewer filters."}
-              {filtering && spots.length > 0 && <><br /><br /><button className="btn sm" onClick={clear}>Clear filters</button></>}
-            </div>
-          )
-      )}
+        </details>
+      </section>
 
       {picked.length > 0 && (
         <div className="tray" role="region" aria-label="Selected places">
@@ -309,7 +287,7 @@ export default function Home() {
           </div>
         </div>
       )}
-      <Tour />
+      <Tour replayRequest={tourReplayRequest} />
     </>
   );
 }

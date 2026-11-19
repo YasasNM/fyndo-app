@@ -21,6 +21,9 @@ import VenuePhoto from "@/components/VenuePhoto";
 import { galleryPhotos } from "@/lib/photoInfo";
 import { descriptionFor, descriptionReviewSource } from "@/lib/placeDescriptions";
 import OfficialLinks from "@/components/OfficialLinks";
+import PublicVenueDetails from "@/components/PublicVenueDetails";
+import PublicPrices from "@/components/PublicPrices";
+import { safePublicUrl } from "@/lib/publicDetails";
 import AddPhoto from "@/components/AddPhoto";
 import AddToList from "@/components/AddToList";
 import { DealBanner } from "@/components/TodayDeals";
@@ -110,7 +113,7 @@ function SpotPage() {
                   <div className="muted"><Ico n="clock" size={14} /> {open === null ? "Hours not added yet" : `${niceTime(spot.open_time)} to ${niceTime(spot.close_time)}`}</div>
                 </div>
               </div>
-              <div className="pcard-price spotprice" aria-label={priceLabel(spot)}>
+              <div className={"pcard-price spotprice" + (price.reported ? " reported" : "")} aria-label={priceLabel(spot)}>
                 {price.big ? <b>{price.big}</b> : null}{price.unit && <span>{price.unit}</span>}
               </div>
             </div>
@@ -152,7 +155,9 @@ function SpotPage() {
 
         <FeatureChips ids={spot.features} />
         <MenuPanel spot={spot} />
-        <OfficialLinks spot={spot} />
+        <OfficialLinks spot={{ ...spot, website: safePublicUrl(spot.website) || "" }} />
+        <PublicPrices spot={spot} />
+        <PublicVenueDetails spot={spot} osmCreditShown={String(spot.id).startsWith("osm-")} />
         <RewardsBox spot={spot} user={user} />
         {spot.lat != null && spot.lng != null && (
           <div style={{ marginTop: 18 }}>

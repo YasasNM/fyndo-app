@@ -1,8 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { loadUtilsSource } from './load-utils.mjs';
 import { readFile } from "node:fs/promises";
 
-const source = await readFile(new URL("../lib/utils.js", import.meta.url), "utf8");
+const source = await loadUtilsSource();
 const utilsUrl = `data:text/javascript;base64,${Buffer.from(source).toString("base64")}`;
 const utils = await import(utilsUrl);
 const plannerSource = (await readFile(new URL("../lib/planner.js", import.meta.url), "utf8")).replace('"./utils"', JSON.stringify(utilsUrl));

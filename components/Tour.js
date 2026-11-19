@@ -2,27 +2,28 @@
 import { useEffect, useState } from "react";
 import { Ico } from "./Icon";
 
-// A three-step first-visit walkthrough for the home page. It never blocks the page:
-// each step points at a real control, and people can skip at any time. Shown once; replay with /?tour=1.
+// Optional help, opened by Help or /?tour=1. Never interrupt a first visit.
 const STEPS = [
-  { sel: ".ask", title: "Say what you feel like", body: "Type it the way you would tell a friend. Fyndo turns it into real places and a plan." },
-  { sel: ".moodrow", title: "Or tap a mood", body: "One tap filters every place in Colombo. Tap it again to clear." },
-  { sel: ".toplinks a[href='/plan'], .tabs a[href='/plan']", title: "Let Fyndo plan the night", body: "Pick a vibe and a budget. You get stops, times, a route and the cost for two." },
+  { sel: ".directory-search", title: "Find a local place", body: "Search by a name, dish or area. Use the controls below to narrow the list." },
+  { sel: ".directory-toggles", title: "Choose what matters", body: "Filter by area, type, budget and opening hours. More filters has moods, occasions and facilities." },
+  { sel: ".toplinks a[href='/plan'], .tabs a[href='/plan']", title: "Plan an outing", body: "The Plan tool combines places into stops, times and a route. Check the listed prices and hours before you go." },
 ];
 const KEY = "fyndo_tour_v1";
 
-export default function Tour() {
+export default function Tour({ replayRequest = 0 }) {
   const [step, setStep] = useState(-1);
 
   useEffect(() => {
-    let seen = false;
-    try { seen = localStorage.getItem(KEY) === "done"; } catch {}
+    if (replayRequest > 0) {
+      setStep(0);
+      return;
+    }
     const replay = new URLSearchParams(window.location.search).get("tour") === "1";
-    if (replay || !seen) {
+    if (replay) {
       const t = setTimeout(() => setStep(0), 900);
       return () => clearTimeout(t);
     }
-  }, []);
+  }, [replayRequest]);
 
   useEffect(() => {
     if (step < 0) return;

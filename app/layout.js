@@ -1,5 +1,5 @@
 import "./globals.css";
-import Nav from "@/components/Nav";
+import AuthGate from "@/components/AuthGate";
 import PWA from "@/components/PWA";
 import { THEME_BOOT } from "@/lib/theme";
 
@@ -30,8 +30,7 @@ export default function RootLayout({ children }) {
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap" />
       </head>
       <body>
-        <Nav />
-        <main className="wrap">{children}</main>
+        <AuthGate>{children}</AuthGate>
         <PWA />
       </body>
     </html>
