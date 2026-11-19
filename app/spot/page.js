@@ -24,7 +24,7 @@ import AddPhoto from "@/components/AddPhoto";
 import AddToList from "@/components/AddToList";
 import { DealBanner } from "@/components/TodayDeals";
 const SpotMap = dynamic(() => import("@/components/SpotMap"), { ssr: false, loading: () => <div className="skel" style={{ height: 240, borderRadius: 16 }} /> });
-import { directionsUrl } from "@/lib/gmaps";
+import { directionsUrl, photosUrl } from "@/lib/gmaps";
 
 export default function SpotPageWrapper() {
   return <Suspense fallback={<div className="loading">Loading...</div>}><SpotPage /></Suspense>;
@@ -79,6 +79,13 @@ function SpotPage() {
         {embed && spot.photos && spot.photos.length > 0 && (
           <div className="card" style={{ overflow: "hidden", marginTop: 14 }}><PhotoGallery photos={galleryPhotos(spot)} placeName={spot.name} /></div>
         )}
+        <div className="card pad small" style={{ marginTop: 14 }}>
+          <a className="linkbtn" href={photosUrl(spot)} target="_blank" rel="noopener noreferrer"
+            aria-label={`View Google Maps photos of ${spot.name}`}>
+            <Ico n="map" size={16} /> View photos on Google Maps
+          </a>
+          <div className="muted" style={{ marginTop: 6 }}>Opens Google Maps; choose Photos on the venue page.</div>
+        </div>
         <AddPhoto spot={spot} user={user} />
         {spot.google_place_id && <GooglePanel placeId={spot.google_place_id} onInfo={setGInfo} onFail={() => setGFail(true)} admin={Boolean(user && user.role === "admin")} />}
         {!spot.google_place_id && user && user.role === "admin" && (

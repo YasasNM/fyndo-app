@@ -7,6 +7,7 @@ import { Ico, ICON_MARKUP, CAT_ICON } from "@/components/Icon";
 import { coverFor } from "@/lib/coverPhotos";
 import { photoMeta } from "@/lib/photoInfo";
 import { googleDown } from "@/lib/api";
+import { photosUrl } from "@/lib/gmaps";
 
 // Kept for old imports. Category icons are drawn in Icon.js now.
 export const CAT_EMOJI = {};
@@ -116,6 +117,12 @@ export default function SpotCard({ spot, rating, distanceKm, why, pick, save, in
           {why && <div className="small why">{why}</div>}
         </div>
       </Link>
+      <div style={{ padding: "0 14px 12px", fontSize: 12 }}>
+        <a className="linkbtn" href={photosUrl(spot)} target="_blank" rel="noopener noreferrer"
+          aria-label={`View Google Maps photos of ${spot.name}`} title="Opens Google Maps; choose Photos on the venue page">
+          View photos on Google Maps
+        </a>
+      </div>
       {save && (
         <button type="button" className={"pcard-save" + (save.on ? " on" : "")} aria-pressed={save.on}
           aria-label={save.on ? `Remove ${spot.name} from saved` : `Save ${spot.name}`} onClick={() => save.toggle(spot.id)}>

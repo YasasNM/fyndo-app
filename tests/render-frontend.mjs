@@ -1,6 +1,8 @@
 // Exercise the real JSX with only browser/data and unrelated child components stubbed.
 import { createRequire } from "node:module";
 import { readFile } from "node:fs/promises";
+const gmapsSource = await readFile(new URL('../lib/gmaps.js', import.meta.url), 'utf8');
+const gmaps = await import(`data:text/javascript;base64,${Buffer.from(gmapsSource).toString('base64')}`);
 const require = createRequire(import.meta.url);
 const React = require("react");
 const { renderToStaticMarkup } = require("react-dom/server");
@@ -34,9 +36,9 @@ export async function renderFrontend(file, { utils, spots = [], state = {}, spot
     "@/components/Stars": { RatingPill: empty },
     "@/lib/api": { googleDown: () => true },
     "@/lib/coverPhotos": { coverFor: () => null },
-    "@/lib/photoInfo": { photoMeta: () => null, galleryPhotos: () => [] },
+    "@/lib/photoInfo": { photoMeta: () => ({ external: false, short: "" }), galleryPhotos: () => [] },
     "@/lib/config": { CONFIG: { whatsapp: "" } },
-    "@/lib/gmaps": { directionsUrl: () => "https://maps.example.test" },
+    "@/lib/gmaps": gmaps,
   };
   const source = await readFile(new URL(`../${file}`, import.meta.url), "utf8");
   const compiled = await transform(source, { filename: file, jsc: { parser: { syntax: "ecmascript", jsx: true }, transform: { react: { runtime: "automatic" } }, target: "es2020" }, module: { type: "commonjs" } });
