@@ -15,10 +15,16 @@ test('photo link opens Maps with the stored place ID and safely encoded name', (
   assert.equal(url.searchParams.has('key'), false);
 });
 
-test('a place without a Google ID searches by its name and precise valid coordinates', () => {
-  const url = new URL(gmaps.photosUrl({ name: 'Pizza Hut', area: 'Colombo District (locality unknown)', lat: 6.9095, lng: 79.8510 }));
-  assert.equal(url.searchParams.get('query'), 'Pizza Hut, 6.9095,79.851');
+test('a place without a Google ID searches its name, category and locality without coordinate text', () => {
+  const url = new URL(gmaps.photosUrl({ name: 'Pizza Hut', category: 'Restaurant', area: 'Colombo District (locality unknown)', lat: 6.9095, lng: 79.8510 }));
+  assert.equal(url.searchParams.get('query'), 'Pizza Hut Restaurant Colombo District Sri Lanka');
   assert.equal(url.searchParams.has('query_place_id'), false);
+});
+
+test('668 regression uses the venue query that succeeds in Maps, not the failing mixed coordinate query', () => {
+  const url = new URL(gmaps.photosUrl({ name: '668', category: 'Restaurant', area: 'Colombo District (locality unknown)', lat: 6.9139566, lng: 79.8649163 }));
+  assert.equal(url.searchParams.get('query'), '668 Restaurant Colombo District Sri Lanka');
+  assert.doesNotMatch(url.searchParams.get('query'), /6\.9139566|79\.8649163|locality unknown/);
 });
 
 const utilsSource = await readFile(new URL('../lib/utils.js', import.meta.url), 'utf8');
@@ -48,6 +54,6 @@ test('a detail page offers the external photo link and tells visitors to choose 
 test('invalid or missing coordinates fall back to the place name and area', () => {
   for (const coordinates of [{}, {lat:null,lng:null}, {lat:'6.9',lng:'79.85'}, {lat:Infinity,lng:79.85}, {lat:91,lng:79.85}, {lat:6.9,lng:181}, {lat:true,lng:false}]) {
     const url = new URL(gmaps.photosUrl({name:'A & B',area:'Nugegoda',...coordinates}));
-    assert.equal(url.searchParams.get('query'), 'A & B, Nugegoda, Sri Lanka');
+    assert.equal(url.searchParams.get('query'), 'A & B Nugegoda Sri Lanka');
   }
 });
