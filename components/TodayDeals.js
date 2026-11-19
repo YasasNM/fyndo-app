@@ -2,7 +2,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Ico } from "./Icon";
-import { coverFor } from "@/lib/coverPhotos";
+import VenuePhoto from "@/components/VenuePhoto";
+import { photoMeta } from "@/lib/photoInfo";
 import { todaysDeals, dealToday, dealTomorrow } from "@/lib/deals";
 
 // Re-check every minute so "on now" and "from 5 pm" stay true while the page is open.
@@ -11,13 +12,6 @@ function useNow() {
   useEffect(() => { setNow(new Date()); const t = setInterval(() => setNow(new Date()), 60000); return () => clearInterval(t); }, []);
   return now;
 }
-
-function photoOf(spot) {
-  if (spot.photos && spot.photos[0]) return { src: spot.photos[0], example: false };
-  const ex = coverFor(spot);
-  return ex ? { src: ex.src, example: !ex.real } : null;
-}
-
 // Home: a row of deals running today, on-now first. Hidden when no place has a deal today.
 export default function TodayDeals({ spots }) {
   const now = useNow();
@@ -34,16 +28,15 @@ export default function TodayDeals({ spots }) {
       </div>
       <div className="deals-row">
         {list.map(({ spot, when }) => {
-          const ph = photoOf(spot);
+          const src = spot.photos?.[0];
           return (
             <Link key={spot.id} href={`/spot?id=${spot.id}`} className="deal">
-              {ph && <img className="deal-img" src={ph.src} alt="" loading="lazy" decoding="async" />}
+              <VenuePhoto className="deal-img" src={src} alt={src ? `Photo of ${spot.name}` : ""} external={src && photoMeta(spot, src).external} />
               <span className="deal-glass">
                 <span className={"deal-when " + when.state}>{when.state === "live" && <i aria-hidden="true" />}{when.label}</span>
                 <b className="deal-title">{spot.deal.title}</b>
                 <span className="deal-place">{spot.name}, {spot.area}</span>
               </span>
-              {ph && ph.example && <span className="deal-example">Example photo</span>}
             </Link>
           );
         })}

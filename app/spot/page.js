@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { db } from "@/lib/data";
 import { useUser, goLogin } from "@/lib/hooks";
-import { Thumb, priceParts, nowHHMM } from "@/components/SpotCard";
+import { priceParts, nowHHMM } from "@/components/SpotCard";
 import { CONFIG } from "@/lib/config";
 import GooglePanel from "@/components/GooglePanel";
 import ReviewsPanel, { FeedbackBox } from "@/components/ReviewsPanel";
@@ -17,8 +17,9 @@ import { embedUrl, niceTime, priceLabel, waUrl, shareNow, isOpenAt } from "@/lib
 
 import dynamic from "next/dynamic";
 import PhotoGallery from "@/components/PhotoGallery";
-import { coverFor } from "@/lib/coverPhotos";
+import VenuePhoto from "@/components/VenuePhoto";
 import { galleryPhotos } from "@/lib/photoInfo";
+import { descriptionFor, descriptionReviewSource } from "@/lib/placeDescriptions";
 import OfficialLinks from "@/components/OfficialLinks";
 import AddPhoto from "@/components/AddPhoto";
 import AddToList from "@/components/AddToList";
@@ -36,9 +37,7 @@ function SpotPage() {
   const [spot, setSpot] = useState(undefined);
   const [saved, setSaved] = useState(false);
   const [msg, setMsg] = useState("");
-  const [gInfo, setGInfo] = useState(null);
   const [rating, setRating] = useState(null);
-  const [gFail, setGFail] = useState(false);
 
   useEffect(() => { db.getSpot(id).then(setSpot).catch(() => setSpot(null)); }, [id]);
   useEffect(() => { db.getRatings().then((r) => setRating(r[id] || null)).catch(() => {}); }, [id]);
@@ -48,6 +47,7 @@ function SpotPage() {
   if (!spot) return <div className="empty"><div className="big"><Ico n="pin" size={30} /></div><h1 className="empty-title">This place was not found</h1><Link href="/" className="linkbtn">Go home</Link></div>;
 
   const embed = embedUrl(spot.video_url);
+  const descriptionSource = descriptionReviewSource(spot);
   const toggle = async () => {
     if (!user) return goLogin();
     try { setSaved(await db.toggleSave(spot.id)); } catch (e) { setMsg(e.message); }
@@ -67,14 +67,8 @@ function SpotPage() {
           <div className="video"><iframe src={embed} allow="autoplay; encrypted-media; fullscreen" allowFullScreen title="Video review" /></div>
         ) : spot.photos && spot.photos.length ? (
           <div className="card" style={{ overflow: "hidden" }}><PhotoGallery photos={galleryPhotos(spot)} placeName={spot.name} /></div>
-        ) : spot.google_place_id && !gFail ? null : coverFor(spot) ? (
-          <figure className="photo spothero" style={{ "--ratio": 16 / 10 }}>
-            <img src={coverFor(spot).large} alt={coverFor(spot).alt} />
-            {!coverFor(spot).real && <span className="pcard-example">Example photo of {spot.category === "Activity" || coverFor(spot).scene ? "a place like this" : "the kind of food here"}</span>}
-            <figcaption className="photocredit"><Link href="/credits">Photo credits</Link></figcaption>
-          </figure>
         ) : (
-          <Thumb spot={spot} className="video empty"><div className="small" style={{ marginTop: 10, position: "relative", zIndex: 1, color: "#fff", fontWeight: 600 }}>Video coming soon</div></Thumb>
+          <VenuePhoto className="spothero" />
         )}
         {embed && spot.photos && spot.photos.length > 0 && (
           <div className="card" style={{ overflow: "hidden", marginTop: 14 }}><PhotoGallery photos={galleryPhotos(spot)} placeName={spot.name} /></div>
@@ -87,7 +81,7 @@ function SpotPage() {
           <div className="muted" style={{ marginTop: 6 }}>Opens Google Maps; choose Photos on the venue page.</div>
         </div>
         <AddPhoto spot={spot} user={user} />
-        {spot.google_place_id && <GooglePanel placeId={spot.google_place_id} onInfo={setGInfo} onFail={() => setGFail(true)} admin={Boolean(user && user.role === "admin")} />}
+        {spot.google_place_id && <GooglePanel placeId={spot.google_place_id} admin={Boolean(user && user.role === "admin")} />}
         {!spot.google_place_id && user && user.role === "admin" && (
           <div className="card pad small" style={{ marginTop: 14 }}>
             <b>Admin note:</b> this place is not linked to Google, so there are no Google photos, ratings or hours here.{" "}
@@ -123,11 +117,14 @@ function SpotPage() {
           );
         })()}
         <div className="row" style={{ gap: 6 }}>{spot.moods.map((m) => <span key={m} className="tag">{m}</span>)}</div>
-        {spot.about && <p>{spot.about}</p>}
+        <p>{descriptionFor(spot)}</p>
+        {descriptionSource && (
+          <p className="small muted">Based on Google reviews · <a className="linkbtn" href={descriptionSource.sourceUrl} target="_blank" rel="noopener noreferrer">Source</a></p>
+        )}
         {String(spot.id).startsWith("osm-") && (
           <p className="small muted">
             Place data © <a className="linkbtn" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap contributors</a>, available under the{" "}
-            <a className="linkbtn" href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noreferrer">ODbL</a>. Hours and prices may not be added yet.
+            <a className="linkbtn" href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noreferrer">ODbL</a>.
           </p>
         )}
 

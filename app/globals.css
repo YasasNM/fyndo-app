@@ -634,6 +634,20 @@ a.rainbar { color: inherit; }
 .two > div > .gpanel:first-child { margin-top: 0; }
 
 /* ---------- place posters ---------- */
+.venue-photo { position: relative; overflow: hidden; background: var(--surface-2); border-radius: inherit; }
+.venue-photo > img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.no-venue-photo { background: radial-gradient(ellipse at 30% 20%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 65%), var(--surface-2); }
+.venue-photo-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; width: 100%; height: 100%; min-height: inherit; color: var(--muted); font-size: 12px; font-weight: 500; }
+.venue-photo-empty svg { color: var(--accent); opacity: 0.65; }
+.mini .venue-photo-empty { gap: 4px; }
+.mini .venue-photo-empty svg { width: 24px; height: 24px; }
+.mini .venue-photo-empty span { display: none; }
+.venue-photo.spothero { aspect-ratio: 16 / 10; border-radius: var(--r-card); }
+.gal-photo { width: 100%; height: 100%; }
+.google-venue-photo { aspect-ratio: 16 / 10; max-height: 260px; }
+.lb-photo { width: min(100%, 1100px); height: min(75vh, 800px); border-radius: var(--r-card); }
+.lb-photo > img { object-fit: contain; }
+.deal-img .venue-photo-empty { justify-content: flex-start; padding-top: 18px; }
 /* Photo first, like a poster wall: a clean image with a hairline edge, the facts set quietly beneath.
    Hover rings the poster in sapphire. */
 .pcard { position: relative; display: flex; flex-direction: column; min-width: 0; }
@@ -657,7 +671,7 @@ a.rainbar { color: inherit; }
 .pcard-state.open { background: var(--green); }
 .pcard-state.closed { background: var(--muted); }
 .pcard-example { position: absolute; left: 8px; bottom: 8px; z-index: 3; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: var(--r-pill); background: rgba(0, 0, 0, 0.55); color: #fff; backdrop-filter: blur(6px); }
-.pcard-body { padding: 10px 2px 44px; display: grid; gap: 5px; }
+.pcard-body { padding: 10px 2px 6px; display: grid; gap: 5px; }
 .pcard-namecol { min-width: 0; }
 .pcard-namecol h3 { font-size: 15.5px; line-height: 1.25; font-weight: 600; letter-spacing: -0.015em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .pcard-sub { font-size: 13px; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -684,13 +698,15 @@ a.rainbar { color: inherit; }
 @keyframes saveRing { from { opacity: .75; transform: scale(1); } to { opacity: 0; transform: scale(1.75); } }
 .pcard-save.on svg { fill: currentColor; }
 @keyframes savePop { 0% { transform: scale(0.8); } 60% { transform: scale(1.14); } 100% { transform: scale(1); } }
-.pcard-pick { position: absolute; left: 0; bottom: 4px; z-index: 3; display: inline-flex; align-items: center; gap: 5px; border: 0;
+.pcard-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 6px 2px 12px; font-size: 12px; }
+.pcard-actions > a { min-width: 0; overflow-wrap: anywhere; }
+.pcard-pick { display: inline-flex; align-items: center; gap: 5px; border: 0; flex: none;
   background: transparent; color: var(--ink-2); border-radius: var(--r-pill); padding: 5px 11px 5px 9px; font-size: 13px; font-weight: 500; cursor: pointer; min-height: 32px;
   box-shadow: inset 0 0 0 1px var(--line-strong); transition: background-color 0.15s, color 0.15s, transform 0.15s var(--ease); }
 .pcard-pick:hover { background: var(--surface-2); color: var(--ink); }
 .pcard-pick:active { transform: scale(0.95); }
 .pcard-pick.on { background: var(--primary); color: var(--on-primary); box-shadow: none; }
-.pcard:not(:has(.pcard-pick)) .pcard-body { padding-bottom: 6px; }
+
 .hscroll .pcard { height: 100%; }
 .pcard { container-type: inline-size; }
 /* Home hero slideshow: slow crossfade with a gentle drift; still for reduced motion. */

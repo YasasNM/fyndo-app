@@ -1,0 +1,82 @@
+[
+  {
+    "id": "osm-node-2160837178",
+    "name": "88 Chinese",
+    "description": "88 Chinese serves Chinese and seafood dishes near Thunmulla. Google reviewers mention a broad menu, generous portions and friendly service.",
+    "sourceUrl": "https://restaurantguru.com/88-Chinese-Restaurant-Colombo-2",
+    "sourceLabel": "Google reviews via Restaurant Guru",
+    "reviewCountRead": 3
+  },
+  {
+    "id": "osm-node-8644068349",
+    "name": "668",
+    "description": "668 is a Chinese restaurant on Alexandra Place in Colombo 7. Google review excerpts are mixed: some praise the food and dining atmosphere, while others raise concerns about prices and service.",
+    "sourceUrl": "https://www.google.com/maps/place?q=place_id:ChIJG3yQjnFZ4joRm_T1bI_oc9g",
+    "sourceLabel": "Google review excerpts surfaced in search",
+    "reviewCountRead": 5
+  },
+  {
+    "id": "osm-node-3713317628",
+    "name": "Peach Valley Chinese Restaurant",
+    "description": "Peach Valley serves Chinese food on Flower Road in Colombo 7. The sampled Google reviews praise the food and friendly service, though one diner notes high prices.",
+    "sourceUrl": "https://restaurantguru.com/Peach-Valley-Colombo",
+    "sourceLabel": "Google reviews via Restaurant Guru",
+    "reviewCountRead": 3
+  },
+  {
+    "id": "osm-node-2049590772",
+    "name": "Ministry of Crab",
+    "description": "Ministry of Crab serves crab and prawns in Colombo's Old Dutch Hospital complex. Both Google reviewers sampled praise the crab and attentive staff, but describe the meal as expensive.",
+    "sourceUrl": "https://restaurantguru.com/Ministry-of-Crab-Colombo",
+    "sourceLabel": "Google reviews via Restaurant Guru",
+    "reviewCountRead": 2
+  },
+  {
+    "id": "osm-node-7058284586",
+    "name": "Nuga Gama",
+    "description": "Nuga Gama serves Sri Lankan dishes including hoppers, curries and traditional desserts in Colombo. The sampled Google reviews praise the food selection and caring service, while one diner found the live entertainment loud.",
+    "sourceUrl": "https://restaurantguru.com/Nuga-Gama-Colombo",
+    "sourceLabel": "Google reviews via Restaurant Guru",
+    "reviewCountRead": 2
+  },
+  {
+    "id": "osm-node-5499481850",
+    "name": "Flow",
+    "description": "FLOW at Hilton Residences on Union Place serves international food. The two Google reviews sampled praise the food and welcoming service, with one describing thoughtful care during an anniversary dinner.",
+    "sourceUrl": "https://restaurantguru.com/FLOW-Colombo",
+    "sourceLabel": "Google reviews via Restaurant Guru",
+    "reviewCountRead": 2
+  },
+  {
+    "id": "osm-node-3773514034",
+    "name": "Shanghai Terrace",
+    "description": "Shanghai Terrace serves Chinese food on Kotte Road in Sri Jayawardenepura Kotte. The sampled Google reviews praise generous portions and warm service, though one diner reports cold cuttlefish and poor handling of a complaint.",
+    "sourceUrl": "https://restaurantguru.com/Shanghai-Terrace-Sri-Jayawardenepura-Kotte",
+    "sourceLabel": "Google reviews via Restaurant Guru",
+    "reviewCountRead": 3
+  },
+  {
+    "id": "osm-node-5192793593",
+    "name": "Sushi-Kai",
+    "description": "Sushi-Kai serves Japanese food on Thimbirigasyaya Road in Jawatte. Google reviewers mention sushi platters, mixed tempura and sashimi, with a returning diner praising consistent food and service.",
+    "sourceUrl": "https://restaurantguru.com/Sushi-Kai-Colombo",
+    "sourceLabel": "Google reviews via Restaurant Guru",
+    "reviewCountRead": 3
+  },
+  {
+    "id": "osm-node-4457404460",
+    "name": "Chinese Dragon Cafe",
+    "description": "Chinese Dragon Cafe's Rajagiriya branch serves Chinese food on Kotte Road. The sampled Google reviews praise the food, portions and helpful staff, while also suggesting improvements to the ambience and upkeep.",
+    "sourceUrl": "https://restaurantguru.com/Chinese-Dragon-Cafe-Rajagiriya-Sri-Jayawardenepura-Kotte",
+    "sourceLabel": "Google reviews via Restaurant Guru",
+    "reviewCountRead": 3
+  },
+  {
+    "id": "osm-node-10220806959",
+    "name": "Shang Palace",
+    "description": "Shang Palace is at the Shangri-La hotel on Galle Face in Colombo. One Google reviewer praises the roast duck, other dishes and cocktails.",
+    "sourceUrl": "https://foodeist.com/place/shang-palace-shangri-la-colombo",
+    "sourceLabel": "Google reviews via Foodeist",
+    "reviewCountRead": 1
+  }
+]
